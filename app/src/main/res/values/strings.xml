@@ -27,8 +27,8 @@
     <string name="searchbar_back_icon">Searchbar back icon</string>
     <string name="search_quote">IU makes great music</string>
     <string name="playlist_cover">Playlist cover</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="click_to_retry">Click to retry</string>
     <string name="undefined_error_message">Undefined error message</string>
+    <string name="downloads">Downloads</string>
+    <string name="settings">Settings</string>
 </resources>

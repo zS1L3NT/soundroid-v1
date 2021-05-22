@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -52,10 +51,10 @@ public class HomeFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.song_recycler_view);
 
         // Click listeners
-        view.findViewById(R.id.header_search).setOnClickListener(__ -> {
-            NavDirections action = HomeFragmentDirections.openSearch();
-            NavHostFragment.findNavController(this).navigate(action);
-        });
+//        view.findViewById(R.id.header_search).setOnClickListener(__ -> {
+//            NavDirections action = HomeFragmentDirections.openSearch();
+//            NavHostFragment.findNavController(this).navigate(action);
+//        });
 
         homeAdapter = new HomeAdapter((song, position) -> {
             NavHostFragment.findNavController(this).navigate(HomeFragmentDirections.openDownloadedSong());
