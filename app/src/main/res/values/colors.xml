@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Theme -->
+    <color name="theme_1">#A9A9A9</color>
+    <color name="theme_2">#8B8B8B</color>
+    <color name="theme_3">#595959</color>
+    <color name="theme_4">#363636</color>
+
+    <color name="theme_button_off">#595959</color>
+    <color name="theme_button_on">@color/white</color>
+
+    <color name="theme_default_gradient">#7b828b</color>
+    <color name="theme_navigator">#202020</color>
+    <color name="theme_playing_bottom">#0C0C0C</color>
+</resources>

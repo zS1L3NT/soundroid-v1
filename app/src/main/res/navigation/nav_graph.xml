@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    android:label="fragment"
+    app:startDestination="@id/fragment_music">
+
+    <fragment
+        android:id="@+id/fragment_music"
+        android:name="com.zectan.soundroid.fragments.MusicFragment"
+        android:label="fragment_music"
+        tools:layout="@layout/fragment_music">
+        <action
+            android:id="@+id/open_search"
+            app:destination="@id/fragment_search"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/open_settings"
+            app:destination="@id/fragment_settings"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/openDownloadedSong"
+            app:destination="@id/fragment_playing"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_playlist"
+        android:name="com.zectan.soundroid.fragments.PlaylistFragment"
+        android:label="fragment_playlist"
+        tools:layout="@layout/fragment_playlist">
+        <action
+            android:id="@+id/view_playlist"
+            app:destination="@id/fragment_playlist_view"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_playing"
+        android:name="com.zectan.soundroid.fragments.PlayingFragment"
+        android:label="fragment_playing"
+        tools:layout="@layout/fragment_playing" />
+    <fragment
+        android:id="@+id/fragment_search"
+        android:name="com.zectan.soundroid.fragments.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/open_search_song"
+            app:destination="@id/fragment_playing"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_settings"
+        android:name="com.zectan.soundroid.fragments.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/fragment_playlist_edit"
+        android:name="com.zectan.soundroid.fragments.PlaylistEditFragment"
+        android:label="fragment_playlist_edit"
+        tools:layout="@layout/fragment_playlist_edit" />
+    <fragment
+        android:id="@+id/fragment_playlist_view"
+        android:name="com.zectan.soundroid.fragments.PlaylistViewFragment"
+        android:label="fragment_playlist_view"
+        tools:layout="@layout/fragment_playlist_view">
+        <action
+            android:id="@+id/edit_playlist"
+            app:destination="@id/fragment_playlist_edit"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/openPlaylistSong"
+            app:destination="@id/fragment_playing"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+</navigation>

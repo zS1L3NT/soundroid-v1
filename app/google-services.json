@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "620761727140",
+    "project_id": "android-soundroid",
+    "storage_bucket": "android-soundroid.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:620761727140:android:7b2b43c44bbf77035d2631",
+        "android_client_info": {
+          "package_name": "com.zectan.soundroid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "620761727140-bkjh59nufs5a6t7u9ufsqrii94scpem6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zectan.soundroid",
+            "certificate_hash": "263f1f2afbde8881568edc1fa8fed429fdcb29a0"
+          }
+        },
+        {
+          "client_id": "620761727140-g8cfc16ndnv2rg2lt2bfu9bajcp3cggk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAp5Rb8H6H1qkMePHzssB4vbkrak9PlCDE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "620761727140-g8cfc16ndnv2rg2lt2bfu9bajcp3cggk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
