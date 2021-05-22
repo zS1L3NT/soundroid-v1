@@ -24,10 +24,12 @@ import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.SearchAdapter;
 import com.zectan.soundroid.objects.Playlist;
+import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 import com.zectan.soundroid.viewmodels.SearchViewModel;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -116,7 +118,8 @@ public class SearchFragment extends Fragment {
 
     private void onSongsChange(List<Song> songs) {
         SearchAdapter songAdapter = new SearchAdapter(songs, (song, position) -> {
-            Playlist queue = new Playlist(song.getId(), "Search result", Collections.singletonList(song));
+            PlaylistInfo info = new PlaylistInfo("spotify-results", "Spotify Results", new ArrayList<>());
+            Playlist queue = new Playlist(info, Collections.singletonList(song));
             NavHostFragment.findNavController(this).navigate(SearchFragmentDirections.openSearchSong());
             playingVM.selectSong(queue, 0);
             closeKeyboard();

@@ -16,7 +16,7 @@ import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.PlaylistAdapter;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 
-import java.util.Collections;
+import java.util.ArrayList;
 
 public class PlaylistFragment extends Fragment {
 
@@ -40,7 +40,7 @@ public class PlaylistFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        PlaylistAdapter songAdapter = new PlaylistAdapter(Collections.singletonList(activity.getStaticPlaylist()));
+        PlaylistAdapter songAdapter = new PlaylistAdapter(new ArrayList<>());
         recyclerView.setAdapter(songAdapter);
 
         return view;

@@ -8,9 +8,9 @@
 
     <fragment
         android:id="@+id/fragment_music"
-        android:name="com.zectan.soundroid.fragments.MusicFragment"
+        android:name="com.zectan.soundroid.fragments.HomeFragment"
         android:label="fragment_music"
-        tools:layout="@layout/fragment_music">
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/open_search"
             app:destination="@id/fragment_search"

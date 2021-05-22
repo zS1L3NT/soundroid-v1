@@ -38,7 +38,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.ViewHo
     public void onBindViewHolder(@NonNull @NotNull PlaylistAdapter.ViewHolder holder, int position) {
         Playlist playlist = playlists.get(position);
 
-        String name = playlist.getName();
+        String name = playlist.getInfo().getName();
         String songCount = playlist.size() + " songs";
 
         holder.nameText.setText(name);

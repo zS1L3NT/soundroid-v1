@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/fragment_music"
-        android:icon="@drawable/navigator_music"
+        android:icon="@drawable/navigator_home"
         android:title="@string/nav_music" />
 
     <item

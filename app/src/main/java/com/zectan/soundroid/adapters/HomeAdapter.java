@@ -17,25 +17,29 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.objects.Animations;
 import com.zectan.soundroid.objects.Playlist;
+import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @SuppressLint("UseCompatLoadingForDrawables")
-public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> {
+public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private static final String TAG = "(SounDroid) SongAdapter";
-    private final Playlist playlist;
+    private Playlist playlist;
     private final OnItemClicked onItemClicked;
 
-    public MusicAdapter(Playlist playlist, OnItemClicked onItemClicked) {
-        this.playlist = playlist;
+    public HomeAdapter(OnItemClicked onItemClicked) {
+        this.playlist = new Playlist(new PlaylistInfo("", "All Songs", new ArrayList<>()), new ArrayList<>());
         this.onItemClicked = onItemClicked;
     }
 
     @NonNull
     @NotNull
     @Override
-    public MusicAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public HomeAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater
                 .from(parent.getContext())
                 .inflate(R.layout.song_list_item, parent, false);
@@ -43,8 +47,14 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
         return new ViewHolder(itemView);
     }
 
-    public void onBindViewHolder(@NonNull MusicAdapter.ViewHolder holder, int position) {
-        Song song = playlist.getSong(position);
+    public void updateSongs(List<String> order, List<Song> songs) {
+        this.playlist = new Playlist(new PlaylistInfo("", "All Songs", order), songs);
+        notifyDataSetChanged();
+    }
+
+    public void onBindViewHolder(@NonNull HomeAdapter.ViewHolder holder, int position) {
+        String songId = playlist.getInfo().getOrder().get(position);
+        Song song = playlist.getSong(songId);
         Context context = holder.itemView.getContext();
 
         String title = song.getTitle();

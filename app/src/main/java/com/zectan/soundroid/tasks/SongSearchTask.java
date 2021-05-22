@@ -1,6 +1,5 @@
 package com.zectan.soundroid.tasks;
 
-import android.graphics.Color;
 import android.util.Log;
 
 import com.squareup.okhttp.MediaType;
@@ -61,9 +60,9 @@ public class SongSearchTask extends Thread {
                     String title = song.getString("title");
                     String artiste = song.getString("artiste");
                     String cover = song.getString("cover");
-                    String colorHexString = song.getString("colorHex");
+                    String colorHex = song.getString("colorHex");
 
-                    songList.add(new Song(folder, id, title, artiste, cover, Color.parseColor(colorHexString)));
+                    songList.add(new Song(folder, id, title, artiste, cover, colorHex));
                 }
 
                 Log.i(TAG, "API_OK: " + songList.size() + " songs");

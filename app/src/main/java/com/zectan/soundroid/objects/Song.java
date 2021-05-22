@@ -10,14 +10,18 @@ import java.io.File;
 
 public class Song {
     private static final String TAG = "(SounDroid) Song";
-    private final String folder;
-    private final String id;
-    private final String title;
-    private final String artiste;
-    private final String cover;
-    private final int colorHex;
+    private String folder;
+    private String id;
+    private String title;
+    private String artiste;
+    private String cover;
+    private String colorHex;
 
-    public Song(String folder, String id, String title, String artiste, String cover, int colorHex) {
+    public Song() {
+
+    }
+
+    public Song(String folder, String id, String title, String artiste, String cover, String colorHex) {
         this.folder = folder;
         this.id = id;
         this.title = title;
@@ -46,7 +50,7 @@ public class Song {
         return cover;
     }
 
-    public int getColorHex() {
+    public String getColorHex() {
         return colorHex;
     }
 

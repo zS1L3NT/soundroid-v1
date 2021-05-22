@@ -62,12 +62,12 @@ public class PlayingViewModel extends ViewModel {
      * @param startPosition Position in the playlist you're starting from
      */
     public void selectSong(Playlist playlist, int startPosition) {
-        Log.i(TAG, String.format("onSongClicked('%s', %d)", playlist.getId(), startPosition));
+        Log.i(TAG, String.format("onSongClicked('%s', %d)", playlist.getInfo().getId(), startPosition));
 
         Playlist queue = this.queue.getValue();
         if (queue == null
-                || !queue.getId().equals(playlist.getId())
-                || playlist.getId().equals("")
+                || !queue.getInfo().getId().equals(playlist.getInfo().getId())
+                || playlist.getInfo().getId().equals("")
         ) {
             // If the new clicked song is from a new playlist or has no id
             this.queue.setValue(playlist);

@@ -5,23 +5,23 @@ import android.annotation.SuppressLint;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Playlist {
-    private final String id, name;
+    private final PlaylistInfo info;
     private final List<Song> songs;
 
-    public Playlist(String id, String name, List<Song> songs) {
-        this.id = id;
-        this.name = name;
+    public Playlist(PlaylistInfo info, List<Song> songs) {
+        this.info = info;
         this.songs = songs;
     }
 
-    public String getId() {
-        return id;
+    public PlaylistInfo getInfo() {
+        return info;
     }
 
-    public String getName() {
-        return name;
+    public List<Song> getSongs() {
+        return songs;
     }
 
     public Song getSong(int position) {
@@ -32,6 +32,15 @@ public class Playlist {
         }
     }
 
+    public Song getSong(String id) {
+        return this
+                .songs
+                .stream()
+                .filter(song -> song.getId().equals(id))
+                .collect(Collectors.toList())
+                .get(0);
+    }
+
     public int size() {
         return songs.size();
     }
@@ -39,6 +48,6 @@ public class Playlist {
     @SuppressLint("DefaultLocale")
     @Override
     public @NotNull String toString() {
-        return String.format("Playlist { id: '%s', size: %d }", id, songs.size());
+        return String.format("Playlist { info: %s, size: %d }", info, songs.size());
     }
 }

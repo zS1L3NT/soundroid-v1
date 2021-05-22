@@ -2,6 +2,7 @@ package com.zectan.soundroid.fragments;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
@@ -234,9 +235,9 @@ public class PlayingFragment extends Fragment {
         String title = song.getTitle();
         String artiste = song.getArtiste();
         String cover = song.getCover();
-        int colorHex = song.getColorHex();
+        String colorHex = song.getColorHex();
 
-        playlistName.setText(queue.getName());
+        playlistName.setText(queue.getInfo().getName());
         titleText.setText(title);
         artisteText.setText(artiste);
         Glide
@@ -246,7 +247,7 @@ public class PlayingFragment extends Fragment {
                 .into(coverImage);
 
         Drawable oldGD = parent.getBackground();
-        int[] colors = {colorHex, activity.getColor(R.color.theme_playing_bottom)};
+        int[] colors = {Color.parseColor(colorHex), activity.getColor(R.color.theme_playing_bottom)};
         GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
 
         Drawable[] layers = {oldGD, newGD};
