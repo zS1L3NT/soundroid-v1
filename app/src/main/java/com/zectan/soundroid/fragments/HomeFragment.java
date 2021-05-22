@@ -91,12 +91,15 @@ public class HomeFragment extends Fragment {
                                     responses.getAndIncrement();
 
                                     if (responses.get() == idealResponses) {
-                                        List<String> order = songs
+                                        List<Song> sortedSongs = songs
                                                 .stream()
                                                 .sorted((song1, song2) -> song1.getTitle().compareTo(song2.getTitle()))
+                                                .collect(Collectors.toList());
+                                        List<String> order = songs
+                                                .stream()
                                                 .map(Song::getId)
                                                 .collect(Collectors.toList());
-                                        homeAdapter.updateSongs(order, songs);
+                                        homeAdapter.updateSongs(order, sortedSongs);
                                     }
                                 })
                                 .addOnFailureListener(this::handleError);

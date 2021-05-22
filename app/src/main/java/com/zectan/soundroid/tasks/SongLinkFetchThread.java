@@ -16,7 +16,6 @@ public class SongLinkFetchThread extends Thread {
     private final ConvertingCallback convertingCallback;
     private final ProgressCallback progressCallback;
     private final ActiveState activeState;
-    private int totalTime;
 
     public SongLinkFetchThread(
             String id,
@@ -74,8 +73,7 @@ public class SongLinkFetchThread extends Thread {
                 Log.i(TAG, "(SOCKET) close");
                 return;
             }
-            totalTime = (int) args[0];
-            Log.d(TAG, "(SOCKET) Total: " + totalTime);
+            Log.d(TAG, "(SOCKET) Downloading...");
             progressCallback.update(0);
             convertingCallback.run(true);
         });
@@ -86,9 +84,9 @@ public class SongLinkFetchThread extends Thread {
                 Log.i(TAG, "(SOCKET) close");
                 return;
             }
-            int currentTime = (int) args[0];
-            Log.d(TAG, "(SOCKET) Progress: " + currentTime);
-            progressCallback.update(100 * currentTime / totalTime);
+            int percent = (int) args[0];
+            Log.d(TAG, "(SOCKET) Progress: " + percent);
+            progressCallback.update(percent);
         });
 
         socket.on("error_" + id, args -> {

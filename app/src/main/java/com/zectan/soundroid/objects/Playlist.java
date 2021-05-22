@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Playlist {
     private final PlaylistInfo info;
@@ -30,15 +29,6 @@ public class Playlist {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    public Song getSong(String id) {
-        return this
-                .songs
-                .stream()
-                .filter(song -> song.getId().equals(id))
-                .collect(Collectors.toList())
-                .get(0);
     }
 
     public int size() {

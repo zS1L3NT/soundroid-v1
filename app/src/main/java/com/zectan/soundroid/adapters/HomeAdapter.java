@@ -53,8 +53,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     }
 
     public void onBindViewHolder(@NonNull HomeAdapter.ViewHolder holder, int position) {
-        String songId = playlist.getInfo().getOrder().get(position);
-        Song song = playlist.getSong(songId);
+        Song song = playlist.getSong(position);
         Context context = holder.itemView.getContext();
 
         String title = song.getTitle();
