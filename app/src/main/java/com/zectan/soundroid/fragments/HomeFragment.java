@@ -5,10 +5,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,6 +36,8 @@ public class HomeFragment extends Fragment {
     private FirebaseRepository repository;
     private HomeAdapter homeAdapter;
 
+    private EditText searchbar;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -48,16 +53,21 @@ public class HomeFragment extends Fragment {
         PlayingViewModel playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
 
         // Reference views
-        RecyclerView recyclerView = view.findViewById(R.id.song_recycler_view);
+        RecyclerView recyclerView = view.findViewById(R.id.home_recycler_view);
+        searchbar = view.findViewById(R.id.home_searchbar);
 
         // Click listeners
-//        view.findViewById(R.id.header_search).setOnClickListener(__ -> {
-//            NavDirections action = HomeFragmentDirections.openSearch();
-//            NavHostFragment.findNavController(this).navigate(action);
-//        });
+        searchbar.setOnClickListener(__ -> {
+            FragmentNavigator.Extras extras = new FragmentNavigator.Extras
+                    .Builder()
+                    .addSharedElement(searchbar, getString(R.string.TRANSITION_searchbar)).build();
+            NavDirections action = HomeFragmentDirections.openSearch();
+            NavHostFragment.findNavController(this).navigate(action, extras);
+        });
 
         homeAdapter = new HomeAdapter((song, position) -> {
-            NavHostFragment.findNavController(this).navigate(HomeFragmentDirections.openDownloadedSong());
+            NavDirections action = HomeFragmentDirections.openDownloadedSong();
+            NavHostFragment.findNavController(this).navigate(action);
             playingVM.selectSong(song, position);
         });
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);

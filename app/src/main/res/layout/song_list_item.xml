@@ -12,25 +12,28 @@
         android:layout_marginStart="15dp"
         android:contentDescription="@string/song_cover"
         android:src="@drawable/default_cover"
-        android:transitionName="transition_song_cover"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/song_list_item_info"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/song_list_item_cover"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/song_list_item_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="@string/Nil"
             android:textColor="@color/white"
             android:textSize="18sp"

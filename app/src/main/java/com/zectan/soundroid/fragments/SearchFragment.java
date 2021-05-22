@@ -1,23 +1,24 @@
 package com.zectan.soundroid.fragments;
 
 import android.animation.ValueAnimator;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.Transition;
+import androidx.transition.TransitionInflater;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.zectan.soundroid.MainActivity;
@@ -39,7 +40,6 @@ import rx.Observable;
 public class SearchFragment extends Fragment {
     private static final String TAG = "(SounDroid) SearchFragment";
     private MainActivity activity;
-    private InputMethodManager imm;
 
     private RecyclerView recyclerView;
     private EditText searchEditText;
@@ -53,12 +53,20 @@ public class SearchFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Transition transition = TransitionInflater
+                .from(requireContext())
+                .inflateTransition(android.R.transition.move);
+        setSharedElementEnterTransition(transition);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         activity = (MainActivity) getActivity();
         assert activity != null;
         activity.hideBottomNavigator();
-        imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 
         // ViewModels
         searchVM = new ViewModelProvider(activity).get(SearchViewModel.class);
@@ -72,7 +80,7 @@ public class SearchFragment extends Fragment {
         // Click listeners
         view.findViewById(R.id.search_back).setOnClickListener(__ -> {
             activity.onBackPressed();
-            closeKeyboard();
+            activity.hideKeyboard(view);
         });
         Observable<String> obs = RxTextView
                 .textChanges(searchEditText)
@@ -80,7 +88,7 @@ public class SearchFragment extends Fragment {
                 .map(CharSequence::toString);
         obs.subscribe(this::searchOnline);
 
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        activity.showKeyboard();
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -88,7 +96,7 @@ public class SearchFragment extends Fragment {
             boolean handled = false;
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 searchOnline(searchEditText.getText().toString());
-                closeKeyboard();
+                activity.hideKeyboard(view);
                 handled = true;
             }
             return handled;
@@ -111,18 +119,13 @@ public class SearchFragment extends Fragment {
         searchVM.searchOnline(text, activity.getFilesDir().getPath());
     }
 
-    public void closeKeyboard() {
-        View focused = activity.getCurrentFocus();
-        imm.hideSoftInputFromWindow(focused.getWindowToken(), 0);
-    }
-
     private void onSongsChange(List<Song> songs) {
         SearchAdapter songAdapter = new SearchAdapter(songs, (song, position) -> {
             PlaylistInfo info = new PlaylistInfo("spotify-results", "Spotify Results", new ArrayList<>());
             Playlist queue = new Playlist(info, Collections.singletonList(song));
             NavHostFragment.findNavController(this).navigate(SearchFragmentDirections.openSearchSong());
             playingVM.selectSong(queue, 0);
-            closeKeyboard();
+            activity.hideKeyboard(this.requireView());
         });
         recyclerView.setAdapter(songAdapter);
     }

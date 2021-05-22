@@ -31,4 +31,6 @@
     <string name="undefined_error_message">Undefined error message</string>
     <string name="downloads">Downloads</string>
     <string name="settings">Settings</string>
+    <string name="TRANSITION_searchbar">TRANSITION searchbar</string>
+    <string name="TRANSITION_cover">TRANSITION cover</string>
 </resources>
