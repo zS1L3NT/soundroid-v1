@@ -23,7 +23,6 @@ import com.zectan.soundroid.objects.Song;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @SuppressLint("UseCompatLoadingForDrawables")
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
@@ -47,8 +46,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         return new ViewHolder(itemView);
     }
 
-    public void updateSongs(List<String> order, List<Song> songs) {
-        this.playlist = new Playlist(new PlaylistInfo("", "All Songs", order), songs);
+    public void updatePlaylist(Playlist playlist) {
+        this.playlist = playlist;
         notifyDataSetChanged();
     }
 
