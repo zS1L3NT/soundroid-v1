@@ -17,10 +17,14 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.transition.Transition;
+import androidx.transition.TransitionInflater;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
@@ -32,6 +36,8 @@ import com.zectan.soundroid.objects.Functions;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.Song;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -52,6 +58,22 @@ public class PlayingFragment extends Fragment {
 
     public PlayingFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Transition transition = TransitionInflater
+                .from(requireContext())
+                .inflateTransition(android.R.transition.move);
+        setSharedElementEnterTransition(transition);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        String transitionName = PlayingFragmentArgs.fromBundle(getArguments()).getTransitionName();
+        ViewCompat.setTransitionName(view.findViewById(R.id.song_cover), transitionName);
     }
 
     @Nullable

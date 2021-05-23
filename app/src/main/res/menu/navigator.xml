@@ -2,18 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/fragment_music"
+        android:id="@+id/fragment_home"
         android:icon="@drawable/navigator_home"
-        android:title="@string/nav_music" />
+        android:title="@string/navigation_home" />
 
     <item
         android:id="@+id/fragment_playing"
         android:icon="@drawable/navigator_audiowave"
-        android:title="@string/song_playing" />
+        android:title="@string/navigation_playing" />
 
     <item
         android:id="@+id/fragment_playlist"
         android:icon="@drawable/navigator_playlist"
-        android:title="@string/nav_playlist" />
+        android:title="@string/navigation_playlist" />
 
 </menu>

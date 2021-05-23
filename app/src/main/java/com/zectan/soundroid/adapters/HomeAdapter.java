@@ -56,6 +56,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         Song song = playlist.getSong(position);
         Context context = holder.itemView.getContext();
 
+        String id = song.getId();
         String title = song.getTitle();
         String artiste = song.getArtiste();
         String cover = song.getCover();
@@ -67,11 +68,11 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 .load(cover)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.coverImage);
-
         holder.itemView.setOnTouchListener(Animations::songListItemSqueeze);
         holder.itemView.setOnClickListener(__ -> {
             Log.i(TAG, String.format("SONG_CLICKED: %s", song));
-            onItemClicked.run(playlist, position);
+            String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_cover), id);
+            onItemClicked.run(holder.coverImage, transitionName, playlist, position);
         });
     }
 
@@ -81,7 +82,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     }
 
     public interface OnItemClicked {
-        void run(Playlist playlist, int position);
+        void run(ImageView cover, String transitionName, Playlist playlist, int position);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -65,9 +65,16 @@ public class HomeFragment extends Fragment {
             NavHostFragment.findNavController(this).navigate(action, extras);
         });
 
-        homeAdapter = new HomeAdapter((song, position) -> {
-            NavDirections action = HomeFragmentDirections.openDownloadedSong();
-            NavHostFragment.findNavController(this).navigate(action);
+        homeAdapter = new HomeAdapter((cover, transitionName, song, position) -> {
+            cover.setTransitionName(transitionName);
+            FragmentNavigator.Extras extras = new FragmentNavigator.Extras
+                    .Builder()
+                    .addSharedElement(cover, transitionName)
+                    .build();
+            NavDirections action = HomeFragmentDirections
+                    .openDownloadedSong()
+                    .setTransitionName(transitionName);
+            NavHostFragment.findNavController(this).navigate(action, extras);
             playingVM.selectSong(song, position);
         });
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);

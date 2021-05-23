@@ -13,6 +13,8 @@ import android.widget.ProgressBar;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -120,10 +122,19 @@ public class SearchFragment extends Fragment {
     }
 
     private void onSongsChange(List<Song> songs) {
-        SearchAdapter songAdapter = new SearchAdapter(songs, (song, position) -> {
+        SearchAdapter songAdapter = new SearchAdapter(songs, (cover, transitionName, song, position) -> {
             PlaylistInfo info = new PlaylistInfo("spotify-results", "Spotify Results", new ArrayList<>());
             Playlist queue = new Playlist(info, Collections.singletonList(song));
-            NavHostFragment.findNavController(this).navigate(SearchFragmentDirections.openSearchSong());
+            cover.setTransitionName(transitionName);
+
+            FragmentNavigator.Extras extras = new FragmentNavigator.Extras
+                    .Builder()
+                    .addSharedElement(cover, transitionName)
+                    .build();
+            NavDirections action = SearchFragmentDirections
+                    .openSearchSong()
+                    .setTransitionName(transitionName);
+            NavHostFragment.findNavController(this).navigate(action, extras);
             playingVM.selectSong(queue, 0);
             activity.hideKeyboard(this.requireView());
         });

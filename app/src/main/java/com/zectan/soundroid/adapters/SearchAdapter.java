@@ -47,9 +47,11 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         Song song = songs.get(position);
         Context context = holder.itemView.getContext();
 
+        String id = song.getId();
         String title = song.getTitle();
         String artiste = song.getArtiste();
         String cover = song.getCover();
+
 
         holder.titleText.setText(title);
         holder.artisteText.setText(artiste);
@@ -58,11 +60,11 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
                 .load(cover)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.coverImage);
-
         holder.itemView.setOnTouchListener(Animations::songListItemSqueeze);
         holder.itemView.setOnClickListener(__ -> {
             Log.i(TAG, String.format("SEARCH_RESULT_CLICKED: %s", song));
-            itemOnClick.run(song, position);
+            String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_cover), id);
+            itemOnClick.run(holder.coverImage, transitionName, song, position);
         });
     }
 
@@ -72,7 +74,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     }
 
     public interface ItemOnClick {
-        void run(Song song, int position);
+        void run(ImageView cover, String transitionName, Song song, int position);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

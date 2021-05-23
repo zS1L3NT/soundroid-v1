@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     android:label="fragment"
-    app:startDestination="@id/fragment_music">
+    app:startDestination="@id/fragment_home">
 
     <fragment
-        android:id="@+id/fragment_music"
+        android:id="@+id/fragment_home"
         android:name="com.zectan.soundroid.fragments.HomeFragment"
-        android:label="fragment_music"
+        android:label="fragment_home"
         tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/open_search"
@@ -50,7 +50,12 @@
         android:id="@+id/fragment_playing"
         android:name="com.zectan.soundroid.fragments.PlayingFragment"
         android:label="fragment_playing"
-        tools:layout="@layout/fragment_playing" />
+        tools:layout="@layout/fragment_playing">
+        <argument
+            android:name="transition_name"
+            android:defaultValue=""
+            app:argType="string" />
+    </fragment>
     <fragment
         android:id="@+id/fragment_search"
         android:name="com.zectan.soundroid.fragments.SearchFragment"
