@@ -283,7 +283,7 @@ public class PlayingFragment extends AnimatedFragment {
 
     private void onPlayingStateChange(boolean playing) {
         playPauseImage.setImageDrawable(activity.getDrawable(
-                playing ? R.drawable.song_pause_fill_foreground : R.drawable.song_play_fill_foreground
+                playing ? R.drawable.controls_pause_filled : R.drawable.controls_play_filled
         ));
     }
 

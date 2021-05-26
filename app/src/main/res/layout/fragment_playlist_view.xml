@@ -27,6 +27,7 @@
         android:layout_marginTop="25dp"
         android:contentDescription="@string/back"
         android:elevation="1dp"
+        android:src="@drawable/back_arrow"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -47,7 +48,7 @@
         android:layout_height="200dp"
         android:layout_marginTop="10dp"
         android:contentDescription="@string/playlist_cover"
-        android:src="@drawable/default_cover"
+        android:src="@drawable/playing_cover_default"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/playlist_view_back" />
