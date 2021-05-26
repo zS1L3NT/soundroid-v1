@@ -3,17 +3,17 @@
 
     <item
         android:id="@+id/fragment_home"
-        android:icon="@drawable/navigator_home"
+        android:icon="@drawable/ic_home"
         android:title="@string/navigation_home" />
 
     <item
         android:id="@+id/fragment_playing"
-        android:icon="@drawable/navigator_audiowave"
+        android:icon="@drawable/ic_audiowave"
         android:title="@string/navigation_playing" />
 
     <item
         android:id="@+id/fragment_playlists"
-        android:icon="@drawable/navigator_playlist"
+        android:icon="@drawable/ic_playlists"
         android:title="@string/navigation_playlist" />
 
 </menu>
