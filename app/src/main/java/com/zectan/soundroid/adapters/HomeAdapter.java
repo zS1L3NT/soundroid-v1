@@ -70,7 +70,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         holder.itemView.setOnTouchListener(Animations::songListItemSqueeze);
         holder.itemView.setOnClickListener(__ -> {
             Log.i(TAG, String.format("SONG_CLICKED: %s", song));
-            String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_cover), id);
+            String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_song_cover), id);
             onItemClicked.run(holder.coverImage, transitionName, playlist, position);
         });
     }

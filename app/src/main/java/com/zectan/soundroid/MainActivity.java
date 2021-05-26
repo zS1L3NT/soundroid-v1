@@ -2,8 +2,10 @@ package com.zectan.soundroid;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -15,8 +17,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 // https://www.glyric.com/2018/merlin/aagaya-nilave
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "(SounDroid) MainActivity";
     private BottomNavigationView bottomNavigationView;
     private InputMethodManager imm;
+    private FirebaseRepository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        repository = new FirebaseRepository();
 
         // Reference views
         bottomNavigationView = findViewById(R.id.bottom_navigator);
@@ -35,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
 
         NavController navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
+    }
+
+    public FirebaseRepository getRepository() {
+        return repository;
     }
 
     public void showBottomNavigator() {
@@ -51,5 +60,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void hideKeyboard(View currentFocus) {
         imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+    }
+
+    public void handleError(Exception e) {
+        Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+        Log.e(TAG, e.getMessage());
     }
 }

@@ -15,4 +15,6 @@
     <color name="theme_default_gradient">#7b828b</color>
     <color name="theme_navigator">#202020</color>
     <color name="theme_playing_bottom">#0C0C0C</color>
+
+    <color name="theme_background">#0C0C0C</color>
 </resources>

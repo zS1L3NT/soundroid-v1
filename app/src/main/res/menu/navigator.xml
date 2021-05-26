@@ -12,7 +12,7 @@
         android:title="@string/navigation_playing" />
 
     <item
-        android:id="@+id/fragment_playlist"
+        android:id="@+id/fragment_playlists"
         android:icon="@drawable/navigator_playlist"
         android:title="@string/navigation_playlist" />
 

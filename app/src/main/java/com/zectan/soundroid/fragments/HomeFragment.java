@@ -27,9 +27,7 @@ import com.zectan.soundroid.objects.Song;
 import com.zectan.soundroid.viewmodels.HomeViewModel;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class HomeFragment extends Fragment {
@@ -99,38 +97,20 @@ public class HomeFragment extends Fragment {
         if (homeVM.requested) return;
         swipeRefreshLayout.setRefreshing(true);
         homeVM.requested = true;
-        List<Song> songs = new ArrayList<>();
 
         repository
-                .playlists(USER_ID)
+                .userSongs(USER_ID)
                 .get()
-                .addOnSuccessListener(playlistSnaps -> {
-                    int idealResponses = playlistSnaps.size();
-                    AtomicInteger responses = new AtomicInteger();
-
-                    playlistSnaps.forEach(playlistSnap -> {
-                        String playlistId = playlistSnap.getId();
-                        repository
-                                .songs(playlistId)
-                                .get()
-                                .addOnSuccessListener(songsSnap -> {
-                                    List<Song> newSongs = songsSnap.toObjects(Song.class);
-                                    songs.addAll(newSongs);
-                                    responses.getAndIncrement();
-
-                                    if (responses.get() == idealResponses) {
-                                        List<String> order = songs
-                                                .stream()
-                                                .sorted((song1, song2) -> song1.getTitle().compareTo(song2.getTitle()))
-                                                .map(Song::getId)
-                                                .collect(Collectors.toList());
-                                        homeVM.playlist.setValue(new Playlist(new PlaylistInfo("", "All Songs", order), songs));
-                                        swipeRefreshLayout.setRefreshing(false);
-                                        homeVM.requested = false;
-                                    }
-                                })
-                                .addOnFailureListener(this::handleError);
-                    });
+                .addOnSuccessListener(snaps -> {
+                    List<Song> songs = snaps.toObjects(Song.class);
+                    List<String> order = songs
+                            .stream()
+                            .sorted((song1, song2) -> song1.getTitle().compareTo(song2.getTitle()))
+                            .map(Song::getId)
+                            .collect(Collectors.toList());
+                    homeVM.playlist.setValue(new Playlist(new PlaylistInfo("", "All Songs", order), songs));
+                    swipeRefreshLayout.setRefreshing(false);
+                    homeVM.requested = false;
                 })
                 .addOnFailureListener(this::handleError);
     }

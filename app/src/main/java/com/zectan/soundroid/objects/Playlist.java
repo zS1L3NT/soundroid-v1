@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Playlist {
     private final PlaylistInfo info;
@@ -13,13 +12,7 @@ public class Playlist {
 
     public Playlist(PlaylistInfo info, List<Song> songs) {
         this.info = info;
-        this.songs = songs
-                .stream()
-                .sorted((song1, song2) -> {
-                    List<String> order = info.getOrder();
-                    return order.indexOf(song1.getId()) - order.indexOf(song2.getId());
-                })
-                .collect(Collectors.toList());
+        this.songs = Functions.sortSongs(songs, info.getOrder());
     }
 
     public PlaylistInfo getInfo() {

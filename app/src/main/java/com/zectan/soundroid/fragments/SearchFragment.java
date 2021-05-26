@@ -10,8 +10,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.FragmentNavigator;
@@ -19,10 +17,9 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.transition.Transition;
-import androidx.transition.TransitionInflater;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
+import com.zectan.soundroid.AnimatedFragment;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.SearchAdapter;
@@ -39,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 
-public class SearchFragment extends Fragment {
+public class SearchFragment extends AnimatedFragment {
     private static final String TAG = "(SounDroid) SearchFragment";
     private MainActivity activity;
 
@@ -52,15 +49,6 @@ public class SearchFragment extends Fragment {
 
     public SearchFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Transition transition = TransitionInflater
-                .from(requireContext())
-                .inflateTransition(android.R.transition.move);
-        setSharedElementEnterTransition(transition);
     }
 
     @Override

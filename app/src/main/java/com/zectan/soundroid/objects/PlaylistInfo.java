@@ -7,6 +7,7 @@ import java.util.List;
 public class PlaylistInfo {
     private String id;
     private String name;
+    private String cover;
     private List<String> order;
 
     public PlaylistInfo() {
@@ -26,12 +27,16 @@ public class PlaylistInfo {
         return name;
     }
 
+    public String getCover() {
+        return cover;
+    }
+
     public List<String> getOrder() {
         return order;
     }
 
     @Override
     public @NotNull String toString() {
-        return String.format("PlaylistInfo { id: '%s', name: '%s' }", id, name);
+        return String.format("PlaylistInfo { id: '%s', name: '%s', cover: '%s' }", id, name, cover);
     }
 }

@@ -21,14 +21,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.transition.Transition;
-import androidx.transition.TransitionInflater;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.zectan.soundroid.AnimatedFragment;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.objects.Animations;
@@ -42,7 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @SuppressLint("UseCompatLoadingForDrawables")
-public class PlayingFragment extends Fragment {
+public class PlayingFragment extends AnimatedFragment {
 
     private MainActivity activity;
     private boolean touchingSeekbar = false;
@@ -58,15 +56,6 @@ public class PlayingFragment extends Fragment {
 
     public PlayingFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Transition transition = TransitionInflater
-                .from(requireContext())
-                .inflateTransition(android.R.transition.move);
-        setSharedElementEnterTransition(transition);
     }
 
     @Override

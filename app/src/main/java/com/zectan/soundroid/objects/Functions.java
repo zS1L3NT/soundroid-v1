@@ -3,6 +3,7 @@ package com.zectan.soundroid.objects;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Functions {
 
@@ -69,6 +70,13 @@ public class Functions {
         Collections.shuffle(order);
         order.add(0, startValue);
         return order;
+    }
+
+    public static List<Song> sortSongs(List<Song> songs, List<String> order) {
+        return songs
+                .stream()
+                .sorted((song1, song2) -> order.indexOf(song1.getId()) - order.indexOf(song2.getId()))
+                .collect(Collectors.toList());
     }
 
     public static void main(String[] args) {

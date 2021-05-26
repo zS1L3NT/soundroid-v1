@@ -1,7 +1,6 @@
 package com.zectan.soundroid.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,36 +13,39 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
-import com.zectan.soundroid.objects.Animations;
+import com.zectan.soundroid.objects.Functions;
 import com.zectan.soundroid.objects.Song;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
-    private static final String TAG = "(SounDroid) SearchAdapter";
-    private final List<Song> songs;
-    private final ItemOnClick itemOnClick;
+public class PlaylistViewAdapter extends RecyclerView.Adapter<PlaylistViewAdapter.ViewHolder> {
+    private final onSongClicked onSongClicked;
+    private List<Song> songs;
 
-    public SearchAdapter(List<Song> songs, ItemOnClick itemOnClick) {
-        this.songs = songs;
-        this.itemOnClick = itemOnClick;
+    public PlaylistViewAdapter(onSongClicked onSongClicked) {
+        this.onSongClicked = onSongClicked;
     }
 
     @NonNull
     @NotNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+    public PlaylistViewAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater
                 .from(parent.getContext())
                 .inflate(R.layout.song_list_item, parent, false);
 
-        return new SearchAdapter.ViewHolder(itemView);
+        return new PlaylistViewAdapter.ViewHolder(itemView);
+    }
+
+    public void updateSongs(List<Song> songs, List<String> order) {
+        this.songs = Functions.sortSongs(songs, order);
+        notifyDataSetChanged();
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull SearchAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull @NotNull PlaylistViewAdapter.ViewHolder holder, int position) {
         Song song = songs.get(position);
         Context context = holder.itemView.getContext();
 
@@ -51,21 +53,17 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         String title = song.getTitle();
         String artiste = song.getArtiste();
         String cover = song.getCover();
-
+        String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_song_cover), id);
 
         holder.titleText.setText(title);
         holder.artisteText.setText(artiste);
+        holder.coverImage.setTransitionName(transitionName);
         Glide
                 .with(context)
                 .load(cover)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.coverImage);
-        holder.itemView.setOnTouchListener(Animations::songListItemSqueeze);
-        holder.itemView.setOnClickListener(__ -> {
-            Log.i(TAG, String.format("SEARCH_RESULT_CLICKED: %s", song));
-            String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_song_cover), id);
-            itemOnClick.run(holder.coverImage, transitionName, song, position);
-        });
+        holder.itemView.setOnClickListener(__ -> onSongClicked.run(holder.coverImage, transitionName, song, position));
     }
 
     @Override
@@ -73,7 +71,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         return songs.size();
     }
 
-    public interface ItemOnClick {
+    public interface onSongClicked {
         void run(ImageView cover, String transitionName, Song song, int position);
     }
 
@@ -90,7 +88,5 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             titleText = itemView.findViewById(R.id.song_list_item_title);
             artisteText = itemView.findViewById(R.id.song_list_item_artiste);
         }
-
     }
-
 }

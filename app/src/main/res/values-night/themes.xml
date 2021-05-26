@@ -4,5 +4,11 @@
         <!-- Status bar color. -->
         <item name="android:windowTranslucentStatus">true</item>
         <!-- Customize your theme here. -->
+        <item name="android:windowSharedElementEnterTransition">
+            @transition/shared_image
+        </item>
+        <item name="android:windowSharedElementExitTransition">
+            @transition/shared_image
+        </item>
     </style>
 </resources>

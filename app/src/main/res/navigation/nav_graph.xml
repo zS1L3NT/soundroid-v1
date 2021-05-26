@@ -34,10 +34,10 @@
             app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
-        android:id="@+id/fragment_playlist"
-        android:name="com.zectan.soundroid.fragments.PlaylistFragment"
+        android:id="@+id/fragment_playlists"
+        android:name="com.zectan.soundroid.fragments.PlaylistsFragment"
         android:label="fragment_playlist"
-        tools:layout="@layout/fragment_playlist">
+        tools:layout="@layout/fragment_playlists">
         <action
             android:id="@+id/view_playlist"
             app:destination="@id/fragment_playlist_view"
@@ -98,5 +98,9 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/fade_out" />
+        <argument
+            android:name="transition_name"
+            android:defaultValue=""
+            app:argType="string" />
     </fragment>
 </navigation>
