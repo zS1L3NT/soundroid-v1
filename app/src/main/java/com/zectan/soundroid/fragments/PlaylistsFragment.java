@@ -5,18 +5,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
-import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.zectan.soundroid.AnimatedFragment;
 import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
@@ -28,7 +26,7 @@ import com.zectan.soundroid.viewmodels.PlaylistsViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlaylistsFragment extends AnimatedFragment {
+public class PlaylistsFragment extends Fragment {
     private static final String TAG = "(SounDroid) PlayingFragment";
     private static final String USER_ID = "admin";
     private MainActivity activity;
@@ -71,15 +69,9 @@ public class PlaylistsFragment extends AnimatedFragment {
         return view;
     }
 
-    private void onPlaylistSelected(ImageView cover, String transitionName, PlaylistInfo info) {
-        FragmentNavigator.Extras extras = new FragmentNavigator.Extras
-                .Builder()
-                .addSharedElement(cover, transitionName)
-                .build();
-        NavDirections action = PlaylistsFragmentDirections
-                .viewPlaylist()
-                .setTransitionName(transitionName);
-        NavHostFragment.findNavController(this).navigate(action, extras);
+    private void onPlaylistSelected(PlaylistInfo info) {
+        NavDirections action = PlaylistsFragmentDirections.openPlaylistView();
+        NavHostFragment.findNavController(this).navigate(action);
         playlistViewVM.info.setValue(info);
         playlistViewVM.songs.setValue(new ArrayList<>());
     }

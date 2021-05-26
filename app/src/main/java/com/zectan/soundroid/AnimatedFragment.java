@@ -12,8 +12,8 @@ public class AnimatedFragment extends Fragment {
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         TransitionInflater inflater = TransitionInflater.from(requireContext());
-        setSharedElementEnterTransition(inflater.inflateTransition(android.R.transition.move));
-        setSharedElementReturnTransition(inflater.inflateTransition(android.R.transition.move));
+        setSharedElementEnterTransition(inflater.inflateTransition(R.transition.shared_image));
+        setSharedElementReturnTransition(inflater.inflateTransition(R.transition.shared_image));
     }
 
 }

@@ -3,12 +3,14 @@ package com.zectan.soundroid;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
@@ -21,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private InputMethodManager imm;
     private FirebaseRepository repository;
+
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +42,40 @@ public class MainActivity extends AppCompatActivity {
                         .findFragmentById(R.id.nav_host_fragment);
         assert navHostFragment != null;
 
-        NavController navController = navHostFragment.getNavController();
+        navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(this::onNavigationItem);
+        bottomNavigationView.setOnNavigationItemReselectedListener(this::onNavigationItem);
+    }
+
+    private boolean onNavigationItem(MenuItem item) {
+        String name = item.getTitle().toString();
+
+        NavOptions options = new NavOptions
+                .Builder()
+                .setEnterAnim(android.R.anim.fade_in)
+                .setExitAnim(R.anim.fade_out)
+                .setPopEnterAnim(R.anim.fade_in)
+                .setPopExitAnim(R.anim.fade_out)
+                .build();
+
+        switch (name) {
+            case "Home":
+                navController.navigate(R.id.fragment_home, null, options);
+                break;
+            case "Playing":
+                navController.navigate(R.id.fragment_playing, null, options);
+                break;
+            case "Playlist":
+                navController.navigate(R.id.fragment_playlists, null, options);
+                break;
+            default:
+                Log.e(TAG, "Unknown navigation name: " + name);
+                break;
+        }
+
+        return true;
     }
 
     public FirebaseRepository getRepository() {

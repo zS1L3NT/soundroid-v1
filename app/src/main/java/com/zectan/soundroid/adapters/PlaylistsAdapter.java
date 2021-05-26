@@ -49,16 +49,13 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistsAdapter.View
         PlaylistInfo info = infos.get(position);
         Context context = holder.itemView.getContext();
 
-        String id = info.getId();
         String name = info.getName();
         String cover = info.getCover();
         String songCount = info.getOrder().size() + " songs";
-        String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_playlist_cover), id);
 
         holder.nameText.setText(name);
         holder.songCountText.setText(songCount);
-        holder.coverImage.setTransitionName(transitionName);
-        holder.itemView.setOnClickListener(__ -> onPlaylistClicked.run(holder.coverImage, transitionName, info));
+        holder.itemView.setOnClickListener(__ -> onPlaylistClicked.run(info));
         Glide
                 .with(context)
                 .load(cover)
@@ -72,7 +69,7 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistsAdapter.View
     }
 
     public interface onPlaylistClicked {
-        void run(ImageView cover, String transitionName, PlaylistInfo info);
+        void run(PlaylistInfo info);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

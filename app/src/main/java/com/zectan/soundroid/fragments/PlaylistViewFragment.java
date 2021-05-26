@@ -7,9 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.FragmentNavigator;
@@ -20,7 +18,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.zectan.soundroid.AnimatedFragment;
 import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
@@ -31,11 +28,9 @@ import com.zectan.soundroid.objects.Song;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
-public class PlaylistViewFragment extends AnimatedFragment {
+public class PlaylistViewFragment extends Fragment {
     private MainActivity activity;
     private FirebaseRepository repository;
 
@@ -48,13 +43,6 @@ public class PlaylistViewFragment extends AnimatedFragment {
 
     public PlaylistViewFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        String transitionName = PlaylistViewFragmentArgs.fromBundle(getArguments()).getTransitionName();
-        ViewCompat.setTransitionName(view.findViewById(R.id.playlist_view_cover), transitionName);
     }
 
     @Override

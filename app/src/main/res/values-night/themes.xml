@@ -1,6 +1,8 @@
 <resources>
     <!-- Base application theme. -->
     <style name="Theme.SounDroid" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowActivityTransitions">true</item>
         <!-- Status bar color. -->
         <item name="android:windowTranslucentStatus">true</item>
         <!-- Customize your theme here. -->

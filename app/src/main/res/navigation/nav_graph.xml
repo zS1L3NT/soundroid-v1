@@ -39,12 +39,13 @@
         android:label="fragment_playlist"
         tools:layout="@layout/fragment_playlists">
         <action
-            android:id="@+id/view_playlist"
+            android:id="@+id/open_playlist_view"
             app:destination="@id/fragment_playlist_view"
-            app:enterAnim="@anim/fade_in"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/fade_out" />
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/fragment_playlists" />
     </fragment>
     <fragment
         android:id="@+id/fragment_playing"
@@ -87,10 +88,10 @@
         <action
             android:id="@+id/edit_playlist"
             app:destination="@id/fragment_playlist_edit"
-            app:enterAnim="@anim/fade_in"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/fade_out" />
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/openPlaylistSong"
             app:destination="@id/fragment_playing"
@@ -98,9 +99,5 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/fade_out" />
-        <argument
-            android:name="transition_name"
-            android:defaultValue=""
-            app:argType="string" />
     </fragment>
 </navigation>
