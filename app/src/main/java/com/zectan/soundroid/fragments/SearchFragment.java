@@ -92,6 +92,12 @@ public class SearchFragment extends AnimatedFragment {
         return view;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        activity.showBottomNavigator();
+    }
+
     private boolean onTexChange(TextView textView, int actionId, KeyEvent keyEvent) {
         boolean handled = false;
         if (actionId == EditorInfo.IME_ACTION_SEND) {
