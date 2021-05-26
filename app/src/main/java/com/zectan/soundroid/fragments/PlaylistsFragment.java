@@ -56,14 +56,16 @@ public class PlaylistsFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.playlists_recycler_view);
         swipeRefreshLayout = view.findViewById(R.id.playlists_swipe_refresh);
 
+        // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
         PlaylistsAdapter playlistsAdapter = new PlaylistsAdapter(this::onPlaylistSelected);
         recyclerView.setAdapter(playlistsAdapter);
         recyclerView.setLayoutManager(layoutManager);
-        swipeRefreshLayout.setOnRefreshListener(this::loadFromFirebase);
 
+        // Observers
         playlistVM.infos.observe(activity, playlistsAdapter::updateInfos);
 
+        swipeRefreshLayout.setOnRefreshListener(this::loadFromFirebase);
         if (playlistVM.infos.getValue() == null) loadFromFirebase();
 
         return view;

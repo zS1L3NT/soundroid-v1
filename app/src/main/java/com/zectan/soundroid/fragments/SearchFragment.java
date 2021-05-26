@@ -3,12 +3,15 @@ package com.zectan.soundroid.fragments;
 import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
@@ -63,45 +66,45 @@ public class SearchFragment extends AnimatedFragment {
         playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
 
         // Reference views
+        ImageView searchBack = view.findViewById(R.id.search_back);
         searchEditText = view.findViewById(R.id.search_edit_text);
         recyclerView = view.findViewById(R.id.search_recycler_view);
         searchProgressbar = view.findViewById(R.id.search_loading);
 
-        // Click listeners
-        view.findViewById(R.id.search_back).setOnClickListener(__ -> {
-            activity.onBackPressed();
-            activity.hideKeyboard(view);
-        });
-        Observable<String> obs = RxTextView
-                .textChanges(searchEditText)
-                .debounce(300, TimeUnit.MILLISECONDS)
-                .map(CharSequence::toString);
-        obs.subscribe(this::searchOnline);
-
-        activity.showKeyboard();
+        // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        searchEditText.setOnEditorActionListener((v, actionId, event) -> {
-            boolean handled = false;
-            if (actionId == EditorInfo.IME_ACTION_SEND) {
-                searchOnline(searchEditText.getText().toString());
-                activity.hideKeyboard(view);
-                handled = true;
-            }
-            return handled;
-        });
 
-        searchVM.liveSongs().observe(activity, this::onSongsChange);
-        searchVM.liveSearching().observe(activity, this::onSearchingChange);
+        // Live Observers
+        searchVM.songs.observe(activity, this::onSongsChange);
+        searchVM.searching.observe(activity, this::onSearchingChange);
+
+        searchBack.setOnClickListener(this::onBackPressed);
+        Observable<String> obs = RxTextView
+                .textChanges(searchEditText)
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .map(CharSequence::toString);
+        obs.subscribe(this::searchOnline);
+        activity.showKeyboard();
+        searchEditText.setOnEditorActionListener(this::onTexChange);
 
         return view;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        activity.showBottomNavigator();
+    private boolean onTexChange(TextView textView, int actionId, KeyEvent keyEvent) {
+        boolean handled = false;
+        if (actionId == EditorInfo.IME_ACTION_SEND) {
+            searchOnline(searchEditText.getText().toString());
+            activity.hideKeyboard(this.requireView());
+            handled = true;
+        }
+        return handled;
+    }
+
+    private void onBackPressed(View view) {
+        activity.onBackPressed();
+        activity.hideKeyboard(requireView());
     }
 
     public void searchOnline(String text) {

@@ -13,8 +13,8 @@ import java.util.List;
 
 public class SearchViewModel extends ViewModel {
     private static final String TAG = "(SounDroid) SearchViewModel";
-    private MutableLiveData<List<Song>> playlists;
-    private MutableLiveData<Boolean> searching;
+    public final MutableLiveData<List<Song>> songs = new MutableLiveData<>();
+    public final MutableLiveData<Boolean> searching = new MutableLiveData<>();
 
     private int searchNumber = 0;
 
@@ -31,45 +31,21 @@ public class SearchViewModel extends ViewModel {
     public void searchOnline(String text, String folder) {
         int searchId = ++searchNumber;
         if (text.isEmpty()) {
-            liveSongs().postValue(new ArrayList<>());
-            liveSearching().postValue(false);
+            songs.postValue(new ArrayList<>());
+            searching.postValue(false);
             return;
         }
 
-        liveSearching().postValue(true);
+        searching.postValue(true);
         new SongSearchTask(text, folder, songs -> {
             if (searchId == searchNumber) {
                 Log.d(TAG, "SEARCH_DISPLAYED");
-                liveSongs().postValue(songs);
-                liveSearching().postValue(false);
+                this.songs.postValue(songs);
+                searching.postValue(false);
             } else {
                 Log.d(TAG, "SEARCH_DISCARDED");
             }
         }).start();
-    }
-
-    /**
-     * Observable for the songs received from API
-     *
-     * @return Mutable Live Data -> List Song
-     */
-    public MutableLiveData<List<Song>> liveSongs() {
-        if (playlists == null) {
-            playlists = new MutableLiveData<>();
-        }
-        return playlists;
-    }
-
-    /**
-     * Observable for searching state
-     *
-     * @return Mutable Live Data -> Boolean
-     */
-    public MutableLiveData<Boolean> liveSearching() {
-        if (searching == null) {
-            searching = new MutableLiveData<>();
-        }
-        return searching;
     }
 
 }

@@ -24,11 +24,11 @@ import java.util.List;
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
     private static final String TAG = "(SounDroid) SearchAdapter";
     private final List<Song> songs;
-    private final ItemOnClick itemOnClick;
+    private final onSongClicked onSongClicked;
 
-    public SearchAdapter(List<Song> songs, ItemOnClick itemOnClick) {
+    public SearchAdapter(List<Song> songs, onSongClicked onSongClicked) {
         this.songs = songs;
-        this.itemOnClick = itemOnClick;
+        this.onSongClicked = onSongClicked;
     }
 
     @NonNull
@@ -64,7 +64,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         holder.itemView.setOnClickListener(__ -> {
             Log.i(TAG, String.format("SEARCH_RESULT_CLICKED: %s", song));
             String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_song_cover), id);
-            itemOnClick.run(holder.coverImage, transitionName, song, position);
+            onSongClicked.run(holder.coverImage, transitionName, song, position);
         });
     }
 
@@ -73,7 +73,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         return songs.size();
     }
 
-    public interface ItemOnClick {
+    public interface onSongClicked {
         void run(ImageView cover, String transitionName, Song song, int position);
     }
 

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -37,6 +38,7 @@ public class HomeFragment extends Fragment {
     private FirebaseRepository repository;
 
     private HomeViewModel homeVM;
+    private PlayingViewModel playingVM;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private EditText searchbar;
@@ -49,48 +51,53 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         activity = (MainActivity) getActivity();
-        repository = new FirebaseRepository();
         assert activity != null;
+        repository = activity.getRepository();
 
         // ViewModels
-        PlayingViewModel playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
         homeVM = new ViewModelProvider(activity).get(HomeViewModel.class);
+        playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
 
         // Reference views
         RecyclerView recyclerView = view.findViewById(R.id.home_recycler_view);
         swipeRefreshLayout = view.findViewById(R.id.home_swipe_refresh);
         searchbar = view.findViewById(R.id.home_searchbar);
 
-        swipeRefreshLayout.setOnRefreshListener(this::loadFromFirebase);
-        searchbar.setOnClickListener(__ -> {
-            FragmentNavigator.Extras extras = new FragmentNavigator.Extras
-                    .Builder()
-                    .addSharedElement(searchbar, getString(R.string.TRANSITION_searchbar)).build();
-            NavDirections action = HomeFragmentDirections.openSearch();
-            NavHostFragment.findNavController(this).navigate(action, extras);
-        });
-        HomeAdapter homeAdapter = new HomeAdapter((cover, transitionName, song, position) -> {
-            cover.setTransitionName(transitionName);
-            FragmentNavigator.Extras extras = new FragmentNavigator.Extras
-                    .Builder()
-                    .addSharedElement(cover, transitionName)
-                    .build();
-            NavDirections action = HomeFragmentDirections
-                    .openDownloadedSong()
-                    .setTransitionName(transitionName);
-            NavHostFragment.findNavController(this).navigate(action, extras);
-            playingVM.selectSong(song, position);
-        });
+        // Recycler View
+        HomeAdapter homeAdapter = new HomeAdapter(this::onSongClicked);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(homeAdapter);
 
-        // Observers
+        // Live Observers
         homeVM.playlist.observe(activity, homeAdapter::updatePlaylist);
 
+        swipeRefreshLayout.setOnRefreshListener(this::loadFromFirebase);
+        searchbar.setOnClickListener(this::onSearchbarClicked);
         if (homeVM.playlist.getValue() == null) loadFromFirebase();
 
         return view;
+    }
+
+    private void onSongClicked(ImageView cover, String transitionName, Playlist playlist, int position) {
+        cover.setTransitionName(transitionName);
+        FragmentNavigator.Extras extras = new FragmentNavigator.Extras
+                .Builder()
+                .addSharedElement(cover, transitionName)
+                .build();
+        NavDirections action = HomeFragmentDirections
+                .openDownloadedSong()
+                .setTransitionName(transitionName);
+        NavHostFragment.findNavController(this).navigate(action, extras);
+        playingVM.selectSong(playlist, position);
+    }
+
+    private void onSearchbarClicked(View view) {
+        FragmentNavigator.Extras extras = new FragmentNavigator.Extras
+                .Builder()
+                .addSharedElement(searchbar, getString(R.string.TRANSITION_searchbar)).build();
+        NavDirections action = HomeFragmentDirections.openSearch();
+        NavHostFragment.findNavController(this).navigate(action, extras);
     }
 
     private void loadFromFirebase() {

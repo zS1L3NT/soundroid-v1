@@ -41,9 +41,7 @@ import java.util.List;
 
 @SuppressLint("UseCompatLoadingForDrawables")
 public class PlayingFragment extends AnimatedFragment {
-
     private MainActivity activity;
-    private boolean touchingSeekbar = false;
 
     private LinearProgressIndicator convertingProgress;
     private ImageView coverImage, shuffleImage, backImage, playPauseImage, nextImage, loopImage;
@@ -51,7 +49,10 @@ public class PlayingFragment extends AnimatedFragment {
     private ProgressBar loadingBar;
     private SeekBar timeSeekbar;
     private LinearLayout parent;
+
     private PlayingViewModel playingVM;
+
+    private boolean touchingSeekbar = false;
     private int finalTouch = 0;
 
     public PlayingFragment() {
@@ -94,10 +95,7 @@ public class PlayingFragment extends AnimatedFragment {
         loadingBar = view.findViewById(R.id.song_loading);
         timeSeekbar = view.findViewById(R.id.song_seekbar);
 
-        enableControls();
-        updateShuffleColor();
-        updateLoopColor();
-
+        // Live Observers
         playingVM.order.observe(activity, this::onOrderChange);
         playingVM.songDuration.observe(activity, this::onSongDurationChange);
         playingVM.jitteringState.observe(activity, this::onJitteringStateChange);
@@ -108,6 +106,10 @@ public class PlayingFragment extends AnimatedFragment {
         playingVM.playTime.observe(activity, this::onPlayTimeChange);
         playingVM.convertingError.observe(activity, this::onConvertingErrorChange);
         playingVM.convertingProgress.observe(activity, this::onConvertingProgressChange);
+
+        enableControls();
+        updateShuffleColor();
+        updateLoopColor();
 
         return view;
     }

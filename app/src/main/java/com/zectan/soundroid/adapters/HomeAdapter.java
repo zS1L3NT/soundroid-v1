@@ -2,7 +2,6 @@ package com.zectan.soundroid.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,11 +27,11 @@ import java.util.ArrayList;
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private static final String TAG = "(SounDroid) SongAdapter";
     private Playlist playlist;
-    private final OnItemClicked onItemClicked;
+    private final onSongClicked onSongClicked;
 
-    public HomeAdapter(OnItemClicked onItemClicked) {
+    public HomeAdapter(onSongClicked onSongClicked) {
         this.playlist = new Playlist(new PlaylistInfo("", "All Songs", new ArrayList<>()), new ArrayList<>());
-        this.onItemClicked = onItemClicked;
+        this.onSongClicked = onSongClicked;
     }
 
     @NonNull
@@ -59,6 +58,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         String title = song.getTitle();
         String artiste = song.getArtiste();
         String cover = song.getCover();
+        String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_song_cover), id);
 
         holder.titleText.setText(title);
         holder.artisteText.setText(artiste);
@@ -68,11 +68,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.coverImage);
         holder.itemView.setOnTouchListener(Animations::songListItemSqueeze);
-        holder.itemView.setOnClickListener(__ -> {
-            Log.i(TAG, String.format("SONG_CLICKED: %s", song));
-            String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_song_cover), id);
-            onItemClicked.run(holder.coverImage, transitionName, playlist, position);
-        });
+        holder.itemView.setOnClickListener(__ -> onSongClicked.run(holder.coverImage, transitionName, playlist, position));
     }
 
     @Override
@@ -80,7 +76,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         return playlist.size();
     }
 
-    public interface OnItemClicked {
+    public interface onSongClicked {
         void run(ImageView cover, String transitionName, Playlist playlist, int position);
     }
 

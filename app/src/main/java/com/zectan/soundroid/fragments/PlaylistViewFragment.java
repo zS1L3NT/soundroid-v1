@@ -33,6 +33,7 @@ import java.util.List;
 public class PlaylistViewFragment extends Fragment {
     private MainActivity activity;
     private FirebaseRepository repository;
+    private PlaylistViewAdapter playlistViewAdapter;
 
     private PlaylistViewViewModel playlistViewVM;
     private PlayingViewModel playingVM;
@@ -62,20 +63,17 @@ public class PlaylistViewFragment extends Fragment {
         coverImage = view.findViewById(R.id.playlist_view_cover);
         nameText = view.findViewById(R.id.playlist_view_name);
 
+        // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
-        PlaylistViewAdapter playlistViewAdapter = new PlaylistViewAdapter(this::onSongSelected);
+        playlistViewAdapter = new PlaylistViewAdapter(this::onSongSelected);
         recyclerView.setAdapter(playlistViewAdapter);
         recyclerView.setLayoutManager(layoutManager);
-        swipeRefreshLayout.setOnRefreshListener(this::loadFromFirebase);
 
+        // Live Observers
         playlistViewVM.info.observe(activity, this::loadPlaylistInfo);
-        playlistViewVM.songs.observe(activity, songs -> {
-            PlaylistInfo info = playlistViewVM.info.getValue();
-            if (info == null) return;
+        playlistViewVM.songs.observe(activity, this::onSongsChange);
 
-            playlistViewAdapter.updateSongs(songs, info.getOrder());
-        });
-
+        swipeRefreshLayout.setOnRefreshListener(this::loadFromFirebase);
         loadSongsFromFirebase();
 
         return view;
@@ -97,6 +95,13 @@ public class PlaylistViewFragment extends Fragment {
 
         Playlist playlist = new Playlist(info, songs);
         playingVM.selectSong(playlist, position);
+    }
+
+    private void onSongsChange(List<Song> songs) {
+        PlaylistInfo info = playlistViewVM.info.getValue();
+        if (info == null) return;
+
+        playlistViewAdapter.updateSongs(songs, info.getOrder());
     }
 
     private void loadPlaylistInfo(PlaylistInfo info) {
