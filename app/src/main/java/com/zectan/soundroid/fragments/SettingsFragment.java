@@ -22,6 +22,11 @@ public class SettingsFragment extends Fragment {
         MainActivity activity = (MainActivity) getActivity();
         assert activity != null;
 
+        // TODO Profile and Logout
+        // TODO Adjust fade time
+        // TODO Download quality
+        // TODO Stream quality
+
         return view;
     }
 }

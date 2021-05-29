@@ -12,13 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.lifecycle.ViewModelProvider;
@@ -48,7 +48,7 @@ public class PlayingFragment extends AnimatedFragment {
     private TextView titleText, artisteText, songTimeText, songLengthText, playlistName, errorMessage, retryMessage;
     private ProgressBar loadingBar;
     private SeekBar timeSeekbar;
-    private LinearLayout parent;
+    private ConstraintLayout parent;
 
     private PlayingViewModel playingVM;
 
