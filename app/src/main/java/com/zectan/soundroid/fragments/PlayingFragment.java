@@ -44,7 +44,7 @@ public class PlayingFragment extends AnimatedFragment {
     private MainActivity activity;
 
     private LinearProgressIndicator convertingProgress;
-    private ImageView coverImage, shuffleImage, backImage, playPauseImage, nextImage, loopImage;
+    private ImageView coverImage, shuffleImage, backImage, playPauseImage, playPauseMiniImage, nextImage, loopImage;
     private TextView titleText, artisteText, songTimeText, songLengthText, playlistName, errorMessage, retryMessage;
     private ProgressBar loadingBar;
     private SeekBar timeSeekbar;
@@ -83,6 +83,7 @@ public class PlayingFragment extends AnimatedFragment {
         shuffleImage = view.findViewById(R.id.song_shuffle);
         backImage = view.findViewById(R.id.song_back);
         playPauseImage = view.findViewById(R.id.song_play_pause);
+        playPauseMiniImage = view.findViewById(R.id.song_play_pause_mini);
         nextImage = view.findViewById(R.id.song_next);
         loopImage = view.findViewById(R.id.song_loop);
         titleText = view.findViewById(R.id.song_title);
@@ -164,6 +165,8 @@ public class PlayingFragment extends AnimatedFragment {
         backImage.setOnTouchListener(Animations::mediumSqueeze);
         playPauseImage.setOnClickListener(this::playPauseSong);
         playPauseImage.setOnTouchListener(Animations::smallSqueeze);
+        playPauseMiniImage.setOnClickListener(this::playPauseSong);
+        playPauseMiniImage.setOnTouchListener(Animations::mediumSqueeze);
         nextImage.setOnClickListener(this::nextSong);
         nextImage.setOnTouchListener(Animations::mediumSqueeze);
         shuffleImage.setOnClickListener(this::shufflePlaylist);
@@ -205,6 +208,8 @@ public class PlayingFragment extends AnimatedFragment {
         backImage.setOnTouchListener(touch);
         playPauseImage.setOnClickListener(click);
         playPauseImage.setOnTouchListener(touch);
+        playPauseMiniImage.setOnClickListener(click);
+        playPauseMiniImage.setOnTouchListener(touch);
         nextImage.setOnClickListener(click);
         nextImage.setOnTouchListener(touch);
         shuffleImage.setOnClickListener(click);
@@ -284,6 +289,9 @@ public class PlayingFragment extends AnimatedFragment {
     private void onPlayingStateChange(boolean playing) {
         playPauseImage.setImageDrawable(activity.getDrawable(
                 playing ? R.drawable.controls_pause_filled : R.drawable.controls_play_filled
+        ));
+        playPauseMiniImage.setImageDrawable(activity.getDrawable(
+                playing ? R.drawable.controls_pause : R.drawable.controls_play
         ));
     }
 

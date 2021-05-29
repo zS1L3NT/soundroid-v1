@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_playing"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     android:background="@drawable/playing_background"
+    android:fitsSystemWindows="true"
+    app:layoutDescription="@xml/fragment_playing_scene"
     tools:context=".fragments.PlayingFragment">
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/converting_progress"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:alpha="0"
+        app:indicatorColor="@color/theme_1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:trackColor="@color/theme_4" />
 
     <TextView
         android:id="@+id/playing_from"
@@ -44,8 +54,7 @@
         app:layout_constraintBottom_toTopOf="@+id/song_seekbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/playlist_name"
-        app:layout_constraintVertical_weight="2" />
+        app:layout_constraintTop_toBottomOf="@+id/playlist_name" />
 
     <TextView
         android:id="@+id/error_message"
@@ -76,7 +85,7 @@
 
     <TextView
         android:id="@+id/song_title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/Nil"
         android:textColor="@color/white"
@@ -103,7 +112,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="150dp"
         android:max="1000"
         android:maxHeight="2dp"
         android:minHeight="2dp"
@@ -111,10 +120,7 @@
         android:thumbTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/song_cover"
-        app:layout_constraintVertical_bias="0.3"
-        app:layout_constraintVertical_weight="4" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/song_time"
@@ -183,10 +189,24 @@
         android:layout_marginTop="8dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/playing_play_song"
+        android:elevation="1dp"
         android:src="@drawable/controls_play_filled"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/song_seekbar" />
+
+    <ImageView
+        android:id="@+id/song_play_pause_mini"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:alpha="0"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/playing_play_song"
+        android:src="@drawable/controls_play"
+        app:layout_constraintBottom_toBottomOf="@id/song_play_pause"
+        app:layout_constraintLeft_toLeftOf="@id/song_play_pause"
+        app:layout_constraintRight_toRightOf="@id/song_play_pause"
+        app:layout_constraintTop_toTopOf="@id/song_play_pause" />
 
     <ImageView
         android:id="@+id/song_next"
@@ -212,13 +232,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/song_next" />
 
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/converting_progress"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:alpha="0"
-        app:indicatorColor="@color/theme_1"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:trackColor="@color/theme_4" />
+    <View
+        android:id="@+id/playing_queue_pill"
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/playing_queue_pill_background"
+        android:elevation="11dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/playing_queue" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playing_queue"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:background="@drawable/playing_queue_background"
+        android:elevation="10dp"
+        android:layoutAnimation="@anim/recycler_view_animation"
+        android:overScrollMode="never"
+        android:paddingTop="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:listitem="@layout/song_list_item" />
+
+</androidx.constraintlayout.motion.widget.MotionLayout>
