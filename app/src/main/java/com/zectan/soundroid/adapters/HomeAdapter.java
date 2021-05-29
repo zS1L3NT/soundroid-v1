@@ -64,6 +64,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         Glide
                 .with(context)
                 .load(cover)
+                .centerCrop()
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.coverImage);
         holder.itemView.setOnClickListener(__ -> onSongClicked.run(holder.coverImage, transitionName, playlist, position));

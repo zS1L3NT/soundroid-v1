@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // TODO View model encapsulation
+
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         repository = new FirebaseRepository();
 
@@ -73,13 +75,16 @@ public class MainActivity extends AppCompatActivity {
         switch (name) {
             case "Home":
                 homeVM.setTransitionState(null);
+                if (bottomNavigationView.getSelectedItemId() == item.getItemId()) break;
                 navController.navigate(R.id.fragment_home, null, options);
                 break;
             case "Playing":
+                if (bottomNavigationView.getSelectedItemId() == item.getItemId()) break;
                 navController.navigate(R.id.fragment_playing, null, options);
                 break;
             case "Playlist":
                 playlistViewVM.setTransitionState(null);
+                if (bottomNavigationView.getSelectedItemId() == item.getItemId()) break;
                 navController.navigate(R.id.fragment_playlists, null, options);
                 break;
             default:

@@ -232,6 +232,7 @@ public class PlayingViewModel extends ViewModel {
      * </code>
      */
     public void initialisePlayer() {
+        Log.d(TAG, "INIT_PLAYER");
         loadingState.postValue(true);
         playTime.postValue(0);
         songDuration.postValue(0);

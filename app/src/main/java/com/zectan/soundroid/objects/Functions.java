@@ -79,6 +79,15 @@ public class Functions {
                 .collect(Collectors.toList());
     }
 
+    public static List<Song> formQueue(List<Song> songs, List<Integer> order, int queueNumber, boolean looping) {
+        List<Song> queue = new ArrayList<>();
+        for (int i = 0; i < order.size(); i++) {
+            queue.add(songs.get(order.get(i)));
+        }
+
+        return queue.subList(looping ? 1 : (queueNumber + 1), order.size());
+    }
+
     public static void main(String[] args) {
         for (int i = 0; i < 100; i++) {
             System.out.println((int) (Math.random() * 10));

@@ -59,6 +59,7 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistsAdapter.View
         Glide
                 .with(context)
                 .load(cover)
+                .centerCrop()
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.coverImage);
     }

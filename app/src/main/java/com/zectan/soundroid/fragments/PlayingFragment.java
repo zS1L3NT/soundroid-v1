@@ -18,10 +18,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
@@ -29,6 +31,7 @@ import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.zectan.soundroid.AnimatedFragment;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
+import com.zectan.soundroid.adapters.PlayingQueueAdapter;
 import com.zectan.soundroid.objects.Animations;
 import com.zectan.soundroid.objects.Functions;
 import com.zectan.soundroid.objects.Playlist;
@@ -42,13 +45,14 @@ import java.util.List;
 @SuppressLint("UseCompatLoadingForDrawables")
 public class PlayingFragment extends AnimatedFragment {
     private MainActivity activity;
+    private PlayingQueueAdapter playingQueueAdapter;
 
     private LinearProgressIndicator convertingProgress;
     private ImageView coverImage, shuffleImage, backImage, playPauseImage, playPauseMiniImage, nextImage, loopImage;
     private TextView titleText, artisteText, songTimeText, songLengthText, playlistName, errorMessage, retryMessage;
     private ProgressBar loadingBar;
     private SeekBar timeSeekbar;
-    private ConstraintLayout parent;
+    private MotionLayout parent;
 
     private PlayingViewModel playingVM;
 
@@ -73,12 +77,12 @@ public class PlayingFragment extends AnimatedFragment {
         activity = (MainActivity) getActivity();
         assert activity != null;
 
-        // ViewModels
+        // View Models
         playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
 
         // Reference views
         convertingProgress = view.findViewById(R.id.converting_progress);
-        parent = view.findViewById(R.id.fragment_playing);
+        parent = view.findViewById(R.id.playing_motion_layout);
         coverImage = view.findViewById(R.id.song_cover);
         shuffleImage = view.findViewById(R.id.song_shuffle);
         backImage = view.findViewById(R.id.song_back);
@@ -95,6 +99,13 @@ public class PlayingFragment extends AnimatedFragment {
         retryMessage = view.findViewById(R.id.retry_message);
         loadingBar = view.findViewById(R.id.song_loading);
         timeSeekbar = view.findViewById(R.id.song_seekbar);
+        RecyclerView recyclerView = view.findViewById(R.id.playing_queue_recycler_view);
+
+        // Recycler Views
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
+        playingQueueAdapter = new PlayingQueueAdapter(this::onSongSelected);
+        recyclerView.setAdapter(playingQueueAdapter);
+        recyclerView.setLayoutManager(layoutManager);
 
         // Live Observers
         playingVM.order.observe(activity, this::onOrderChange);
@@ -113,6 +124,10 @@ public class PlayingFragment extends AnimatedFragment {
         updateLoopColor();
 
         return view;
+    }
+
+    private void onSongSelected(ImageView imageView, String s, List<Song> playlist, int i) {
+
     }
 
     public void backSong(View v) {
@@ -157,6 +172,10 @@ public class PlayingFragment extends AnimatedFragment {
 
             }
         }
+    }
+
+    public void animateHide() {
+        parent.setTransitionState(null);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -248,6 +267,15 @@ public class PlayingFragment extends AnimatedFragment {
     private void onOrderChange(List<Integer> order) {
         Playlist queue = playingVM.queue.getValue();
         assert queue != null;
+
+        playingQueueAdapter.updateQueue(
+                Functions.formQueue(
+                        queue.getSongs(),
+                        order,
+                        playingVM.queueNumber,
+                        playingVM.loopingState
+                )
+        );
 
         Song song = queue.getSong(order.get(0));
         String title = song.getTitle();

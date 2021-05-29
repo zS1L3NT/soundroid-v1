@@ -2,7 +2,7 @@
 <androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment_playing"
+    android:id="@+id/playing_motion_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/playing_background"
@@ -241,18 +241,20 @@
         android:elevation="11dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/playing_queue" />
+        app:layout_constraintTop_toTopOf="@id/playing_queue_recycler_view" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/playing_queue"
+        android:id="@+id/playing_queue_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="37dp"
         android:background="@drawable/playing_queue_background"
         android:elevation="10dp"
         android:layoutAnimation="@anim/recycler_view_animation"
         android:overScrollMode="never"
         android:paddingTop="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/song_play_pause"
         tools:listitem="@layout/song_list_item" />
 
 </androidx.constraintlayout.motion.widget.MotionLayout>

@@ -61,6 +61,7 @@ public class PlaylistViewAdapter extends RecyclerView.Adapter<PlaylistViewAdapte
         Glide
                 .with(context)
                 .load(cover)
+                .centerCrop()
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.coverImage);
         holder.itemView.setOnClickListener(__ -> onSongClicked.run(holder.coverImage, transitionName, song, position));
