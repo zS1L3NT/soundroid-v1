@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
@@ -41,6 +42,7 @@ public class HomeFragment extends Fragment {
     private PlayingViewModel playingVM;
 
     private SwipeRefreshLayout swipeRefreshLayout;
+    private MotionLayout motionLayout;
     private EditText searchbar;
 
     public HomeFragment() {
@@ -61,6 +63,7 @@ public class HomeFragment extends Fragment {
         // Reference views
         RecyclerView recyclerView = view.findViewById(R.id.home_recycler_view);
         swipeRefreshLayout = view.findViewById(R.id.home_swipe_refresh);
+        motionLayout = view.findViewById(R.id.home_motion_layout);
         searchbar = view.findViewById(R.id.home_searchbar);
 
         // Recycler View
@@ -72,6 +75,10 @@ public class HomeFragment extends Fragment {
         // Live Observers
         homeVM.playlist.observe(activity, homeAdapter::updatePlaylist);
 
+        if (homeVM.getTransitionState() != null) {
+            motionLayout.setTransitionState(homeVM.getTransitionState());
+            homeVM.setTransitionState(null);
+        }
         swipeRefreshLayout.setOnRefreshListener(this::loadFromFirebase);
         searchbar.setOnClickListener(this::onSearchbarClicked);
         if (homeVM.playlist.getValue() == null) loadFromFirebase();
@@ -90,6 +97,7 @@ public class HomeFragment extends Fragment {
                 .setTransitionName(transitionName);
         NavHostFragment.findNavController(this).navigate(action, extras);
         playingVM.selectSong(playlist, position);
+        homeVM.setTransitionState(motionLayout.getTransitionState());
     }
 
     private void onSearchbarClicked(View view) {
@@ -98,6 +106,7 @@ public class HomeFragment extends Fragment {
                 .addSharedElement(searchbar, getString(R.string.TRANSITION_searchbar)).build();
         NavDirections action = HomeFragmentDirections.openSearch();
         NavHostFragment.findNavController(this).navigate(action, extras);
+        homeVM.setTransitionState(motionLayout.getTransitionState());
     }
 
     private void loadFromFirebase() {

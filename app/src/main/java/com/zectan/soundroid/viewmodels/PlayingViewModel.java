@@ -265,7 +265,7 @@ public class PlayingViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
-        super.onCleared();
         mp.pause();
+        super.onCleared();
     }
 }

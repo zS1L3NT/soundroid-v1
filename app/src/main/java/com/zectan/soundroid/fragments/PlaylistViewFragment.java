@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
@@ -39,6 +40,7 @@ public class PlaylistViewFragment extends Fragment {
     private PlayingViewModel playingVM;
 
     private SwipeRefreshLayout swipeRefreshLayout;
+    private MotionLayout motionLayout;
     private ImageView coverImage;
     private TextView nameText;
 
@@ -60,6 +62,7 @@ public class PlaylistViewFragment extends Fragment {
         // Reference Views
         RecyclerView recyclerView = view.findViewById(R.id.playlist_view_recycler_view);
         swipeRefreshLayout = view.findViewById(R.id.playlist_view_swipe_refresh);
+        motionLayout = view.findViewById(R.id.playlist_view_motion_layout);
         coverImage = view.findViewById(R.id.playlist_view_cover);
         nameText = view.findViewById(R.id.playlist_view_name);
 
@@ -73,6 +76,10 @@ public class PlaylistViewFragment extends Fragment {
         playlistViewVM.info.observe(activity, this::loadPlaylistInfo);
         playlistViewVM.songs.observe(activity, this::onSongsChange);
 
+        if (playlistViewVM.getTransitionState() != null) {
+            motionLayout.setTransitionState(playlistViewVM.getTransitionState());
+            playlistViewVM.setTransitionState(null);
+        }
         swipeRefreshLayout.setOnRefreshListener(this::loadFromFirebase);
         loadSongsFromFirebase();
 
@@ -95,6 +102,7 @@ public class PlaylistViewFragment extends Fragment {
 
         Playlist playlist = new Playlist(info, songs);
         playingVM.selectSong(playlist, position);
+        playlistViewVM.setTransitionState(motionLayout.getTransitionState());
     }
 
     private void onSongsChange(List<Song> songs) {

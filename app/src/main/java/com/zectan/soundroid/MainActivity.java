@@ -9,12 +9,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.zectan.soundroid.viewmodels.HomeViewModel;
+import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 
 // https://www.glyric.com/2018/merlin/aagaya-nilave
 
@@ -23,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
     private InputMethodManager imm;
     private FirebaseRepository repository;
+
+    private HomeViewModel homeVM;
+    private PlaylistViewViewModel playlistViewVM;
 
     private NavController navController;
 
@@ -33,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
 
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         repository = new FirebaseRepository();
+
+        // View Models
+        homeVM = new ViewModelProvider(this).get(HomeViewModel.class);
+        playlistViewVM = new ViewModelProvider(this).get(PlaylistViewViewModel.class);
 
         // Reference views
         bottomNavigationView = findViewById(R.id.bottom_navigator);
@@ -62,12 +72,14 @@ public class MainActivity extends AppCompatActivity {
 
         switch (name) {
             case "Home":
+                homeVM.setTransitionState(null);
                 navController.navigate(R.id.fragment_home, null, options);
                 break;
             case "Playing":
                 navController.navigate(R.id.fragment_playing, null, options);
                 break;
             case "Playlist":
+                playlistViewVM.setTransitionState(null);
                 navController.navigate(R.id.fragment_playlists, null, options);
                 break;
             default:

@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
-import com.zectan.soundroid.objects.Animations;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
@@ -67,7 +66,6 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
                 .load(cover)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.coverImage);
-        holder.itemView.setOnTouchListener(Animations::songListItemSqueeze);
         holder.itemView.setOnClickListener(__ -> onSongClicked.run(holder.coverImage, transitionName, playlist, position));
     }
 
