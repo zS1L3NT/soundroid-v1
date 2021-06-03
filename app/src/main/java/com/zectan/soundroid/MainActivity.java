@@ -1,5 +1,6 @@
 package com.zectan.soundroid;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.zectan.soundroid.objects.MarginProxy;
 import com.zectan.soundroid.viewmodels.HomeViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 
@@ -23,7 +25,7 @@ import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "(SounDroid) MainActivity";
-    private BottomNavigationView bottomNavigationView;
+    private BottomNavigationView navigator;
     private InputMethodManager imm;
     private FirebaseRepository repository;
 
@@ -36,29 +38,29 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+    
         // TODO View model encapsulation
-
+    
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         repository = new FirebaseRepository();
-
+    
         // View Models
         homeVM = new ViewModelProvider(this).get(HomeViewModel.class);
         playlistViewVM = new ViewModelProvider(this).get(PlaylistViewViewModel.class);
-
+    
         // Reference views
-        bottomNavigationView = findViewById(R.id.bottom_navigator);
-
+        navigator = findViewById(R.id.bottom_navigator);
+    
         NavHostFragment navHostFragment = (NavHostFragment)
-                getSupportFragmentManager()
-                        .findFragmentById(R.id.nav_host_fragment);
+            getSupportFragmentManager()
+                .findFragmentById(R.id.nav_host_fragment);
         assert navHostFragment != null;
-
+    
         navController = navHostFragment.getNavController();
-        NavigationUI.setupWithNavController(bottomNavigationView, navController);
-
-        bottomNavigationView.setOnNavigationItemSelectedListener(this::onNavigationItem);
-        bottomNavigationView.setOnNavigationItemReselectedListener(this::onNavigationItem);
+        NavigationUI.setupWithNavController(navigator, navController);
+    
+        navigator.setOnNavigationItemSelectedListener(this::onNavigationItem);
+        navigator.setOnNavigationItemReselectedListener(this::onNavigationItem);
     }
 
     private boolean onNavigationItem(MenuItem item) {
@@ -75,42 +77,48 @@ public class MainActivity extends AppCompatActivity {
         switch (name) {
             case "Home":
                 homeVM.setTransitionState(null);
-                if (bottomNavigationView.getSelectedItemId() == item.getItemId()) break;
+                if (navigator.getSelectedItemId() == item.getItemId()) break;
                 navController.navigate(R.id.fragment_home, null, options);
                 break;
             case "Playing":
-                if (bottomNavigationView.getSelectedItemId() == item.getItemId()) break;
+                if (navigator.getSelectedItemId() == item.getItemId()) break;
                 navController.navigate(R.id.fragment_playing, null, options);
                 break;
             case "Playlist":
                 playlistViewVM.setTransitionState(null);
-                if (bottomNavigationView.getSelectedItemId() == item.getItemId()) break;
+                if (navigator.getSelectedItemId() == item.getItemId()) break;
                 navController.navigate(R.id.fragment_playlists, null, options);
                 break;
             default:
                 Log.e(TAG, "Unknown navigation name: " + name);
                 break;
         }
-
+    
         return true;
     }
-
+    
     public FirebaseRepository getRepository() {
         return repository;
     }
-
-    public void showBottomNavigator() {
-        bottomNavigationView.setVisibility(View.VISIBLE);
+    
+    public void hideNavigator() {
+        MarginProxy mp = new MarginProxy(navigator);
+        ValueAnimator va = ValueAnimator.ofInt(mp.getBottomMargin(), -navigator.getHeight()).setDuration(250);
+        va.addUpdateListener(animation -> mp.setBottomMargin((int) animation.getAnimatedValue()));
+        va.start();
     }
-
-    public void hideBottomNavigator() {
-        bottomNavigationView.setVisibility(View.GONE);
+    
+    public void showNavigator() {
+        MarginProxy mp = new MarginProxy(navigator);
+        ValueAnimator va = ValueAnimator.ofInt(mp.getBottomMargin(), 0).setDuration(250);
+        va.addUpdateListener(animation -> mp.setBottomMargin((int) animation.getAnimatedValue()));
+        va.start();
     }
-
+    
     public void showKeyboard() {
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
-
+    
     public void hideKeyboard(View currentFocus) {
         imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
     }

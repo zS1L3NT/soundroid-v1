@@ -85,7 +85,7 @@ public class Functions {
             queue.add(songs.get(order.get(i)));
         }
 
-        return queue.subList(looping ? 1 : (queueNumber + 1), order.size());
+        return order.size() > 0 ? queue.subList(looping ? 1 : (queueNumber + 1), order.size()) : new ArrayList<>();
     }
 
     public static void main(String[] args) {

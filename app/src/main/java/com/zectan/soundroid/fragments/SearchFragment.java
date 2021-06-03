@@ -59,7 +59,7 @@ public class SearchFragment extends AnimatedFragment {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         activity = (MainActivity) getActivity();
         assert activity != null;
-        activity.hideBottomNavigator();
+        activity.hideNavigator();
 
         // ViewModels
         searchVM = new ViewModelProvider(activity).get(SearchViewModel.class);
@@ -95,7 +95,7 @@ public class SearchFragment extends AnimatedFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        activity.showBottomNavigator();
+        activity.showNavigator();
     }
 
     private boolean onTexChange(TextView textView, int actionId, KeyEvent keyEvent) {

@@ -58,13 +58,15 @@ public class PlayingFragment extends AnimatedFragment {
 
     private boolean touchingSeekbar = false;
     private int finalTouch = 0;
+    private int startMotion = 0;
 
     public PlayingFragment() {
         // Required empty public constructor
     }
-
+    
     @Override
-    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull @NotNull View view,
+                              @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         String transitionName = PlayingFragmentArgs.fromBundle(getArguments()).getTransitionName();
         ViewCompat.setTransitionName(view.findViewById(R.id.song_cover), transitionName);
@@ -118,23 +120,36 @@ public class PlayingFragment extends AnimatedFragment {
         playingVM.playTime.observe(activity, this::onPlayTimeChange);
         playingVM.convertingError.observe(activity, this::onConvertingErrorChange);
         playingVM.convertingProgress.observe(activity, this::onConvertingProgressChange);
-
+        parent.addTransitionListener(transitionListener());
+    
         enableControls();
         updateShuffleColor();
         updateLoopColor();
-
+        activity.showNavigator();
+    
         return view;
     }
-
-    private void onSongSelected(ImageView imageView, String s, List<Song> playlist, int i) {
-
+    
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        activity.showNavigator();
     }
-
+    
+    private void onSongSelected(List<Song> displayed, int position) {
+        Playlist queue = playingVM.queue.getValue();
+        if (queue == null)
+            return;
+        
+        playingVM.selectSong(queue, queue.getSongs().indexOf(displayed.get(position)));
+    }
+    
     public void backSong(View v) {
         Integer duration = playingVM.playTime.getValue();
         System.out.println(duration);
-        if (duration == null) return;
-
+        if (duration == null)
+            return;
+        
         if (duration <= 2) {
             playingVM.playPreviousSong();
         } else {
@@ -162,20 +177,17 @@ public class PlayingFragment extends AnimatedFragment {
     public void playPauseSong(View v) {
         Boolean playingState = playingVM.playingState.getValue();
         Boolean loadingState = playingVM.loadingState.getValue();
-        if (loadingState != null && loadingState) return;
+        if (loadingState != null && loadingState)
+            return;
         if (playingState != null && playingState) {
             playingVM.stopPlaying();
         } else {
             try {
                 playingVM.startPlaying();
             } catch (Exception ignored) {
-
+            
             }
         }
-    }
-
-    public void animateHide() {
-        parent.setTransitionState(null);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -252,50 +264,40 @@ public class PlayingFragment extends AnimatedFragment {
 
     private void updateShuffleColor() {
         shuffleImage.setColorFilter(
-                ContextCompat.getColor(activity, playingVM.shufflingState ? R.color.theme_button_on : R.color.theme_button_off),
-                android.graphics.PorterDuff.Mode.MULTIPLY
-        );
+            ContextCompat.getColor(activity,
+                playingVM.shufflingState ? R.color.theme_button_on : R.color.theme_button_off),
+            android.graphics.PorterDuff.Mode.MULTIPLY);
     }
 
     private void updateLoopColor() {
         loopImage.setColorFilter(
-                ContextCompat.getColor(activity, playingVM.loopingState ? R.color.theme_button_on : R.color.theme_button_off),
-                android.graphics.PorterDuff.Mode.MULTIPLY
-        );
+            ContextCompat.getColor(activity,
+                playingVM.loopingState ? R.color.theme_button_on : R.color.theme_button_off),
+            android.graphics.PorterDuff.Mode.MULTIPLY);
     }
 
     private void onOrderChange(List<Integer> order) {
         Playlist queue = playingVM.queue.getValue();
         assert queue != null;
-
+    
         playingQueueAdapter.updateQueue(
-                Functions.formQueue(
-                        queue.getSongs(),
-                        order,
-                        playingVM.queueNumber,
-                        playingVM.loopingState
-                )
-        );
-
+            Functions.formQueue(queue.getSongs(), order, playingVM.queueNumber, playingVM.loopingState));
+    
         Song song = queue.getSong(order.get(0));
         String title = song.getTitle();
         String artiste = song.getArtiste();
         String cover = song.getCover();
         String colorHex = song.getColorHex();
-
+    
         playlistName.setText(queue.getInfo().getName());
         titleText.setText(title);
         artisteText.setText(artiste);
-        Glide
-                .with(activity)
-                .load(cover)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(coverImage);
-
+        Glide.with(activity).load(cover).transition(DrawableTransitionOptions.withCrossFade()).into(coverImage);
+    
         Drawable oldGD = parent.getBackground();
         int[] colors = {Color.parseColor(colorHex), activity.getColor(R.color.theme_playing_bottom)};
         GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
-
+    
         Drawable[] layers = {oldGD, newGD};
         TransitionDrawable transition = new TransitionDrawable(layers);
         parent.setBackground(transition);
@@ -307,28 +309,27 @@ public class PlayingFragment extends AnimatedFragment {
     }
 
     private void onJitteringStateChange(boolean jittering) {
-        loadingBar.setVisibility(jittering ? View.VISIBLE : View.INVISIBLE);
+        loadingBar.setAlpha(jittering ? 1 : 0);
+        parent.requestLayout();
     }
 
     private void onLoadingStateChange(boolean loading) {
-        loadingBar.setVisibility(loading ? View.VISIBLE : View.INVISIBLE);
+        loadingBar.setAlpha(loading ? 1 : 0);
+        parent.requestLayout();
     }
 
     private void onPlayingStateChange(boolean playing) {
-        playPauseImage.setImageDrawable(activity.getDrawable(
-                playing ? R.drawable.controls_pause_filled : R.drawable.controls_play_filled
-        ));
-        playPauseMiniImage.setImageDrawable(activity.getDrawable(
-                playing ? R.drawable.controls_pause : R.drawable.controls_play
-        ));
+        playPauseImage.setImageDrawable(
+            activity.getDrawable(playing ? R.drawable.controls_pause_filled : R.drawable.controls_play_filled));
+        playPauseMiniImage
+            .setImageDrawable(activity.getDrawable(playing ? R.drawable.controls_pause : R.drawable.controls_play));
     }
 
     private void onConvertingStateChange(boolean converting) {
         float alpha = convertingProgress.getAlpha();
-        ValueAnimator alphaAnimation = ValueAnimator
-                .ofFloat(alpha, converting ? 1 : 0)
-                .setDuration(500);
-        alphaAnimation.addUpdateListener(animation -> convertingProgress.setAlpha((float) animation.getAnimatedValue()));
+        ValueAnimator alphaAnimation = ValueAnimator.ofFloat(alpha, converting ? 1 : 0).setDuration(500);
+        alphaAnimation
+            .addUpdateListener(animation -> convertingProgress.setAlpha((float) animation.getAnimatedValue()));
         alphaAnimation.start();
     }
 
@@ -351,17 +352,13 @@ public class PlayingFragment extends AnimatedFragment {
                 playingVM.convertingError.setValue("");
                 playingVM.recursivelyRunPlaylist();
             }), 1000);
-
-            ValueAnimator darkenAnimation = ValueAnimator.ofArgb(
-                    activity.getColor(R.color.white),
-                    activity.getColor(R.color.theme_3)
-            ).setDuration(1000);
-            darkenAnimation.addUpdateListener(animation -> coverImage.setColorFilter(
-                    (int) animation.getAnimatedValue(),
-                    android.graphics.PorterDuff.Mode.MULTIPLY
-            ));
+    
+            ValueAnimator darkenAnimation = ValueAnimator
+                .ofArgb(activity.getColor(R.color.white), activity.getColor(R.color.theme_3)).setDuration(1000);
+            darkenAnimation.addUpdateListener(animation -> coverImage.setColorFilter((int) animation.getAnimatedValue(),
+                android.graphics.PorterDuff.Mode.MULTIPLY));
             darkenAnimation.start();
-
+    
             ValueAnimator messageAnimation = ValueAnimator.ofFloat(0f, 1f).setDuration(500);
             messageAnimation.addUpdateListener(animation -> {
                 float alpha = (float) animation.getAnimatedValue();
@@ -379,12 +376,43 @@ public class PlayingFragment extends AnimatedFragment {
             coverImage.clearColorFilter();
             errorMessage.setAlpha(0f);
             retryMessage.setAlpha(0f);
-
+    
             enableControls();
         }
     }
-
+    
     private void onConvertingProgressChange(int progress) {
         convertingProgress.setProgressCompat(progress, true);
+    }
+    
+    public MotionLayout.TransitionListener transitionListener() {
+        return new MotionLayout.TransitionListener() {
+            @Override
+            public void onTransitionStarted(MotionLayout motionLayout, int i, int i1) {
+                if (startMotion == 0) {
+                    startMotion = i1;
+                }
+                if (i != startMotion) {
+                    activity.showNavigator();
+                }
+            }
+            
+            @Override
+            public void onTransitionChange(MotionLayout motionLayout, int i, int i1, float v) {
+            }
+            
+            @Override
+            public void onTransitionCompleted(MotionLayout motionLayout, int i) {
+                if (i == startMotion) {
+                    activity.hideNavigator();
+                } else {
+                    activity.showNavigator();
+                }
+            }
+            
+            @Override
+            public void onTransitionTrigger(MotionLayout motionLayout, int i, boolean b, float v) {
+            }
+        };
     }
 }

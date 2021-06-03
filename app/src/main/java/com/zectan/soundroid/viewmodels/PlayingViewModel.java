@@ -9,6 +9,7 @@ import com.zectan.soundroid.objects.Functions;
 import com.zectan.soundroid.objects.MusicPlayer;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.Song;
+import com.zectan.soundroid.tasks.SongLinkFetchThread;
 
 import java.util.List;
 import java.util.Timer;
@@ -99,11 +100,13 @@ public class PlayingViewModel extends ViewModel {
 
         // Get the gradient before calling the song processing
         song.getFileLocation(
-                link -> {
+            new SongLinkFetchThread.Callback() {
+                @Override
+                public void onFinish(String link) {
                     if (playId == playNumber) {
                         mp.setNewData(link, () -> {
                             Log.d(TAG, "SONG_LOADED");
-
+                    
                             mp.setOnCompletionListener(__ -> playNextSong());
                             startPlaying();
                             loadingState.postValue(false);
@@ -112,11 +115,28 @@ public class PlayingViewModel extends ViewModel {
                     } else {
                         Log.d(TAG, "SONG_DISCARDED");
                     }
-                },
-                convertingError::postValue,
-                convertingState::postValue,
-                convertingProgress::postValue,
-                () -> playId == playNumber);
+                }
+        
+                @Override
+                public void onError(String message) {
+                    convertingError.postValue(message);
+                }
+        
+                @Override
+                public void isConverting(boolean converting) {
+                    convertingState.postValue(converting);
+                }
+        
+                @Override
+                public void onProgress(int progress) {
+                    convertingProgress.postValue(progress);
+                }
+        
+                @Override
+                public boolean isInactive() {
+                    return playId != playNumber;
+                }
+            });
     }
 
     /**

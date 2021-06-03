@@ -48,21 +48,19 @@ public class PlayingQueueAdapter extends RecyclerView.Adapter<PlayingQueueAdapte
     public void onBindViewHolder(@NonNull PlayingQueueAdapter.ViewHolder holder, int position) {
         Song song = queue.get(position);
         Context context = holder.itemView.getContext();
-
-        String id = song.getId();
+    
         String title = song.getTitle();
         String artiste = song.getArtiste();
         String cover = song.getCover();
-        String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_song_cover), id);
-
+    
         holder.titleText.setText(title);
         holder.artisteText.setText(artiste);
         Glide
-                .with(context)
-                .load(cover)
-                .centerCrop()
-                .into(holder.coverImage);
-        holder.itemView.setOnClickListener(__ -> onSongClicked.run(holder.coverImage, transitionName, queue, position));
+            .with(context)
+            .load(cover)
+            .centerCrop()
+            .into(holder.coverImage);
+        holder.itemView.setOnClickListener(__ -> onSongClicked.run(queue, position));
     }
 
     @Override
@@ -71,7 +69,7 @@ public class PlayingQueueAdapter extends RecyclerView.Adapter<PlayingQueueAdapte
     }
 
     public interface onSongClicked {
-        void run(ImageView cover, String transitionName, List<Song> playlist, int position);
+        void run(List<Song> playlist, int position);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

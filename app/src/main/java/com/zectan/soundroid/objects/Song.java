@@ -54,29 +54,16 @@ public class Song {
         return colorHex;
     }
 
-    public void getFileLocation(
-            SongLinkFetchThread.FinishCallback finishCallback,
-            SongLinkFetchThread.ErrorCallback errorCallback,
-            SongLinkFetchThread.ConvertingCallback convertingCallback,
-            SongLinkFetchThread.ProgressCallback progressCallback,
-            SongLinkFetchThread.ActiveState activeState
-    ) {
+    public void getFileLocation(SongLinkFetchThread.Callback callback) {
         File file = new File(folder, id + ".mp3");
         if (file.exists()) {
             Log.d(TAG, "READING_SONG");
-            finishCallback.run(file.getPath());
+            callback.onFinish(file.getPath());
         } else {
             Log.d(TAG, "STREAMING_SONG");
-            new SongLinkFetchThread(
-                    id,
-                    finishCallback,
-                    errorCallback,
-                    convertingCallback,
-                    progressCallback,
-                    activeState
-            ).start();
+            new SongLinkFetchThread(id, callback).start();
         }
-
+    
     }
 
     @Override
