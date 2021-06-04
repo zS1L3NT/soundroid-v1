@@ -109,6 +109,7 @@ public class PlayingFragment extends AnimatedFragment {
         playingQueueAdapter = new PlayingQueueAdapter(this::onSongSelected);
         recyclerView.setAdapter(playingQueueAdapter);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
         
         // Live Observers
         playingVM.order.observe(activity, this::onOrderChange);

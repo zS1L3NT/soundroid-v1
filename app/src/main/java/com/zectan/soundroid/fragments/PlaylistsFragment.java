@@ -61,6 +61,7 @@ public class PlaylistsFragment extends Fragment {
         PlaylistsAdapter playlistsAdapter = new PlaylistsAdapter(this::onPlaylistSelected);
         recyclerView.setAdapter(playlistsAdapter);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
 
         // Observers
         playlistVM.infos.observe(activity, playlistsAdapter::updateInfos);
