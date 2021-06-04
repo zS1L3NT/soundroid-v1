@@ -59,7 +59,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layoutAnimation="@anim/recycler_view_animation"
-            android:overScrollMode="never"
             tools:listitem="@layout/playlist_list_item" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

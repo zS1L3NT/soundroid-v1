@@ -86,7 +86,6 @@
         android:layout_marginTop="20dp"
         android:elevation="1dp"
         android:layoutAnimation="@anim/recycler_view_animation"
-        android:overScrollMode="never"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/playlist_view_name"
         tools:listitem="@layout/song_list_item" />

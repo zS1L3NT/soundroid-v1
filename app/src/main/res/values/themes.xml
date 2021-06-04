@@ -5,6 +5,7 @@
         <item name="android:windowActivityTransitions">true</item>
         <!-- Status bar color. -->
         <item name="android:windowTranslucentStatus">true</item>
+        <item name="colorPrimary">@color/theme_2</item>
         <!-- Customize your theme here. -->
         <item name="android:windowSharedElementEnterTransition">
             @transition/shared_image

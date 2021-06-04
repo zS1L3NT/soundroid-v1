@@ -43,27 +43,34 @@ public class Functions {
             formatted.append(minutes).append(":");
         }
         formatted.append(seconds);
-
+    
         return formatted.toString();
     }
-
+    
     public static List<Integer> createOrder(int startValue, int length) {
         List<Integer> order = new ArrayList<>();
         for (int i = startValue; i < length; i++) order.add(i);
         for (int i = 0; i < startValue; i++) order.add(i);
         return order;
     }
-
+    
+    public static List<Integer> createOrder(int startValue, List<Integer> order) {
+        List<Integer> newOrder = new ArrayList<>();
+        for (int i = startValue; i < order.size(); i++) newOrder.add(order.get(i));
+        for (int i = 0; i < startValue; i++) newOrder.add(i);
+        return newOrder;
+    }
+    
     public static List<Integer> changeOrder(List<Integer> order, int startValue) {
         int position = order.indexOf(startValue);
         if (position < 0) return order;
-
+        
         List<Integer> newOrder = new ArrayList<>();
         for (int i = position; i < order.size(); i++) newOrder.add(order.get(i));
         for (int i = 0; i < position; i++) newOrder.add(order.get(i));
         return newOrder;
     }
-
+    
     public static List<Integer> shuffleOrder(int startValue, int length) {
         List<Integer> order = new ArrayList<>();
         for (int i = 0; i < length; i++) if (i != startValue) order.add(i);
@@ -71,21 +78,34 @@ public class Functions {
         order.add(0, startValue);
         return order;
     }
-
+    
+    public static List<Integer> shuffleOrder(int startValue, List<Integer> order) {
+        List<Integer> shuffle = new ArrayList<>();
+        for (int i = 0; i < order.size(); i++) if (i != startValue) shuffle.add(order.get(i));
+        Collections.shuffle(shuffle);
+        shuffle.add(0, startValue);
+        return shuffle;
+    }
+    
     public static List<Song> sortSongs(List<Song> songs, List<String> order) {
         return songs
-                .stream()
-                .sorted((song1, song2) -> order.indexOf(song1.getId()) - order.indexOf(song2.getId()))
-                .collect(Collectors.toList());
+            .stream()
+            .sorted((song1, song2) -> order.indexOf(song1.getId()) - order.indexOf(song2.getId()))
+            .collect(Collectors.toList());
     }
-
-    public static List<Song> formQueue(List<Song> songs, List<Integer> order, int queueNumber, boolean looping) {
+    
+    public static List<Song> formQueue(List<Song> songs, List<Integer> order) {
         List<Song> queue = new ArrayList<>();
         for (int i = 0; i < order.size(); i++) {
-            queue.add(songs.get(order.get(i)));
+            int songsIndex = order.get(i);
+            if (songsIndex == -1) {
+                queue.add(Song.getDefault());
+            } else {
+                queue.add(songs.get(songsIndex));
+            }
         }
-
-        return order.size() > 0 ? queue.subList(looping ? 1 : (queueNumber + 1), order.size()) : new ArrayList<>();
+        
+        return order.size() > 0 ? queue.subList(1, order.size()) : new ArrayList<>();
     }
 
     public static void main(String[] args) {

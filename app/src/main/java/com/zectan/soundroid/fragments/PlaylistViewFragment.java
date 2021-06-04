@@ -75,6 +75,7 @@ public class PlaylistViewFragment extends Fragment {
         // Live Observers
         playlistViewVM.info.observe(activity, this::loadPlaylistInfo);
         playlistViewVM.songs.observe(activity, this::onSongsChange);
+        motionLayout.addTransitionListener(activity.getTransitionListener());
 
         if (playlistViewVM.getTransitionState() != null) {
             motionLayout.setTransitionState(playlistViewVM.getTransitionState());

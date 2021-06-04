@@ -94,7 +94,6 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layoutAnimation="@anim/recycler_view_animation"
-        android:overScrollMode="never"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/home_download_text"
         tools:listitem="@layout/song_list_item" />

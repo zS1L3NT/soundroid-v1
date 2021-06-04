@@ -74,6 +74,7 @@ public class HomeFragment extends Fragment {
 
         // Live Observers
         homeVM.playlist.observe(activity, homeAdapter::updatePlaylist);
+        motionLayout.addTransitionListener(activity.getTransitionListener());
 
         if (homeVM.getTransitionState() != null) {
             motionLayout.setTransitionState(homeVM.getTransitionState());

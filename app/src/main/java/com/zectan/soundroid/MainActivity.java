@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
@@ -122,9 +123,37 @@ public class MainActivity extends AppCompatActivity {
     public void hideKeyboard(View currentFocus) {
         imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
     }
-
+    
     public void handleError(Exception e) {
         Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
         Log.e(TAG, e.getMessage());
+    }
+    
+    public MotionLayout.TransitionListener getTransitionListener() {
+        return new MotionLayout.TransitionListener() {
+            @Override
+            public void onTransitionStarted(MotionLayout motionLayout, int i, int i1) {
+                if (i == motionLayout.getStartState()) {
+                    showNavigator();
+                }
+            }
+            
+            @Override
+            public void onTransitionChange(MotionLayout motionLayout, int i, int i1, float v) {
+            }
+            
+            @Override
+            public void onTransitionCompleted(MotionLayout motionLayout, int i) {
+                if (i == motionLayout.getEndState()) {
+                    hideNavigator();
+                } else {
+                    showNavigator();
+                }
+            }
+            
+            @Override
+            public void onTransitionTrigger(MotionLayout motionLayout, int i, boolean b, float v) {
+            }
+        };
     }
 }

@@ -84,10 +84,10 @@ public class MusicPlayer {
     }
 
     /**
-     * Starts the music player
+     * Clear the music player
      */
-    public void start() {
-        player.start();
+    public void reset() {
+        player.reset();
     }
 
     /**
