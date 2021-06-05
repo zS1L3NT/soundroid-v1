@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView navigator;
     private InputMethodManager imm;
     private FirebaseRepository repository;
+    private MarginProxy mp;
 
     private HomeViewModel homeVM;
     private PlaylistViewViewModel playlistViewVM;
@@ -56,9 +57,9 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
         assert navHostFragment != null;
-    
         navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(navigator, navController);
+        mp = new MarginProxy(navigator);
     
         navigator.setOnNavigationItemSelectedListener(this::onNavigationItem);
         navigator.setOnNavigationItemReselectedListener(this::onNavigationItem);
@@ -103,14 +104,12 @@ public class MainActivity extends AppCompatActivity {
     }
     
     public void hideNavigator() {
-        MarginProxy mp = new MarginProxy(navigator);
         ValueAnimator va = ValueAnimator.ofInt(mp.getBottomMargin(), -navigator.getHeight()).setDuration(250);
         va.addUpdateListener(animation -> mp.setBottomMargin((int) animation.getAnimatedValue()));
         va.start();
     }
     
     public void showNavigator() {
-        MarginProxy mp = new MarginProxy(navigator);
         ValueAnimator va = ValueAnimator.ofInt(mp.getBottomMargin(), 0).setDuration(250);
         va.addUpdateListener(animation -> mp.setBottomMargin((int) animation.getAnimatedValue()));
         va.start();
@@ -134,20 +133,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTransitionStarted(MotionLayout motionLayout, int i, int i1) {
                 if (i == motionLayout.getStartState()) {
-                    showNavigator();
+                    mp.setBottomMargin(0);
                 }
             }
             
             @Override
             public void onTransitionChange(MotionLayout motionLayout, int i, int i1, float v) {
+                mp.setBottomMargin((int) (v * -navigator.getHeight()));
             }
             
             @Override
             public void onTransitionCompleted(MotionLayout motionLayout, int i) {
                 if (i == motionLayout.getEndState()) {
-                    hideNavigator();
+                    mp.setBottomMargin(-navigator.getHeight());
                 } else {
-                    showNavigator();
+                    mp.setBottomMargin(0);
                 }
             }
             
