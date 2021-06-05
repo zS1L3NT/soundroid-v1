@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Playlist {
     private PlaylistInfo info;
@@ -39,10 +40,14 @@ public class Playlist {
         }
     }
     
+    public Song getSong(String id) {
+        return this.songs.stream().filter(song -> song.getId().equals(id)).collect(Collectors.toList()).get(0);
+    }
+    
     public int size() {
         return songs.size();
     }
-
+    
     @SuppressLint("DefaultLocale")
     @Override
     public @NotNull String toString() {

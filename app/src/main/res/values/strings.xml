@@ -9,6 +9,7 @@
     <string name="playing_loop_song">Loop song</string>
     <string name="playing_shuffle_song">Shuffle song</string>
     <string name="song_list_item_cover">Song cover</string>
+    <string name="queue_list_item_cover">Song cover</string>
     <string name="playing_default_time">0:00</string>
     <string name="navigation_home">Home</string>
     <string name="navigation_playlist">Playlist</string>

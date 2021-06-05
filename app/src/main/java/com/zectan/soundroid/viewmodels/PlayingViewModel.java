@@ -12,10 +12,12 @@ import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
 import com.zectan.soundroid.tasks.SongLinkFetchThread;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 /**
  * Queue Number:
@@ -51,13 +53,13 @@ public class PlayingViewModel extends ViewModel {
     public MutableLiveData<Integer> convertingProgress = new MutableLiveData<>();
     public MutableLiveData<Integer> songDuration = new MutableLiveData<>();
     public MutableLiveData<String> convertingError = new MutableLiveData<>();
-    public MutableLiveData<List<Integer>> order = new MutableLiveData<>();
+    public MutableLiveData<List<Integer>> sequence = new MutableLiveData<>();
     private Timer playProgressTimer, playTimeTimer;
-
+    
     public PlayingViewModel() {
         // Required empty public constructor
     }
-
+    
     /**
      * Click event to play a new song to play
      *
@@ -66,35 +68,35 @@ public class PlayingViewModel extends ViewModel {
      */
     public void selectSong(Playlist playlist, int startPosition) {
         Log.i(TAG, String.format("onSongClicked('%s', %d)", playlist.getInfo().getId(), startPosition));
-
+    
         Playlist queue = this.queue.getValue();
         if (queue == null
-                || !queue.getInfo().getId().equals(playlist.getInfo().getId())
-                || playlist.getInfo().getId().equals("")
+            || !queue.getInfo().getId().equals(playlist.getInfo().getId())
+            || playlist.getInfo().getId().equals("")
         ) {
             // If the new clicked song is from a new playlist or has no id
             this.queue.setValue(playlist);
         }
-
+    
         queueNumber = 0;
         if (shufflingState) {
-            order.setValue(Functions.shuffleOrder(startPosition, playlist.size()));
+            sequence.setValue(Functions.shuffleOrder(startPosition, playlist.size()));
         } else {
-            order.setValue(Functions.createOrder(startPosition, playlist.size()));
+            sequence.setValue(Functions.createOrder(startPosition, playlist.size()));
         }
         recursivelyRunPlaylist();
     }
-
+    
     /**
      * Method to recursively traverse a playlist
      */
     public void recursivelyRunPlaylist() {
         Log.i(TAG, "recursivelyRunPlaylist()");
         Playlist queue = this.queue.getValue();
-        List<Integer> order = this.order.getValue();
-        if (queue == null || order == null) return;
+        List<Integer> sequence = this.sequence.getValue();
+        if (queue == null || sequence == null) return;
     
-        Song song = queue.getSong(order.get(0));
+        Song song = queue.getSong(sequence.get(0));
         int playId = ++playNumber;
     
         mp.pause();
@@ -103,7 +105,7 @@ public class PlayingViewModel extends ViewModel {
         if (song.getId().equals("")) {
             this.loadingState.setValue(false);
             this.queue.setValue(null);
-            this.order.setValue(null);
+            this.sequence.setValue(null);
             mp.reset();
             return;
         }
@@ -116,7 +118,7 @@ public class PlayingViewModel extends ViewModel {
                     if (playId == playNumber) {
                         mp.setNewData(link, () -> {
                             Log.d(TAG, "SONG_LOADED");
-                    
+    
                             mp.setOnCompletionListener(__ -> playNextSong());
                             startPlaying();
                             loadingState.postValue(false);
@@ -126,37 +128,37 @@ public class PlayingViewModel extends ViewModel {
                         Log.d(TAG, "SONG_DISCARDED");
                     }
                 }
-        
+    
                 @Override
                 public void onError(String message) {
                     convertingError.postValue(message);
                 }
-        
+    
                 @Override
                 public void isConverting(boolean converting) {
                     convertingState.postValue(converting);
                 }
-        
+    
                 @Override
                 public void onProgress(int progress) {
                     convertingProgress.postValue(progress);
                 }
-        
+    
                 @Override
                 public boolean isInactive() {
                     return playId != playNumber;
                 }
             });
     }
-
+    
     /**
      * Play the previous song in the queue or reset the song progress
      */
     public void playPreviousSong() {
         Playlist queue = this.queue.getValue();
-        List<Integer> order = this.order.getValue();
-        if (queue == null || order == null) return;
-
+        List<Integer> sequence = this.sequence.getValue();
+        if (queue == null || sequence == null) return;
+    
         if (--queueNumber <= -1) {
             if (loopingState)
                 queueNumber += queue.size();
@@ -166,19 +168,19 @@ public class PlayingViewModel extends ViewModel {
             }
         }
     
-        if (order.size() == 0) return;
-        int lastItemInOrder = order.get(order.size() - 1);
-        this.order.setValue(Functions.changeOrder(order, lastItemInOrder));
+        if (sequence.size() == 0) return;
+        int lastItemInOrder = sequence.get(sequence.size() - 1);
+        this.sequence.setValue(Functions.changeOrder(sequence, lastItemInOrder));
         recursivelyRunPlaylist();
     }
-
+    
     /**
      * Play the next song in the queue
      */
     public void playNextSong() {
         Playlist queue = this.queue.getValue();
-        List<Integer> order = this.order.getValue();
-        if (queue == null || order == null) return;
+        List<Integer> sequence = this.sequence.getValue();
+        if (queue == null || sequence == null) return;
     
         Log.i(TAG, "queueNumber: " + queueNumber++);
     
@@ -190,21 +192,21 @@ public class PlayingViewModel extends ViewModel {
             }
         }
     
-        if (order.size() > 1) {
-            int secondItemInOrder = order.get(1);
+        if (sequence.size() > 1) {
+            int secondItemInOrder = sequence.get(1);
             if (!loopingState) {
-                order.remove(0);
+                sequence.remove(0);
             }
-            this.order.setValue(Functions.changeOrder(order, secondItemInOrder));
+            this.sequence.setValue(Functions.changeOrder(sequence, secondItemInOrder));
         } else {
             if (!loopingState) {
-                this.order.setValue(Collections.singletonList(-1));
+                this.sequence.setValue(Collections.singletonList(-1));
             }
         }
     
         recursivelyRunPlaylist();
     }
-
+    
     /**
      * Starts the music player
      */
@@ -212,7 +214,7 @@ public class PlayingViewModel extends ViewModel {
         playProgressTimer = new Timer();
         playTimeTimer = new Timer();
         mp.fadeIn();
-
+    
         playProgressTimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -229,7 +231,7 @@ public class PlayingViewModel extends ViewModel {
             }
         }, 0, 250);
     }
-
+    
     /**
      * Stops the music player, cancels the intervals for the progressbar and updates the listeners
      */
@@ -238,21 +240,21 @@ public class PlayingViewModel extends ViewModel {
         playTimeTimer.cancel();
         mp.fadeOut(() -> playingState.postValue(false));
     }
-
+    
     /**
      * Shuffle or sort queue, depending on shuffle state
      */
     public void shuffleOrSortOrder() {
         Playlist queue = this.queue.getValue();
-        List<Integer> order = this.order.getValue();
-        if (queue == null || order == null) return;
+        List<Integer> sequence = this.sequence.getValue();
+        if (queue == null || sequence == null) return;
     
-        int value = order.get(0);
+        int value = sequence.get(0);
     
         if (shufflingState) {
-            this.order.setValue(Functions.shuffleOrder(value, order));
+            this.sequence.setValue(Functions.shuffleOrder(value, sequence));
         } else {
-            this.order.setValue(Functions.createOrder(value, order));
+            this.sequence.setValue(Functions.createOrder(value, sequence));
         }
     }
     
@@ -270,19 +272,30 @@ public class PlayingViewModel extends ViewModel {
         } else {
             order = queue.getInfo().getOrder();
             songs = queue.getSongs();
-            
+    
             order.remove(song.getId());
             order.add(song.getId());
             songs.add(song);
-            
+    
             queue.setSongs(songs);
             this.queue.setValue(queue);
         }
-        
+    
     }
     
-    public void removeFromQueue(int index) {
-    
+    public void reorderQueue(List<Song> songs) {
+        Playlist queue = this.queue.getValue();
+        List<Integer> sequence = this.sequence.getValue();
+        assert queue != null && sequence != null;
+        
+        List<Integer> newSequence = new ArrayList<>();
+        newSequence.add(sequence.get(0));
+        newSequence.addAll(songs
+            .stream()
+            .map(song -> queue.getSongs().indexOf(song))
+            .collect(Collectors.toList()));
+        
+        this.sequence.setValue(newSequence);
     }
     
     /**
@@ -305,7 +318,7 @@ public class PlayingViewModel extends ViewModel {
         songDuration.postValue(0);
         playProgress.postValue(0);
     }
-
+    
     /**
      * Seeker for the seekbar to change the song timing
      * <br/>
@@ -316,15 +329,15 @@ public class PlayingViewModel extends ViewModel {
      * @param finalTouch Progress value (upon 1000) of the selected position
      */
     public void seekTo(int finalTouch) {
-        List<Integer> order = this.order.getValue();
-        if (order == null) return;
+        List<Integer> sequence = this.sequence.getValue();
+        if (sequence == null) return;
     
         Log.d(TAG, String.format("seekTo(%d)", finalTouch));
     
-        if (order.size() > 0) loadingState.setValue(true);
+        if (sequence.size() > 0) loadingState.setValue(true);
         mp.seekTo(finalTouch, __ -> loadingState.setValue(false));
     }
-
+    
     /**
      * Getter for the duration of the current playing song
      *
@@ -333,7 +346,7 @@ public class PlayingViewModel extends ViewModel {
     public int getDuration() {
         return mp.getDuration();
     }
-
+    
     @Override
     protected void onCleared() {
         mp.pause();

@@ -27,11 +27,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.zectan.soundroid.AnimatedFragment;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
-import com.zectan.soundroid.adapters.PlayingQueueAdapter;
+import com.zectan.soundroid.adapters.QueueAdapter;
 import com.zectan.soundroid.objects.Animations;
 import com.zectan.soundroid.objects.Functions;
 import com.zectan.soundroid.objects.Playlist;
@@ -45,21 +46,36 @@ import java.util.List;
 
 @SuppressLint("UseCompatLoadingForDrawables")
 public class PlayingFragment extends AnimatedFragment {
+    private static final String TAG = "(SounDroid) PlayingFragment";
     private MainActivity activity;
-    private PlayingQueueAdapter playingQueueAdapter;
-
+    private final QueueAdapter.Callback queueAdapterCallback = new QueueAdapter.Callback() {
+        @Override
+        public void onSongSelected(Song song) {
+            Playlist queue = playingVM.queue.getValue();
+            if (queue == null)
+                return;
+            
+            playingVM.selectSong(queue, queue.getSongs().indexOf(song));
+        }
+        
+        @Override
+        public void onReorder(List<Song> songs) {
+            playingVM.reorderQueue(songs);
+        }
+    };
+    
     private LinearProgressIndicator convertingProgress;
     private ImageView coverImage, shuffleImage, backImage, playPauseImage, playPauseMiniImage, nextImage, loopImage;
     private TextView titleText, artisteText, songTimeText, songLengthText, playlistName, errorMessage, retryMessage;
     private ProgressBar loadingBar;
     private SeekBar timeSeekbar;
     private MotionLayout parent;
-
+    
     private PlayingViewModel playingVM;
-
+    private QueueAdapter queueAdapter;
     private boolean touchingSeekbar = false;
     private int finalTouch = 0;
-
+    
     public PlayingFragment() {
         // Required empty public constructor
     }
@@ -102,17 +118,18 @@ public class PlayingFragment extends AnimatedFragment {
         retryMessage = view.findViewById(R.id.retry_message);
         loadingBar = view.findViewById(R.id.song_loading);
         timeSeekbar = view.findViewById(R.id.song_seekbar);
-        RecyclerView recyclerView = view.findViewById(R.id.playing_queue_recycler_view);
-        
+        DragDropSwipeRecyclerView recyclerView = view.findViewById(R.id.playing_queue_recycler_view);
+    
         // Recycler Views
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
-        playingQueueAdapter = new PlayingQueueAdapter(this::onSongSelected);
-        recyclerView.setAdapter(playingQueueAdapter);
+        queueAdapter = new QueueAdapter(queueAdapterCallback);
+        recyclerView.setAdapter(queueAdapter);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
-        
+        recyclerView.setOrientation(DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING);
+        recyclerView.setReduceItemAlphaOnSwiping(true);
+    
         // Live Observers
-        playingVM.order.observe(activity, this::onOrderChange);
+        playingVM.sequence.observe(activity, this::onOrderChange);
         playingVM.songDuration.observe(activity, this::onSongDurationChange);
         playingVM.jitteringState.observe(activity, this::onJitteringStateChange);
         playingVM.loadingState.observe(activity, this::onLoadingStateChange);
@@ -146,14 +163,6 @@ public class PlayingFragment extends AnimatedFragment {
         activity.showNavigator();
     }
     
-    private void onSongSelected(List<Song> displayed, int position) {
-        Playlist queue = playingVM.queue.getValue();
-        if (queue == null)
-            return;
-        
-        playingVM.selectSong(queue, queue.getSongs().indexOf(displayed.get(position)));
-    }
-    
     public void backSong(View v) {
         Integer duration = playingVM.playTime.getValue();
         System.out.println(duration);
@@ -167,22 +176,22 @@ public class PlayingFragment extends AnimatedFragment {
             playingVM.initialisePlayer();
         }
     }
-
+    
     public void nextSong(View v) {
         playingVM.playNextSong();
     }
-
+    
     public void shufflePlaylist(View v) {
         playingVM.shufflingState = !playingVM.shufflingState;
         playingVM.shuffleOrSortOrder();
         updateShuffleColor();
     }
-
+    
     public void loopPlaylist(View v) {
         playingVM.loopingState = !playingVM.loopingState;
         updateLoopColor();
     }
-
+    
     //
     public void playPauseSong(View v) {
         Boolean playingState = playingVM.playingState.getValue();
@@ -199,7 +208,7 @@ public class PlayingFragment extends AnimatedFragment {
             }
         }
     }
-
+    
     @SuppressLint("ClickableViewAccessibility")
     private void enableControls() {
         playPauseImage.setOnClickListener(this::playPauseSong);
@@ -211,19 +220,19 @@ public class PlayingFragment extends AnimatedFragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     finalTouch = progress;
-
+    
                     double percent = (double) progress / 1000;
                     double durationS = (double) playingVM.getDuration() / 1000;
                     int selectedTime = (int) (percent * durationS);
                     songTimeText.setText(Functions.formatDate(selectedTime));
                 }
             }
-
+    
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 touchingSeekbar = true;
             }
-
+    
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 playingVM.seekTo(finalTouch);
@@ -231,7 +240,7 @@ public class PlayingFragment extends AnimatedFragment {
             }
         });
     }
-
+    
     @SuppressLint("ClickableViewAccessibility")
     private void disableControls() {
         View.OnClickListener click = c -> {
@@ -245,51 +254,51 @@ public class PlayingFragment extends AnimatedFragment {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             }
-
+    
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
             }
-
+    
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
     }
-
+    
     private void updateShuffleColor() {
         shuffleImage.setColorFilter(
             ContextCompat.getColor(activity,
                 playingVM.shufflingState ? R.color.theme_button_on : R.color.theme_button_off),
             android.graphics.PorterDuff.Mode.MULTIPLY);
     }
-
+    
     private void updateLoopColor() {
         loopImage.setColorFilter(
             ContextCompat.getColor(activity,
                 playingVM.loopingState ? R.color.theme_button_on : R.color.theme_button_off),
             android.graphics.PorterDuff.Mode.MULTIPLY);
     }
-
+    
     private void onOrderChange(List<Integer> order) {
         Playlist queue = playingVM.queue.getValue();
         String colorHex;
-    
+        
         if (queue == null) {
-            playingQueueAdapter.updateQueue(new ArrayList<>());
+            queueAdapter.updateQueue(new ArrayList<>());
             playlistName.setText("-");
             coverImage.setImageDrawable(activity.getDrawable(R.drawable.playing_cover_default));
             titleText.setText("-");
             artisteText.setText("-");
             colorHex = "#7b828b";
         } else {
-            playingQueueAdapter.updateQueue(Functions.formQueue(queue.getSongs(), order));
-        
+            queueAdapter.updateQueue(Functions.formQueue(queue.getSongs(), order));
+            
             Song song = queue.getSong(order.get(0));
             String title = song.getTitle();
             String artiste = song.getArtiste();
             String cover = song.getCover();
             colorHex = song.getColorHex();
-        
+            
             playlistName.setText(queue.getInfo().getName());
             titleText.setText(title);
             artisteText.setText(artiste);
@@ -300,38 +309,38 @@ public class PlayingFragment extends AnimatedFragment {
                 .placeholder(R.drawable.playing_cover_default)
                 .into(coverImage);
         }
-    
+        
         Drawable oldGD = parent.getBackground();
         int[] colors = {Color.parseColor(colorHex), activity.getColor(R.color.theme_playing_bottom)};
         GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
-    
+        
         Drawable[] layers = {oldGD, newGD};
         TransitionDrawable transition = new TransitionDrawable(layers);
         parent.setBackground(transition);
         transition.startTransition(500);
     }
-
+    
     private void onSongDurationChange(int duration) {
         songLengthText.setText(Functions.formatDate(duration));
     }
-
+    
     private void onJitteringStateChange(boolean jittering) {
         loadingBar.setAlpha(jittering ? 1 : 0);
         parent.requestLayout();
     }
-
+    
     private void onLoadingStateChange(boolean loading) {
         loadingBar.setAlpha(loading ? 1 : 0);
         parent.requestLayout();
     }
-
+    
     private void onPlayingStateChange(boolean playing) {
         playPauseImage.setImageDrawable(
             activity.getDrawable(playing ? R.drawable.controls_pause_filled : R.drawable.controls_play_filled));
         playPauseMiniImage
             .setImageDrawable(activity.getDrawable(playing ? R.drawable.controls_pause : R.drawable.controls_play));
     }
-
+    
     private void onConvertingStateChange(boolean converting) {
         float alpha = convertingProgress.getAlpha();
         ValueAnimator alphaAnimation = ValueAnimator.ofFloat(alpha, converting ? 1 : 0).setDuration(500);
@@ -339,19 +348,19 @@ public class PlayingFragment extends AnimatedFragment {
             .addUpdateListener(animation -> convertingProgress.setAlpha((float) animation.getAnimatedValue()));
         alphaAnimation.start();
     }
-
+    
     private void onPlayProgressChange(int time) {
         if (!touchingSeekbar) {
             timeSeekbar.setProgress(time);
         }
     }
-
+    
     private void onPlayTimeChange(int time) {
         if (!touchingSeekbar) {
             songTimeText.setText(Functions.formatDate(time));
         }
     }
-
+    
     private void onConvertingErrorChange(String message) {
         if (!message.isEmpty()) {
             errorMessage.setText(message);
@@ -374,7 +383,7 @@ public class PlayingFragment extends AnimatedFragment {
             });
             messageAnimation.setStartDelay(500);
             messageAnimation.start();
-
+    
             disableControls();
             playingVM.loadingState.setValue(false);
         } else {

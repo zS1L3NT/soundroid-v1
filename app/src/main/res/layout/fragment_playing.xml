@@ -90,19 +90,25 @@
         android:text="@string/Nil"
         android:textColor="@color/white"
         android:textSize="22sp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintEnd_toStartOf="@id/song_loading"
         app:layout_constraintBottom_toTopOf="@+id/song_artiste"
         app:layout_constraintStart_toStartOf="@+id/song_artiste" />
 
     <TextView
         android:id="@+id/song_artiste"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginBottom="8dp"
         android:alpha="0.6"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:text="@string/Nil"
         android:textColor="@color/white"
         android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@id/song_loading"
         app:layout_constraintBottom_toTopOf="@+id/song_seekbar"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -250,7 +256,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="20dp" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
         android:id="@+id/playing_queue_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -260,6 +266,10 @@
         android:paddingTop="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/playing_queue_helper"
-        tools:listitem="@layout/song_list_item" />
+        app:behind_swiped_item_bg_color="#E53935"
+        app:behind_swiped_item_icon="@drawable/queue_delete"
+        app:behind_swiped_item_icon_margin="16dp"
+        app:item_layout="@layout/queue_list_item"
+        tools:listitem="@layout/queue_list_item" />
 
 </androidx.constraintlayout.motion.widget.MotionLayout>

@@ -7,29 +7,29 @@
     android:background="?android:attr/selectableItemBackground">
 
     <ImageView
-        android:id="@+id/song_list_item_cover"
+        android:id="@+id/queue_list_item_cover"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="15dp"
-        android:contentDescription="@string/song_list_item_cover"
+        android:contentDescription="@string/queue_list_item_cover"
         android:src="@drawable/playing_cover_default"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:id="@+id/song_list_item_info"
+        android:id="@+id/queue_list_item_info"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/song_list_item_menu"
-        app:layout_constraintStart_toEndOf="@+id/song_list_item_cover"
+        app:layout_constraintEnd_toStartOf="@+id/queue_list_item_drag"
+        app:layout_constraintStart_toEndOf="@+id/queue_list_item_cover"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/song_list_item_title"
+            android:id="@+id/queue_list_item_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -41,7 +41,7 @@
             tools:layout_editor_absoluteX="106dp" />
 
         <TextView
-            android:id="@+id/song_list_item_artiste"
+            android:id="@+id/queue_list_item_artiste"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:alpha="0.8"
@@ -49,21 +49,30 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/song_list_item_title"
+            app:layout_constraintTop_toBottomOf="@+id/queue_list_item_title"
             tools:layout_editor_absoluteX="66dp" />
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/song_list_item_menu"
+        android:id="@+id/queue_list_item_drag"
         android:layout_width="50dp"
         android:layout_height="match_parent"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp"
+        android:padding="15dp"
         android:contentDescription="@string/menu"
-        android:src="@drawable/ic_menu"
+        android:src="@drawable/queue_drag"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/white" />
+
+    <TextView
+        android:id="@+id/queue_list_item_id"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
