@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">SounDroid</string>
     <string name="app_icon">App Icon</string>
+
     <string name="playing_cover">Image cover</string>
     <string name="playing_from">Playing From Playlist</string>
     <string name="playing_next_song">Next song</string>

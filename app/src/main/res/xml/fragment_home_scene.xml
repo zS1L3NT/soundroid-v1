@@ -5,53 +5,58 @@
     <ConstraintSet android:id="@+id/start" />
 
     <ConstraintSet android:id="@+id/end">
-        <Constraint android:id="@id/home_settings" />
-        <Constraint
-            android:id="@+id/home_app_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-        <Constraint
-            android:id="@+id/home_app_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
-            android:scaleX="0.7"
-            android:scaleY="0.7"
-            app:layout_constraintBottom_toBottomOf="@+id/home_app_icon"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/home_app_icon" />
-        <Constraint
-            android:id="@+id/home_searchbar"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:alpha="0"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintEnd_toStartOf="@+id/home_settings"
-            app:layout_constraintStart_toEndOf="@+id/home_app_icon"
-            app:layout_constraintTop_toTopOf="parent" />
-        <Constraint
-            android:id="@+id/home_download_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="75dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-        <Constraint
-            android:id="@+id/home_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/home_download_text" />
+        <Constraint android:id="@+id/home_app_icon">
+            <Layout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </Constraint>
+        <Constraint android:id="@+id/home_app_name">
+            <Layout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                app:layout_constraintBottom_toBottomOf="@+id/home_app_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/home_app_icon" />
+            <Transform
+                android:scaleX="0.7"
+                android:scaleY="0.7" />
+        </Constraint>
+        <Constraint android:id="@+id/home_searchbar">
+            <Layout
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toStartOf="@+id/home_settings"
+                app:layout_constraintStart_toEndOf="@+id/home_app_icon"
+                app:layout_constraintTop_toTopOf="parent" />
+            <PropertySet android:alpha="0" />
+        </Constraint>
+        <Constraint android:id="@+id/home_download_text">
+            <Layout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="75dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </Constraint>
+        <Constraint android:id="@+id/home_recycler_view">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/home_download_text" />
+        </Constraint>
     </ConstraintSet>
 
     <Transition
