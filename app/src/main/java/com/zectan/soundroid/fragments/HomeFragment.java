@@ -82,7 +82,7 @@ public class HomeFragment extends Fragment {
             List<Option> options = new ArrayList<>();
             options.add(Option.addToQueue());
             options.add(Option.addToPlaylist());
-            options.add(Option.download());
+            options.add(Option.download(song));
             optionsMenuVM.options.setValue(options);
         }
     };
@@ -152,6 +152,7 @@ public class HomeFragment extends Fragment {
                     .sorted((song1, song2) -> song1.getTitle().compareTo(song2.getTitle()))
                     .map(Song::getId)
                     .collect(Collectors.toList());
+                songs.forEach(song -> song.setDirectoryWith(requireContext()));
                 homeVM.playlist.setValue(new Playlist(new PlaylistInfo("", "All Songs", order), songs));
                 swipeRefreshLayout.setRefreshing(false);
                 homeVM.requested = false;

@@ -160,6 +160,7 @@ public class PlaylistViewFragment extends Fragment {
                 .addOnSuccessListener(snaps -> {
                     List<Song> songs = snaps.toObjects(Song.class);
                     songs.sort((song1, song2) -> song1.getTitle().compareTo(song2.getTitle()));
+                    songs.forEach(song -> song.setDirectoryWith(requireContext()));
                     playlistViewVM.songs.setValue(songs);
                     swipeRefreshLayout.setRefreshing(false);
                     playlistViewVM.requested = false;

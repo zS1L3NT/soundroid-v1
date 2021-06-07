@@ -10,7 +10,7 @@ import com.zectan.soundroid.objects.MusicPlayer;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
-import com.zectan.soundroid.tasks.SongLinkFetchThread;
+import com.zectan.soundroid.sockets.ConvertSongSocket;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -112,13 +112,13 @@ public class PlayingViewModel extends ViewModel {
     
         // Get the gradient before calling the song processing
         song.getFileLocation(
-            new SongLinkFetchThread.Callback() {
+            new ConvertSongSocket.Callback() {
                 @Override
                 public void onFinish(String link) {
                     if (playId == playNumber) {
                         mp.setNewData(link, () -> {
                             Log.d(TAG, "SONG_LOADED");
-    
+
                             mp.setOnCompletionListener(__ -> playNextSong());
                             startPlaying();
                             loadingState.postValue(false);

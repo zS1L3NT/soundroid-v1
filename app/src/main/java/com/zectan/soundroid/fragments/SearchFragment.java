@@ -115,7 +115,7 @@ public class SearchFragment extends AnimatedFragment {
 
     public void searchOnline(String text) {
         Log.d(TAG, "SEARCHING: " + text);
-        searchVM.searchOnline(text, activity.getFilesDir().getPath());
+        searchVM.searchOnline(text, getContext());
     }
 
     private void onSongsChange(List<Song> songs) {
