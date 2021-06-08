@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.objects.Functions;
 import com.zectan.soundroid.objects.Song;
@@ -33,8 +32,8 @@ public class PlaylistViewAdapter extends RecyclerView.Adapter<PlaylistViewAdapte
     @Override
     public PlaylistViewAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater
-                .from(parent.getContext())
-                .inflate(R.layout.song_list_item, parent, false);
+            .from(parent.getContext())
+            .inflate(R.layout.song_list_item, parent, false);
 
         return new PlaylistViewAdapter.ViewHolder(itemView);
     }
@@ -59,11 +58,11 @@ public class PlaylistViewAdapter extends RecyclerView.Adapter<PlaylistViewAdapte
         holder.artisteText.setText(artiste);
         holder.coverImage.setTransitionName(transitionName);
         Glide
-                .with(context)
-                .load(cover)
-                .centerCrop()
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(holder.coverImage);
+            .with(context)
+            .load(cover)
+            .error(R.drawable.playing_cover_default)
+            .centerCrop()
+            .into(holder.coverImage);
         holder.itemView.setOnClickListener(__ -> onSongClicked.run(holder.coverImage, transitionName, song, position));
     }
 

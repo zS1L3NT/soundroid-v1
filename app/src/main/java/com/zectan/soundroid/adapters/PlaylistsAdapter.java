@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.objects.PlaylistInfo;
 
@@ -33,8 +32,8 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistsAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater
-                .from(parent.getContext())
-                .inflate(R.layout.playlist_list_item, parent, false);
+            .from(parent.getContext())
+            .inflate(R.layout.playlist_list_item, parent, false);
 
         return new PlaylistsAdapter.ViewHolder(itemView);
     }
@@ -57,11 +56,11 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistsAdapter.View
         holder.songCountText.setText(songCount);
         holder.itemView.setOnClickListener(__ -> onPlaylistClicked.run(info));
         Glide
-                .with(context)
-                .load(cover)
-                .centerCrop()
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(holder.coverImage);
+            .with(context)
+            .load(cover)
+            .error(R.drawable.playing_cover_default)
+            .centerCrop()
+            .into(holder.coverImage);
     }
 
     @Override

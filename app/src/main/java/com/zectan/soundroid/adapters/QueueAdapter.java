@@ -5,6 +5,7 @@ import android.view.View;
 
 import com.bumptech.glide.Glide;
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter;
+import com.zectan.soundroid.R;
 import com.zectan.soundroid.objects.Song;
 
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +52,8 @@ public class QueueAdapter extends DragDropSwipeAdapter<Song, QueueViewHolder> {
         Glide
             .with(context)
             .load(cover)
+            .error(R.drawable.playing_cover_default)
+            .centerCrop()
             .into(holder.coverImage);
         holder.itemView.setOnClickListener(__ -> callback.onSongSelected(song));
     }

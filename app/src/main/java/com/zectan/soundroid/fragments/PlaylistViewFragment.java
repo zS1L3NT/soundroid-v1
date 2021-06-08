@@ -61,6 +61,7 @@ public class PlaylistViewFragment extends Fragment {
 
         // Reference Views
         RecyclerView recyclerView = view.findViewById(R.id.playlist_view_recycler_view);
+        ImageView backImage = view.findViewById(R.id.playlist_view_back);
         swipeRefreshLayout = view.findViewById(R.id.playlist_view_swipe_refresh);
         motionLayout = view.findViewById(R.id.playlist_view_motion_layout);
         coverImage = view.findViewById(R.id.playlist_view_cover);
@@ -77,6 +78,7 @@ public class PlaylistViewFragment extends Fragment {
         playlistViewVM.info.observe(activity, this::loadPlaylistInfo);
         playlistViewVM.songs.observe(activity, this::onSongsChange);
         motionLayout.addTransitionListener(activity.getTransitionListener());
+        backImage.setOnClickListener(__ -> activity.onBackPressed());
 
         if (playlistViewVM.getTransitionState() != null) {
             motionLayout.setTransitionState(playlistViewVM.getTransitionState());

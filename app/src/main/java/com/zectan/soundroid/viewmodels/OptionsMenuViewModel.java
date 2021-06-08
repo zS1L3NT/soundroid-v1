@@ -10,6 +10,7 @@ import java.util.List;
 public class OptionsMenuViewModel extends ViewModel {
     public MutableLiveData<String> url = new MutableLiveData<>();
     public MutableLiveData<String> title = new MutableLiveData<>();
+    public MutableLiveData<String> colorHex = new MutableLiveData<>();
     public MutableLiveData<String> description = new MutableLiveData<>();
     public MutableLiveData<List<Option>> options = new MutableLiveData<>();
     

@@ -26,6 +26,7 @@
         android:layout_height="40dp"
         android:layout_marginStart="25dp"
         android:layout_marginTop="25dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
         android:elevation="1dp"
         android:src="@drawable/ic_back"
@@ -85,7 +86,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
         android:elevation="1dp"
-        android:layoutAnimation="@anim/recycler_view_animation"
+        android:layoutAnimation="@anim/songs_recycler_animation"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/playlist_view_name"
         tools:listitem="@layout/song_list_item" />

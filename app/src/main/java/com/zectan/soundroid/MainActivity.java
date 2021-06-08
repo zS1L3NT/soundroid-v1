@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -150,10 +151,14 @@ public class MainActivity extends AppCompatActivity {
                     mp.setBottomMargin(0);
                 }
             }
-            
+
             @Override
             public void onTransitionTrigger(MotionLayout motionLayout, int i, boolean b, float v) {
             }
         };
+    }
+
+    public RelativeLayout getView() {
+        return findViewById(R.id.activity_main);
     }
 }

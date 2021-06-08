@@ -14,10 +14,13 @@
         android:id="@+id/converting_progress"
         android:layout_width="match_parent"
         android:layout_height="2dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
         android:alpha="0"
         app:indicatorColor="@color/theme_1"
-        app:layout_constraintTop_toTopOf="parent"
-        app:trackColor="@color/theme_4" />
+        app:layout_constraintBottom_toBottomOf="@id/song_seekbar"
+        app:layout_constraintTop_toTopOf="@id/song_seekbar"
+        app:trackColor="@android:color/transparent" />
 
     <TextView
         android:id="@+id/playing_from"
@@ -42,19 +45,19 @@
         app:layout_constraintStart_toStartOf="@+id/playing_from"
         app:layout_constraintTop_toBottomOf="@+id/playing_from" />
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/song_cover"
         android:layout_width="340dp"
         android:layout_height="340dp"
         android:layout_marginBottom="64dp"
         android:background="@drawable/playing_cover_shadow"
-        android:contentDescription="@string/playing_cover"
         android:elevation="5dp"
         android:src="@drawable/playing_cover_default"
         app:layout_constraintBottom_toTopOf="@+id/song_seekbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/playlist_name" />
+        app:layout_constraintTop_toBottomOf="@+id/playlist_name"
+        app:shapeAppearanceOverlay="@style/RoundImage5dp" />
 
     <TextView
         android:id="@+id/error_message"
@@ -87,13 +90,13 @@
         android:id="@+id/song_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:text="@string/Nil"
         android:textColor="@color/white"
         android:textSize="22sp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        app:layout_constraintEnd_toStartOf="@id/song_loading"
         app:layout_constraintBottom_toTopOf="@+id/song_artiste"
+        app:layout_constraintEnd_toStartOf="@id/song_loading"
         app:layout_constraintStart_toStartOf="@+id/song_artiste" />
 
     <TextView
@@ -108,8 +111,8 @@
         android:text="@string/Nil"
         android:textColor="@color/white"
         android:textSize="15sp"
-        app:layout_constraintEnd_toStartOf="@id/song_loading"
         app:layout_constraintBottom_toTopOf="@+id/song_seekbar"
+        app:layout_constraintEnd_toStartOf="@id/song_loading"
         app:layout_constraintStart_toStartOf="parent" />
 
     <SeekBar
@@ -252,9 +255,9 @@
         android:id="@+id/playing_queue_helper"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="20dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
         android:id="@+id/playing_queue_recycler_view"
@@ -262,14 +265,14 @@
         android:layout_height="0dp"
         android:background="@drawable/playing_queue_background"
         android:elevation="10dp"
-        android:layoutAnimation="@anim/recycler_view_animation"
+        android:layoutAnimation="@anim/songs_recycler_animation"
         android:paddingTop="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/playing_queue_helper"
         app:behind_swiped_item_bg_color="#E53935"
         app:behind_swiped_item_icon="@drawable/queue_delete"
         app:behind_swiped_item_icon_margin="16dp"
         app:item_layout="@layout/queue_list_item"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/playing_queue_helper"
         tools:listitem="@layout/queue_list_item" />
 
 </androidx.constraintlayout.motion.widget.MotionLayout>

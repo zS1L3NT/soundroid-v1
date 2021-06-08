@@ -23,14 +23,14 @@ import java.util.ArrayList;
 @SuppressLint("UseCompatLoadingForDrawables")
 public class HomeAdapter extends RecyclerView.Adapter<SongViewHolder> {
     private static final String TAG = "(SounDroid) SongAdapter";
-    private Playlist playlist;
     private final Callback callback;
-    
+    private Playlist playlist;
+
     public HomeAdapter(Callback Callback) {
         this.playlist = new Playlist(new PlaylistInfo("", "All Songs", new ArrayList<>()), new ArrayList<>());
         this.callback = Callback;
     }
-    
+
     @NonNull
     @NotNull
     @Override
@@ -38,43 +38,46 @@ public class HomeAdapter extends RecyclerView.Adapter<SongViewHolder> {
         View itemView = LayoutInflater
             .from(parent.getContext())
             .inflate(R.layout.song_list_item, parent, false);
-        
+
         return new SongViewHolder(itemView);
     }
-    
+
     public void updatePlaylist(Playlist playlist) {
         this.playlist = playlist;
         notifyDataSetChanged();
     }
-    
+
     public void onBindViewHolder(@NonNull SongViewHolder holder, int position) {
         Song song = playlist.getSong(position);
         Context context = holder.itemView.getContext();
-        
+
         String id = song.getId();
         String title = song.getTitle();
         String artiste = song.getArtiste();
         String cover = song.getCover();
         String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_song_cover), id);
-        
+
+        holder.coverImage.setTransitionName(transitionName);
         holder.titleText.setText(title);
         holder.artisteText.setText(artiste);
         holder.menuImage.setOnClickListener(__ -> callback.onMenuClicked(song));
         Glide
             .with(context)
             .load(cover)
+            .error(R.drawable.playing_cover_default)
+            .centerCrop()
             .into(holder.coverImage);
         holder.itemView.setOnClickListener(__ -> callback.onSongClicked(holder.coverImage, transitionName, playlist, position));
     }
-    
+
     @Override
     public int getItemCount() {
         return playlist.size();
     }
-    
+
     public interface Callback {
         void onSongClicked(ImageView cover, String transitionName, Playlist playlist, int position);
-        
+
         void onMenuClicked(Song song);
     }
 }

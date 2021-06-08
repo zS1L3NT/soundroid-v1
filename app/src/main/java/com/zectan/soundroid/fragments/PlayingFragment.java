@@ -1,5 +1,7 @@
 package com.zectan.soundroid.fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
@@ -48,6 +50,13 @@ import java.util.List;
 public class PlayingFragment extends AnimatedFragment {
     private static final String TAG = "(SounDroid) PlayingFragment";
     private MainActivity activity;
+    private LinearProgressIndicator convertingProgress;
+    private ImageView coverImage, shuffleImage, playPauseImage, playPauseMiniImage, loopImage;
+    private TextView titleText, artisteText, songTimeText, songLengthText, playlistName, errorMessage, retryMessage;
+    private ProgressBar loadingBar;
+    private SeekBar timeSeekbar;
+    private MotionLayout parent;
+    private PlayingViewModel playingVM;
     private final QueueAdapter.Callback queueAdapterCallback = new QueueAdapter.Callback() {
         @Override
         public void onSongSelected(Song song) {
@@ -63,15 +72,6 @@ public class PlayingFragment extends AnimatedFragment {
             playingVM.reorderQueue(songs);
         }
     };
-
-    private LinearProgressIndicator convertingProgress;
-    private ImageView coverImage, shuffleImage, backImage, playPauseImage, playPauseMiniImage, nextImage, loopImage;
-    private TextView titleText, artisteText, songTimeText, songLengthText, playlistName, errorMessage, retryMessage;
-    private ProgressBar loadingBar;
-    private SeekBar timeSeekbar;
-    private MotionLayout parent;
-
-    private PlayingViewModel playingVM;
     private QueueAdapter queueAdapter;
     private boolean touchingSeekbar = false;
     private int finalTouch = 0;
@@ -100,14 +100,15 @@ public class PlayingFragment extends AnimatedFragment {
         playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
 
         // Reference views
+        DragDropSwipeRecyclerView recyclerView = view.findViewById(R.id.playing_queue_recycler_view);
+        ImageView backImage = view.findViewById(R.id.song_back);
+        ImageView nextImage = view.findViewById(R.id.song_next);
         convertingProgress = view.findViewById(R.id.converting_progress);
         parent = view.findViewById(R.id.playing_motion_layout);
         coverImage = view.findViewById(R.id.song_cover);
         shuffleImage = view.findViewById(R.id.song_shuffle);
-        backImage = view.findViewById(R.id.song_back);
         playPauseImage = view.findViewById(R.id.song_play_pause);
         playPauseMiniImage = view.findViewById(R.id.song_play_pause_mini);
-        nextImage = view.findViewById(R.id.song_next);
         loopImage = view.findViewById(R.id.song_loop);
         titleText = view.findViewById(R.id.song_title);
         artisteText = view.findViewById(R.id.song_artiste);
@@ -118,7 +119,6 @@ public class PlayingFragment extends AnimatedFragment {
         retryMessage = view.findViewById(R.id.retry_message);
         loadingBar = view.findViewById(R.id.song_loading);
         timeSeekbar = view.findViewById(R.id.song_seekbar);
-        DragDropSwipeRecyclerView recyclerView = view.findViewById(R.id.playing_queue_recycler_view);
 
         // Recycler Views
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
@@ -306,7 +306,7 @@ public class PlayingFragment extends AnimatedFragment {
                 .with(activity)
                 .load(cover)
                 .transition(DrawableTransitionOptions.withCrossFade())
-                .placeholder(R.drawable.playing_cover_default)
+                .error(R.drawable.playing_cover_default)
                 .centerCrop()
                 .into(coverImage);
         }
@@ -345,8 +345,20 @@ public class PlayingFragment extends AnimatedFragment {
     private void onConvertingStateChange(boolean converting) {
         float alpha = convertingProgress.getAlpha();
         ValueAnimator alphaAnimation = ValueAnimator.ofFloat(alpha, converting ? 1 : 0).setDuration(500);
-        alphaAnimation
-            .addUpdateListener(animation -> convertingProgress.setAlpha((float) animation.getAnimatedValue()));
+
+        if (!converting) timeSeekbar.setVisibility(View.VISIBLE);
+        alphaAnimation.addUpdateListener(animation -> {
+            float val = (float) animation.getAnimatedValue();
+            convertingProgress.setAlpha(val);
+            timeSeekbar.setAlpha(1f - val);
+        });
+        alphaAnimation.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                if (converting) timeSeekbar.setVisibility(View.INVISIBLE);
+            }
+        });
         alphaAnimation.start();
     }
 

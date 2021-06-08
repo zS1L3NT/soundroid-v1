@@ -101,6 +101,7 @@ public class PlayingViewModel extends ViewModel {
     
         mp.pause();
         initialisePlayer();
+        convertingState.setValue(false);
     
         if (song.getId().equals("")) {
             this.loadingState.setValue(false);

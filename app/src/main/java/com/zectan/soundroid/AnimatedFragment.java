@@ -13,7 +13,6 @@ public class AnimatedFragment extends Fragment {
         super.onCreate(savedInstanceState);
         TransitionInflater inflater = TransitionInflater.from(requireContext());
         setSharedElementEnterTransition(inflater.inflateTransition(R.transition.shared_image));
-        setSharedElementReturnTransition(inflater.inflateTransition(R.transition.shared_image));
     }
 
 }

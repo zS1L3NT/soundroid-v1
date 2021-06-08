@@ -35,8 +35,10 @@
         <action
             android:id="@+id/open_options_menu"
             app:destination="@id/fragment_options_menu"
-            app:enterAnim="@anim/slide_in_up"
-            app:popExitAnim="@anim/slide_out_up" />
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/fragment_playlists"

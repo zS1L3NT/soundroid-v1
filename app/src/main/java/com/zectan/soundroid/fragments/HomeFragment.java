@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.constraintlayout.motion.widget.MotionLayout;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.FragmentNavigator;
@@ -19,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.zectan.soundroid.AnimatedFragment;
 import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
@@ -35,16 +35,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends AnimatedFragment {
     private static final String TAG = "(SounDroid) HomeFragment";
     private final String USER_ID = "admin";
     private MainActivity activity;
     private FirebaseRepository repository;
-    
+
     private HomeViewModel homeVM;
     private PlayingViewModel playingVM;
     private OptionsMenuViewModel optionsMenuVM;
-    
+
     private SwipeRefreshLayout swipeRefreshLayout;
     private MotionLayout motionLayout;
     private EditText searchbar;
@@ -56,7 +56,6 @@ public class HomeFragment extends Fragment {
     private final HomeAdapter.Callback homeAdapterCallback = new HomeAdapter.Callback() {
         @Override
         public void onSongClicked(ImageView cover, String transitionName, Playlist playlist, int position) {
-            cover.setTransitionName(transitionName);
             FragmentNavigator.Extras extras = new FragmentNavigator.Extras
                 .Builder()
                 .addSharedElement(cover, transitionName)
@@ -71,14 +70,16 @@ public class HomeFragment extends Fragment {
         
         @Override
         public void onMenuClicked(Song song) {
-            NavDirections action = HomeFragmentDirections.openOptionsMenu();
+            NavDirections action = HomeFragmentDirections
+                .openOptionsMenu();
             NavHostFragment.findNavController(HomeFragment.this).navigate(action);
             homeVM.setTransitionState(motionLayout.getTransitionState());
-            activity.hideNavigator();
-            
-            optionsMenuVM.description.setValue(song.getArtiste());
+
             optionsMenuVM.url.setValue(song.getCover());
             optionsMenuVM.title.setValue(song.getTitle());
+            optionsMenuVM.colorHex.setValue(song.getColorHex());
+            optionsMenuVM.description.setValue(song.getArtiste());
+
             List<Option> options = new ArrayList<>();
             options.add(Option.addToQueue());
             options.add(Option.addToPlaylist());
