@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 public class Song {
     private static final String TAG = "(SounDroid) Song";
@@ -63,6 +64,10 @@ public class Song {
         return colorHex;
     }
 
+    public void setColorHex(String colorHex) {
+        this.colorHex = colorHex;
+    }
+
     public File getDirectory() {
         return this.directory;
     }
@@ -102,5 +107,25 @@ public class Song {
             cover,
             colorHex
         );
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Song)) return false;
+        Song song = (Song) o;
+        return Objects.equals(id, song.id) &&
+            Objects.equals(title, song.title) &&
+            Objects.equals(artiste, song.artiste) &&
+            Objects.equals(cover, song.cover) &&
+            Objects.equals(colorHex, song.colorHex) &&
+            Objects.equals(directory, song.directory) &&
+            Objects.equals(playlists, song.playlists) &&
+            Objects.equals(users, song.users);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, artiste, cover, colorHex, directory, playlists, users);
     }
 }

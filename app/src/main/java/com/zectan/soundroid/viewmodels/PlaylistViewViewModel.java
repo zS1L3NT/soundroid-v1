@@ -13,7 +13,7 @@ import java.util.List;
 public class PlaylistViewViewModel extends ViewModel {
     public MutableLiveData<PlaylistInfo> info = new MutableLiveData<>();
     public MutableLiveData<List<Song>> songs = new MutableLiveData<>();
-    public boolean requested = false;
+    public boolean loading = false, firebase = true;
     private Bundle transitionState;
 
     public PlaylistViewViewModel() {

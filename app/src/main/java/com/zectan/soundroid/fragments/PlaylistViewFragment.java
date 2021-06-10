@@ -26,6 +26,7 @@ import com.zectan.soundroid.adapters.PlaylistViewAdapter;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
+import com.zectan.soundroid.sockets.PlaylistLookupSocket;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 
@@ -75,7 +76,7 @@ public class PlaylistViewFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
 
         // Live Observers
-        playlistViewVM.info.observe(activity, this::loadPlaylistInfo);
+        playlistViewVM.info.observe(activity, this::onInfoChange);
         playlistViewVM.songs.observe(activity, this::onSongsChange);
         motionLayout.addTransitionListener(activity.getTransitionListener());
         backImage.setOnClickListener(__ -> activity.onBackPressed());
@@ -84,20 +85,20 @@ public class PlaylistViewFragment extends Fragment {
             motionLayout.setTransitionState(playlistViewVM.getTransitionState());
             playlistViewVM.setTransitionState(null);
         }
-        swipeRefreshLayout.setOnRefreshListener(this::loadFromFirebase);
-        loadSongsFromFirebase();
+        swipeRefreshLayout.setOnRefreshListener(this::loadPlaylistData);
+        loadPlaylistData();
 
         return view;
     }
 
     private void onSongSelected(ImageView cover, String transitionName, Song song, int position) {
         FragmentNavigator.Extras extras = new FragmentNavigator.Extras
-                .Builder()
-                .addSharedElement(cover, transitionName)
-                .build();
+            .Builder()
+            .addSharedElement(cover, transitionName)
+            .build();
         NavDirections action = PlaylistViewFragmentDirections
-                .openPlaylistSong()
-                .setTransitionName(transitionName);
+            .openPlaylistSong()
+            .setTransitionName(transitionName);
         NavHostFragment.findNavController(this).navigate(action, extras);
 
         PlaylistInfo info = playlistViewVM.info.getValue();
@@ -116,21 +117,21 @@ public class PlaylistViewFragment extends Fragment {
         playlistViewAdapter.updateSongs(songs, info.getOrder());
     }
 
-    private void loadPlaylistInfo(PlaylistInfo info) {
+    private void onInfoChange(PlaylistInfo info) {
         nameText.setText(info.getName());
         if (info.getCover() != null) {
             Glide
-                    .with(activity)
-                    .load(info.getCover())
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(coverImage);
+                .with(activity)
+                .load(info.getCover())
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(coverImage);
         }
     }
 
-    private void loadFromFirebase() {
-        if (playlistViewVM.requested) return;
+    private void loadPlaylistData() {
+        if (playlistViewVM.loading) return;
         swipeRefreshLayout.setRefreshing(true);
-        playlistViewVM.requested = true;
+        playlistViewVM.loading = true;
 
         PlaylistInfo info = playlistViewVM.info.getValue();
         if (info == null) {
@@ -138,35 +139,47 @@ public class PlaylistViewFragment extends Fragment {
             return;
         }
 
-        repository
+        if (playlistViewVM.firebase) {
+            repository
                 .playlist(info.getId())
                 .get()
                 .addOnSuccessListener(snap -> {
                     PlaylistInfo newInfo = snap.toObject(PlaylistInfo.class);
                     playlistViewVM.info.setValue(newInfo);
 
-                    loadSongsFromFirebase();
+                    repository
+                        .playlistSongs(info.getId())
+                        .get()
+                        .addOnSuccessListener(snaps -> {
+                            List<Song> songs = snaps.toObjects(Song.class);
+                            songs.sort((a, b) -> a.getTitle().compareTo(b.getTitle()));
+                            songs.forEach(song -> song.setDirectoryWith(requireContext()));
+                            playlistViewVM.songs.setValue(songs);
+                            swipeRefreshLayout.setRefreshing(false);
+                            playlistViewVM.loading = false;
+                        })
+                        .addOnFailureListener(activity::handleError);
                 });
-    }
+        } else {
+            new PlaylistLookupSocket(info, getContext(), new PlaylistLookupSocket.Callback() {
+                @Override
+                public void onFinish(Playlist playlist) {
+                    playlistViewVM.songs.postValue(playlist.getSongs());
+                    swipeRefreshLayout.setRefreshing(false);
+                    playlistViewVM.loading = false;
+                }
 
-    private void loadSongsFromFirebase() {
-        PlaylistInfo info = playlistViewVM.info.getValue();
-        if (info == null) {
-            activity.handleError(new Exception("Info not initialised"));
-            return;
+                @Override
+                public void onError(String message) {
+                    activity.handleError(new Exception(message));
+                }
+
+                @Override
+                public boolean isInactive() {
+                    return false;
+                }
+            });
         }
 
-        repository
-                .playlistSongs(info.getId())
-                .get()
-                .addOnSuccessListener(snaps -> {
-                    List<Song> songs = snaps.toObjects(Song.class);
-                    songs.sort((song1, song2) -> song1.getTitle().compareTo(song2.getTitle()));
-                    songs.forEach(song -> song.setDirectoryWith(requireContext()));
-                    playlistViewVM.songs.setValue(songs);
-                    swipeRefreshLayout.setRefreshing(false);
-                    playlistViewVM.requested = false;
-                })
-                .addOnFailureListener(activity::handleError);
     }
 }

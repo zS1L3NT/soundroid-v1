@@ -37,4 +37,5 @@
     <string name="options_menu_title">Title</string>
     <string name="options_menu_description">Description</string>
     <string name="options_menu_back">Back</string>
+    <string name="playlist">Playlist</string>
 </resources>

@@ -78,6 +78,7 @@ public class PlaylistsFragment extends Fragment {
         NavHostFragment.findNavController(this).navigate(action);
         playlistViewVM.info.setValue(info);
         playlistViewVM.songs.setValue(new ArrayList<>());
+        playlistViewVM.firebase = true;
     }
 
     private void loadFromFirebase() {

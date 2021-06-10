@@ -64,6 +64,7 @@
         android:elevation="1dp"
         android:fontFamily="@font/carme"
         android:text="@string/Nil"
+        android:textAlignment="center"
         android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/playlist_view_recycler_view"

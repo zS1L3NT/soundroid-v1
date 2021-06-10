@@ -17,6 +17,7 @@ import com.zectan.soundroid.objects.Song;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistViewAdapter extends RecyclerView.Adapter<PlaylistViewAdapter.ViewHolder> {
@@ -25,6 +26,7 @@ public class PlaylistViewAdapter extends RecyclerView.Adapter<PlaylistViewAdapte
 
     public PlaylistViewAdapter(onSongClicked onSongClicked) {
         this.onSongClicked = onSongClicked;
+        this.songs = new ArrayList<>();
     }
 
     @NonNull

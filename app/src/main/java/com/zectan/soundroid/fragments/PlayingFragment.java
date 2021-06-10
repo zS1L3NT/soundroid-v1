@@ -57,7 +57,7 @@ public class PlayingFragment extends AnimatedFragment {
     private SeekBar timeSeekbar;
     private MotionLayout parent;
     private PlayingViewModel playingVM;
-    private final QueueAdapter.Callback queueAdapterCallback = new QueueAdapter.Callback() {
+    private final QueueAdapter.Callback callback = new QueueAdapter.Callback() {
         @Override
         public void onSongSelected(Song song) {
             Playlist queue = playingVM.queue.getValue();
@@ -122,7 +122,7 @@ public class PlayingFragment extends AnimatedFragment {
 
         // Recycler Views
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
-        queueAdapter = new QueueAdapter(queueAdapterCallback);
+        queueAdapter = new QueueAdapter(callback);
         recyclerView.setAdapter(queueAdapter);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setOrientation(DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING);
@@ -155,12 +155,6 @@ public class PlayingFragment extends AnimatedFragment {
         loopImage.setOnTouchListener(Animations::mediumSqueeze);
 
         return view;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        activity.showNavigator();
     }
 
     public void backSong(View v) {

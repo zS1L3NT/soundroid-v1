@@ -1,8 +1,6 @@
 package com.zectan.soundroid.fragments;
 
-import android.animation.ValueAnimator;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,14 +8,12 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
-import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,25 +26,48 @@ import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
+import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 import com.zectan.soundroid.viewmodels.SearchViewModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import rx.Observable;
+// TODO Animate search results
 
 public class SearchFragment extends AnimatedFragment {
     private static final String TAG = "(SounDroid) SearchFragment";
     private MainActivity activity;
+    private NavController navController;
 
-    private RecyclerView recyclerView;
     private EditText searchEditText;
-    private ProgressBar searchProgressbar;
 
     private SearchViewModel searchVM;
     private PlayingViewModel playingVM;
+    private PlaylistViewViewModel playlistViewVM;
+
+    private final SearchAdapter.Callback callback = new SearchAdapter.Callback() {
+        @Override
+        public void onSongClicked(Song song) {
+            PlaylistInfo info = new PlaylistInfo(song.getId(), "Search Result", Collections.singletonList(song.getId()));
+            Playlist playlist = new Playlist(info, Collections.singletonList(song));
+
+            NavDirections action = SearchFragmentDirections.openSearchSong();
+            navController.navigate(action);
+            playingVM.selectSong(playlist, 0);
+            activity.hideKeyboard(SearchFragment.this.requireView());
+        }
+
+        @Override
+        public void onPlaylistClicked(PlaylistInfo info) {
+            playlistViewVM.info.postValue(info);
+            playlistViewVM.songs.postValue(new ArrayList<>());
+
+            NavDirections action = SearchFragmentDirections.openPlaylistView();
+            navController.navigate(action);
+            playlistViewVM.firebase = false;
+        }
+    };
 
     public SearchFragment() {
         // Required empty public constructor
@@ -59,53 +78,40 @@ public class SearchFragment extends AnimatedFragment {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         activity = (MainActivity) getActivity();
         assert activity != null;
-        activity.hideNavigator();
+        navController = NavHostFragment.findNavController(this);
 
         // ViewModels
         searchVM = new ViewModelProvider(activity).get(SearchViewModel.class);
         playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
+        playlistViewVM = new ViewModelProvider(activity).get(PlaylistViewViewModel.class);
 
         // Reference views
+        RecyclerView recyclerView = view.findViewById(R.id.search_recycler_view);
         ImageView searchBack = view.findViewById(R.id.search_back);
         searchEditText = view.findViewById(R.id.search_edit_text);
-        recyclerView = view.findViewById(R.id.search_recycler_view);
-        searchProgressbar = view.findViewById(R.id.search_loading);
 
         // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
+        SearchAdapter searchAdapter = new SearchAdapter(callback);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(searchAdapter);
+        recyclerView.setHasFixedSize(true);
 
-        // Live Observers
-        searchVM.songs.observe(activity, this::onSongsChange);
-        searchVM.searching.observe(activity, this::onSearchingChange);
-
+        // Observers
+        searchVM.results.observe(activity, searchAdapter::updateResults);
+        searchVM.error.observe(activity, System.out::println);
         searchBack.setOnClickListener(this::onBackPressed);
-        Observable<String> obs = RxTextView
-                .textChanges(searchEditText)
-                .debounce(500, TimeUnit.MILLISECONDS)
-                .map(CharSequence::toString);
-        obs.subscribe(this::searchOnline);
+
+        RxTextView
+            .textChanges(searchEditText)
+            .debounce(250, TimeUnit.MILLISECONDS)
+            .map(CharSequence::toString)
+            .subscribe(this::afterSearchDebounce);
+        activity.hideNavigator();
         activity.showKeyboard();
-        searchEditText.setOnEditorActionListener(this::onTexChange);
+        searchEditText.setOnEditorActionListener(this::onTextChange);
 
         return view;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        activity.showNavigator();
-    }
-
-    private boolean onTexChange(TextView textView, int actionId, KeyEvent keyEvent) {
-        boolean handled = false;
-        if (actionId == EditorInfo.IME_ACTION_SEND) {
-            searchOnline(searchEditText.getText().toString());
-            activity.hideKeyboard(this.requireView());
-            handled = true;
-        }
-        return handled;
     }
 
     private void onBackPressed(View view) {
@@ -113,52 +119,21 @@ public class SearchFragment extends AnimatedFragment {
         activity.hideKeyboard(requireView());
     }
 
-    public void searchOnline(String text) {
-        Log.d(TAG, "SEARCHING: " + text);
-        searchVM.searchOnline(text, getContext());
-    }
-
-    private void onSongsChange(List<Song> songs) {
-        SearchAdapter songAdapter = new SearchAdapter(songs, (cover, transitionName, song, position) -> {
-            PlaylistInfo info = new PlaylistInfo("spotify-results", "Spotify Results", new ArrayList<>());
-            Playlist queue = new Playlist(info, Collections.singletonList(song));
-            cover.setTransitionName(transitionName);
-
-            FragmentNavigator.Extras extras = new FragmentNavigator.Extras
-                    .Builder()
-                    .addSharedElement(cover, transitionName)
-                    .build();
-            NavDirections action = SearchFragmentDirections
-                    .openSearchSong()
-                    .setTransitionName(transitionName);
-            NavHostFragment.findNavController(this).navigate(action, extras);
-            playingVM.selectSong(queue, 0);
+    private boolean onTextChange(TextView textView, int actionId, KeyEvent keyEvent) {
+        boolean handled = false;
+        if (actionId == EditorInfo.IME_ACTION_SEND) {
+            searchVM.search(searchEditText.getText().toString(), getContext());
             activity.hideKeyboard(this.requireView());
-        });
-        recyclerView.setAdapter(songAdapter);
+            handled = true;
+        }
+        return handled;
     }
 
-    private void onSearchingChange(boolean searching) {
-        ValueAnimator fadeIn = ValueAnimator.ofFloat(0f, 1f).setDuration(500);
-        ValueAnimator fadeOut = ValueAnimator.ofFloat(1f, 0f).setDuration(500);
-
-        fadeIn.addUpdateListener(animation -> {
-            if (searching) {
-                searchProgressbar.setAlpha((float) animation.getAnimatedValue());
-            } else {
-                recyclerView.setAlpha((float) animation.getAnimatedValue());
-            }
-        });
-
-        fadeOut.addUpdateListener(animation -> {
-            if (searching) {
-                recyclerView.setAlpha((float) animation.getAnimatedValue());
-            } else {
-                searchProgressbar.setAlpha((float) animation.getAnimatedValue());
-            }
-        });
-
-        fadeOut.start();
-        fadeIn.start();
+    private void afterSearchDebounce(String text) {
+        String search = searchVM.search.getValue();
+        if (search == null || !search.equals(text)) {
+            searchVM.search.postValue(text);
+            searchVM.search(text, getContext());
+        }
     }
 }
