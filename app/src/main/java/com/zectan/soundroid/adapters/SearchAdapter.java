@@ -24,11 +24,11 @@ import java.util.List;
 public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     private static final String TAG = "(SounDroid) SearchAdapter";
     private final Callback mCallback;
-    private final List<SearchResult> results;
+    private final List<SearchResult> mResults;
 
     public SearchAdapter(Callback callback) {
         mCallback = callback;
-        results = new ArrayList<>();
+        mResults = new ArrayList<>();
     }
 
     @NonNull
@@ -43,19 +43,19 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     }
 
     public void updateResults(List<SearchResult> results) {
-        this.results.clear();
-        this.results.addAll(results);
+        mResults.clear();
+        mResults.addAll(results);
         notifyDataSetChanged();
     }
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull SearchViewHolder holder, int position) {
-        holder.bind(results.get(position));
+        holder.bind(mResults.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return results.size();
+        return mResults.size();
     }
 
     public interface Callback {

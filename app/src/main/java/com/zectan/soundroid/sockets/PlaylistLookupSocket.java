@@ -3,6 +3,7 @@ package com.zectan.soundroid.sockets;
 import android.content.Context;
 import android.util.Log;
 
+import com.zectan.soundroid.classes.Socket;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;

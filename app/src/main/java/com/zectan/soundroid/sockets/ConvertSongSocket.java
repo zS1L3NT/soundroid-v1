@@ -2,6 +2,8 @@ package com.zectan.soundroid.sockets;
 
 import android.util.Log;
 
+import com.zectan.soundroid.classes.Socket;
+
 public class ConvertSongSocket extends Socket {
     private static final String TAG = "(SounDroid) ConvertSongThread";
     private final Callback callback;

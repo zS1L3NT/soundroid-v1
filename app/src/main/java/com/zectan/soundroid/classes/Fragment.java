@@ -1,4 +1,4 @@
-package com.zectan.soundroid.fragments;
+package com.zectan.soundroid.classes;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +15,7 @@ import androidx.viewbinding.ViewBinding;
 import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.viewmodels.HomeViewModel;
+import com.zectan.soundroid.viewmodels.MainViewModel;
 import com.zectan.soundroid.viewmodels.OptionsMenuViewModel;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
@@ -29,6 +30,7 @@ public class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragm
     protected MainActivity activity;
     protected T B;
 
+    protected MainViewModel mainVM;
     protected HomeViewModel homeVM;
     protected OptionsMenuViewModel optionsMenuVM;
     protected PlayingViewModel playingVM;
@@ -48,6 +50,7 @@ public class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragm
         repository = activity.getRepository();
         navController = NavHostFragment.findNavController(this);
 
+        mainVM = new ViewModelProvider(activity).get(MainViewModel.class);
         homeVM = new ViewModelProvider(activity).get(HomeViewModel.class);
         optionsMenuVM = new ViewModelProvider(activity).get(OptionsMenuViewModel.class);
         playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);

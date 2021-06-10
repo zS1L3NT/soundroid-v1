@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.adapters.PlaylistViewAdapter;
+import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlaylistViewBinding;
 import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.objects.Playlist;
@@ -42,7 +43,6 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
 
             Playlist playlist = new Playlist(info, songs);
             playingVM.selectSong(playlist, position);
-            playlistViewVM.setTransitionState(B.parent.getTransitionState());
         }
 
         @Override
@@ -69,10 +69,6 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         B.parent.addTransitionListener(activity.getTransitionListener());
         B.backImage.setOnClickListener(__ -> activity.onBackPressed());
 
-        if (playlistViewVM.getTransitionState() != null) {
-            B.parent.setTransitionState(playlistViewVM.getTransitionState());
-            playlistViewVM.setTransitionState(null);
-        }
         B.swipeRefresh.setOnRefreshListener(this::loadPlaylistData);
         loadPlaylistData();
 
@@ -104,7 +100,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
 
         PlaylistInfo info = playlistViewVM.info.getValue();
         if (info == null) {
-            activity.handleError(new Exception("Info not initialised"));
+            mainVM.error.postValue(new Exception("Info not initialised"));
             return;
         }
 
@@ -127,8 +123,10 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
                             B.swipeRefresh.setRefreshing(false);
                             playlistViewVM.loading = false;
                         })
-                        .addOnFailureListener(activity::handleError);
-                });
+                        .addOnFailureListener(mainVM.error::postValue);
+
+                })
+                .addOnFailureListener(mainVM.error::postValue);
         } else {
             new PlaylistLookupSocket(info, getContext(), new PlaylistLookupSocket.Callback() {
                 @Override
@@ -140,7 +138,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
 
                 @Override
                 public void onError(String message) {
-                    activity.handleError(new Exception(message));
+                    mainVM.error.postValue(new Exception(message));
                 }
 
                 @Override

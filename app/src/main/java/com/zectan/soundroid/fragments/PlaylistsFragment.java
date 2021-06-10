@@ -1,11 +1,9 @@
 package com.zectan.soundroid.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
@@ -13,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.zectan.soundroid.adapters.PlaylistsAdapter;
+import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlaylistsBinding;
 import com.zectan.soundroid.objects.PlaylistInfo;
 
@@ -61,19 +60,14 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
         playlistsVM.requested = true;
 
         repository
-                .playlists(USER_ID)
-                .get()
-                .addOnSuccessListener(snaps -> {
-                    List<PlaylistInfo> infos = snaps.toObjects(PlaylistInfo.class);
-                    playlistsVM.infos.setValue(infos);
-                    B.swipeRefresh.setRefreshing(false);
-                    playlistsVM.requested = false;
-                })
-                .addOnFailureListener(this::handleError);
-    }
-
-    private void handleError(Exception e) {
-        Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
-        Log.e(TAG, e.getMessage());
+            .playlists(USER_ID)
+            .get()
+            .addOnSuccessListener(snaps -> {
+                List<PlaylistInfo> infos = snaps.toObjects(PlaylistInfo.class);
+                playlistsVM.infos.setValue(infos);
+                B.swipeRefresh.setRefreshing(false);
+                playlistsVM.requested = false;
+            })
+            .addOnFailureListener(mainVM.error::postValue);
     }
 }

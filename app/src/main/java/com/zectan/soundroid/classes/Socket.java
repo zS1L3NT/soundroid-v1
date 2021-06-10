@@ -1,4 +1,4 @@
-package com.zectan.soundroid.sockets;
+package com.zectan.soundroid.classes;
 
 import android.util.Log;
 

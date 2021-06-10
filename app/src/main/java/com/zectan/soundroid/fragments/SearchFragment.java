@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.zectan.soundroid.adapters.SearchAdapter;
+import com.zectan.soundroid.classes.FragmentAnimated;
 import com.zectan.soundroid.databinding.FragmentSearchBinding;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.PlaylistInfo;
@@ -67,7 +68,7 @@ public class SearchFragment extends FragmentAnimated<FragmentSearchBinding> {
 
         // Observers
         searchVM.results.observe(activity, searchAdapter::updateResults);
-        searchVM.error.observe(activity, System.out::println);
+        searchVM.error.observe(activity, err -> mainVM.error.postValue(new Exception(err)));
         B.headerBackImage.setOnClickListener(this::onBackPressed);
 
         RxTextView

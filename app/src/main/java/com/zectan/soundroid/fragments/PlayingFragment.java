@@ -28,6 +28,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.QueueAdapter;
+import com.zectan.soundroid.classes.FragmentAnimated;
 import com.zectan.soundroid.databinding.FragmentPlayingBinding;
 import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.objects.Playlist;
@@ -41,6 +42,7 @@ import java.util.List;
 @SuppressLint("UseCompatLoadingForDrawables")
 public class PlayingFragment extends FragmentAnimated<FragmentPlayingBinding> {
     private static final String TAG = "(SounDroid) PlayingFragment";
+    private QueueAdapter queueAdapter;
 
     private final QueueAdapter.Callback callback = new QueueAdapter.Callback() {
         @Override
@@ -58,7 +60,6 @@ public class PlayingFragment extends FragmentAnimated<FragmentPlayingBinding> {
         }
     };
 
-    private QueueAdapter queueAdapter;
     private boolean touchingSeekbar = false;
     private int finalTouch = 0;
 
@@ -101,7 +102,6 @@ public class PlayingFragment extends FragmentAnimated<FragmentPlayingBinding> {
         enableControls();
         updateShuffleColor();
         updateLoopColor();
-        activity.showNavigator();
         B.shuffleImage.setOnClickListener(this::shufflePlaylist);
         B.shuffleImage.setOnTouchListener(Anonymous::animationMediumSqueeze);
         B.backImage.setOnClickListener(this::backSong);

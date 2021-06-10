@@ -1,4 +1,4 @@
-package com.zectan.soundroid.fragments;
+package com.zectan.soundroid.classes;
 
 import android.os.Bundle;
 

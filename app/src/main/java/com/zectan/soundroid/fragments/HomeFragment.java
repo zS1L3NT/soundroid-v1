@@ -1,12 +1,10 @@
 package com.zectan.soundroid.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.FragmentNavigator;
@@ -16,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.HomeAdapter;
+import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentHomeBinding;
 import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.objects.Option;
@@ -44,14 +43,12 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
             NavDirections action = HomeFragmentDirections.openDownloadedSong().setTransitionName(transitionName);
             NavHostFragment.findNavController(HomeFragment.this).navigate(action, extras);
             playingVM.selectSong(playlist, position);
-            homeVM.setTransitionState(B.parent.getTransitionState());
         }
 
         @Override
         public void onMenuClicked(Song song) {
             NavDirections action = HomeFragmentDirections.openOptionsMenu();
             NavHostFragment.findNavController(HomeFragment.this).navigate(action);
-            homeVM.setTransitionState(B.parent.getTransitionState());
 
             optionsMenuVM.url.setValue(song.getCover());
             optionsMenuVM.title.setValue(song.getTitle());
@@ -81,23 +78,17 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
         homeVM.playlist.observe(activity, homeAdapter::updatePlaylist);
         B.parent.addTransitionListener(activity.getTransitionListener());
 
-        if (homeVM.getTransitionState() != null) {
-            B.parent.setTransitionState(homeVM.getTransitionState());
-            homeVM.setTransitionState(null);
-        }
         B.swipeRefresh.setOnRefreshListener(this::loadSongsData);
         B.searchbar.setOnClickListener(this::onSearchbarClicked);
         if (homeVM.playlist.getValue() == null) loadSongsData();
-        activity.showNavigator();
 
         return B.getRoot();
     }
-    
+
     private void onSearchbarClicked(View view) {
         FragmentNavigator.Extras extras = Anonymous.makeExtras(B.searchbar, getString(R.string.TRANSITION_searchbar));
         NavDirections action = HomeFragmentDirections.openSearch();
         NavHostFragment.findNavController(this).navigate(action, extras);
-        homeVM.setTransitionState(B.parent.getTransitionState());
     }
 
     private void loadSongsData() {
@@ -120,11 +111,6 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
                 B.swipeRefresh.setRefreshing(false);
                 homeVM.requested = false;
             })
-            .addOnFailureListener(this::handleError);
-    }
-    
-    private void handleError(Exception e) {
-        Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
-        Log.e(TAG, e.getMessage());
+            .addOnFailureListener(mainVM.error::postValue);
     }
 }

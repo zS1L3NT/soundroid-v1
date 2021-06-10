@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.OptionsAdapter;
+import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentOptionsMenuBinding;
 import com.zectan.soundroid.objects.Option;
 
@@ -42,6 +43,7 @@ public class OptionsMenuFragment extends Fragment<FragmentOptionsMenuBinding> {
         optionsMenuVM.description.observe(activity, this::onDescriptionChange);
         optionsMenuVM.options.observe(activity, this::onOptionsChange);
         B.backImage.setOnClickListener(__ -> activity.onBackPressed());
+        activity.hideNavigator();
 
         return B.getRoot();
     }

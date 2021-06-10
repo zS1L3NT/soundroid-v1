@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentSettingsBinding;
 
 import org.jetbrains.annotations.NotNull;
