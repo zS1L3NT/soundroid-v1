@@ -3,57 +3,57 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ConstraintSet android:id="@+id/start">
-        <Constraint android:id="@+id/error_message">
+        <Constraint android:id="@+id/error_text">
             <Layout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/song_cover"
+                app:layout_constraintBottom_toBottomOf="@+id/cover_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/song_cover" />
+                app:layout_constraintTop_toTopOf="@+id/cover_image" />
             <Transform android:elevation="6dp" />
             <PropertySet android:alpha="0" />
         </Constraint>
-        <Constraint android:id="@+id/retry_message">
+        <Constraint android:id="@+id/retry_text">
             <Layout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/error_message" />
+                app:layout_constraintTop_toBottomOf="@+id/error_text" />
             <PropertySet android:alpha="0" />
             <Transform android:elevation="6dp" />
         </Constraint>
-        <Constraint android:id="@+id/song_title">
+        <Constraint android:id="@+id/title_text">
             <Layout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@+id/song_artiste"
-                app:layout_constraintEnd_toStartOf="@+id/song_loading"
-                app:layout_constraintStart_toStartOf="@+id/song_artiste" />
+                app:layout_constraintBottom_toTopOf="@+id/description_text"
+                app:layout_constraintEnd_toStartOf="@+id/loading_circle"
+                app:layout_constraintStart_toStartOf="@+id/description_text" />
         </Constraint>
-        <Constraint android:id="@+id/song_artiste">
+        <Constraint android:id="@+id/description_text">
             <Layout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
                 android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/song_seekbar"
-                app:layout_constraintEnd_toStartOf="@id/song_loading"
+                app:layout_constraintBottom_toTopOf="@+id/playing_seekbar"
+                app:layout_constraintEnd_toStartOf="@id/loading_circle"
                 app:layout_constraintStart_toStartOf="parent" />
             <PropertySet android:alpha="0.6" />
         </Constraint>
-        <Constraint android:id="@+id/song_loading">
+        <Constraint android:id="@+id/loading_circle">
             <Layout
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginEnd="32dp"
-                app:layout_constraintBottom_toBottomOf="@+id/song_title"
+                app:layout_constraintBottom_toBottomOf="@+id/title_text"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/song_title" />
+                app:layout_constraintTop_toTopOf="@+id/title_text" />
             <PropertySet android:alpha="0" />
         </Constraint>
-        <Constraint android:id="@+id/song_seekbar">
+        <Constraint android:id="@+id/playing_seekbar">
             <Layout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -68,75 +68,75 @@
                 app:attributeName="enabled"
                 app:customBoolean="true" />
         </Constraint>
-        <Constraint android:id="@+id/song_shuffle">
+        <Constraint android:id="@+id/shuffle_image">
             <Layout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="24dp"
-                app:layout_constraintBottom_toBottomOf="@+id/song_back"
+                app:layout_constraintBottom_toBottomOf="@+id/back_image"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/song_back" />
+                app:layout_constraintTop_toTopOf="@+id/back_image" />
             <CustomAttribute
                 app:attributeName="enabled"
                 app:customBoolean="true" />
         </Constraint>
-        <Constraint android:id="@+id/song_back">
+        <Constraint android:id="@+id/back_image">
             <Layout
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                app:layout_constraintBottom_toBottomOf="@+id/song_play_pause"
-                app:layout_constraintEnd_toStartOf="@+id/song_play_pause"
-                app:layout_constraintStart_toEndOf="@+id/song_shuffle"
-                app:layout_constraintTop_toTopOf="@+id/song_play_pause" />
+                app:layout_constraintBottom_toBottomOf="@+id/play_pause_image"
+                app:layout_constraintEnd_toStartOf="@+id/play_pause_image"
+                app:layout_constraintStart_toEndOf="@+id/shuffle_image"
+                app:layout_constraintTop_toTopOf="@+id/play_pause_image" />
             <CustomAttribute
                 app:attributeName="enabled"
                 app:customBoolean="true" />
         </Constraint>
-        <Constraint android:id="@+id/song_play_pause">
+        <Constraint android:id="@+id/play_pause_image">
             <Layout
                 android:layout_width="85dp"
                 android:layout_height="85dp"
                 android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/song_seekbar" />
+                app:layout_constraintTop_toBottomOf="@+id/playing_seekbar" />
             <CustomAttribute
                 app:attributeName="enabled"
                 app:customBoolean="true" />
         </Constraint>
-        <Constraint android:id="@+id/song_play_pause_mini">
+        <Constraint android:id="@+id/play_pause_mini_image">
             <Layout
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                app:layout_constraintBottom_toBottomOf="@id/song_play_pause"
-                app:layout_constraintLeft_toLeftOf="@id/song_play_pause"
-                app:layout_constraintRight_toRightOf="@id/song_play_pause"
-                app:layout_constraintTop_toTopOf="@id/song_play_pause" />
+                app:layout_constraintBottom_toBottomOf="@id/play_pause_image"
+                app:layout_constraintLeft_toLeftOf="@id/play_pause_image"
+                app:layout_constraintRight_toRightOf="@id/play_pause_image"
+                app:layout_constraintTop_toTopOf="@id/play_pause_image" />
             <PropertySet android:alpha="0" />
             <CustomAttribute
                 app:attributeName="enabled"
                 app:customBoolean="false" />
         </Constraint>
-        <Constraint android:id="@+id/song_next">
+        <Constraint android:id="@+id/next_image">
             <Layout
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                app:layout_constraintBottom_toBottomOf="@+id/song_play_pause"
-                app:layout_constraintEnd_toStartOf="@+id/song_loop"
-                app:layout_constraintStart_toEndOf="@+id/song_play_pause"
-                app:layout_constraintTop_toTopOf="@+id/song_play_pause" />
+                app:layout_constraintBottom_toBottomOf="@+id/play_pause_image"
+                app:layout_constraintEnd_toStartOf="@+id/loop_image"
+                app:layout_constraintStart_toEndOf="@+id/play_pause_image"
+                app:layout_constraintTop_toTopOf="@+id/play_pause_image" />
             <CustomAttribute
                 app:attributeName="enabled"
                 app:customBoolean="true" />
         </Constraint>
-        <Constraint android:id="@+id/song_loop">
+        <Constraint android:id="@+id/loop_image">
             <Layout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="24dp"
-                app:layout_constraintBottom_toBottomOf="@+id/song_next"
+                app:layout_constraintBottom_toBottomOf="@+id/next_image"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/song_next" />
+                app:layout_constraintTop_toTopOf="@+id/next_image" />
             <CustomAttribute
                 app:attributeName="enabled"
                 app:customBoolean="true" />
@@ -144,16 +144,16 @@
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
-        <Constraint android:id="@+id/playlist_name">
+        <Constraint android:id="@+id/playlist_name_text">
             <Layout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toEndOf="@+id/playing_from"
-                app:layout_constraintStart_toStartOf="@+id/playing_from"
-                app:layout_constraintTop_toBottomOf="@+id/playing_from" />
+                app:layout_constraintEnd_toEndOf="@+id/playing_from_text"
+                app:layout_constraintStart_toStartOf="@+id/playing_from_text"
+                app:layout_constraintTop_toBottomOf="@+id/playing_from_text" />
             <PropertySet android:alpha="0" />
         </Constraint>
-        <Constraint android:id="@+id/playing_from">
+        <Constraint android:id="@+id/playing_from_text">
             <Layout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -163,7 +163,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
             <PropertySet android:alpha="0" />
         </Constraint>
-        <Constraint android:id="@+id/song_cover">
+        <Constraint android:id="@+id/cover_image">
             <Layout
                 android:layout_width="50dp"
                 android:layout_height="50dp"
@@ -172,80 +172,80 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </Constraint>
-        <Constraint android:id="@+id/error_message">
+        <Constraint android:id="@+id/error_text">
             <Layout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/song_cover"
+                app:layout_constraintBottom_toBottomOf="@+id/cover_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/song_cover" />
+                app:layout_constraintTop_toTopOf="@+id/cover_image" />
             <PropertySet android:alpha="0" />
             <Transform
                 android:elevation="6dp"
                 android:scaleX="0"
                 android:scaleY="0" />
         </Constraint>
-        <Constraint android:id="@+id/retry_message">
+        <Constraint android:id="@+id/retry_text">
             <Layout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/error_message" />
+                app:layout_constraintTop_toBottomOf="@+id/error_text" />
             <PropertySet android:alpha="0" />
             <Transform
                 android:elevation="6dp"
                 android:scaleX="0"
                 android:scaleY="0" />
         </Constraint>
-        <Constraint android:id="@+id/song_title">
+        <Constraint android:id="@+id/title_text">
             <Layout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="-2dp"
-                app:layout_constraintBottom_toTopOf="@+id/song_artiste"
-                app:layout_constraintEnd_toStartOf="@+id/song_loading"
-                app:layout_constraintStart_toStartOf="@+id/song_artiste"
-                app:layout_constraintTop_toTopOf="@id/song_cover" />
+                app:layout_constraintBottom_toTopOf="@+id/description_text"
+                app:layout_constraintEnd_toStartOf="@+id/loading_circle"
+                app:layout_constraintStart_toStartOf="@+id/description_text"
+                app:layout_constraintTop_toTopOf="@id/cover_image" />
             <Transform
                 android:scaleX="0.8"
                 android:scaleY="0.8" />
         </Constraint>
-        <Constraint android:id="@+id/song_artiste">
+        <Constraint android:id="@+id/description_text">
             <Layout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="40dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="0dp"
-                app:layout_constraintBottom_toBottomOf="@id/song_cover"
-                app:layout_constraintEnd_toStartOf="@+id/song_loading"
-                app:layout_constraintStart_toStartOf="@id/song_cover"
-                app:layout_constraintTop_toBottomOf="@+id/song_title" />
+                app:layout_constraintBottom_toBottomOf="@id/cover_image"
+                app:layout_constraintEnd_toStartOf="@+id/loading_circle"
+                app:layout_constraintStart_toStartOf="@id/cover_image"
+                app:layout_constraintTop_toBottomOf="@+id/title_text" />
             <PropertySet android:alpha="0.6" />
             <Transform
                 android:scaleX="0.8"
                 android:scaleY="0.8" />
         </Constraint>
-        <Constraint android:id="@+id/song_loading">
+        <Constraint android:id="@+id/loading_circle">
             <Layout
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginEnd="72dp"
-                app:layout_constraintBottom_toBottomOf="@id/song_cover"
+                app:layout_constraintBottom_toBottomOf="@id/cover_image"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/song_cover" />
+                app:layout_constraintTop_toTopOf="@id/cover_image" />
             <PropertySet android:alpha="0" />
         </Constraint>
-        <Constraint android:id="@+id/song_seekbar">
+        <Constraint android:id="@+id/playing_seekbar">
             <Layout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/song_play_pause"
+                app:layout_constraintBottom_toTopOf="@+id/play_pause_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
             <PropertySet
@@ -255,47 +255,47 @@
                 app:attributeName="enabled"
                 app:customBoolean="false" />
         </Constraint>
-        <Constraint android:id="@+id/song_time">
+        <Constraint android:id="@+id/time_text">
             <Layout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
-                app:layout_constraintStart_toStartOf="@+id/song_seekbar"
-                app:layout_constraintTop_toBottomOf="@+id/song_seekbar" />
+                app:layout_constraintStart_toStartOf="@+id/playing_seekbar"
+                app:layout_constraintTop_toBottomOf="@+id/playing_seekbar" />
         </Constraint>
-        <Constraint android:id="@+id/song_length">
+        <Constraint android:id="@+id/length_text">
             <Layout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="18dp"
-                app:layout_constraintEnd_toEndOf="@+id/song_seekbar"
-                app:layout_constraintTop_toBottomOf="@+id/song_seekbar" />
+                app:layout_constraintEnd_toEndOf="@+id/playing_seekbar"
+                app:layout_constraintTop_toBottomOf="@+id/playing_seekbar" />
         </Constraint>
-        <Constraint android:id="@+id/song_shuffle">
+        <Constraint android:id="@+id/shuffle_image">
             <Layout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="24dp"
-                app:layout_constraintBottom_toBottomOf="@+id/song_back"
+                app:layout_constraintBottom_toBottomOf="@+id/back_image"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/song_back" />
+                app:layout_constraintTop_toTopOf="@+id/back_image" />
             <CustomAttribute
                 app:attributeName="enabled"
                 app:customBoolean="false" />
         </Constraint>
-        <Constraint android:id="@+id/song_back">
+        <Constraint android:id="@+id/back_image">
             <Layout
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                app:layout_constraintBottom_toBottomOf="@+id/song_play_pause"
-                app:layout_constraintEnd_toStartOf="@+id/song_play_pause"
-                app:layout_constraintStart_toEndOf="@+id/song_shuffle"
-                app:layout_constraintTop_toTopOf="@+id/song_play_pause" />
+                app:layout_constraintBottom_toBottomOf="@+id/play_pause_image"
+                app:layout_constraintEnd_toStartOf="@+id/play_pause_image"
+                app:layout_constraintStart_toEndOf="@+id/shuffle_image"
+                app:layout_constraintTop_toTopOf="@+id/play_pause_image" />
             <CustomAttribute
                 app:attributeName="enabled"
                 app:customBoolean="false" />
         </Constraint>
-        <Constraint android:id="@+id/song_play_pause">
+        <Constraint android:id="@+id/play_pause_image">
             <Layout
                 android:layout_width="85dp"
                 android:layout_height="85dp"
@@ -306,44 +306,44 @@
                 app:attributeName="enabled"
                 app:customBoolean="false" />
         </Constraint>
-        <Constraint android:id="@+id/song_play_pause_mini">
+        <Constraint android:id="@+id/play_pause_mini_image">
             <Layout
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginRight="20dp"
-                app:layout_constraintBottom_toBottomOf="@id/song_cover"
+                app:layout_constraintBottom_toBottomOf="@id/cover_image"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@id/song_cover" />
+                app:layout_constraintTop_toTopOf="@id/cover_image" />
             <PropertySet android:alpha="1" />
             <CustomAttribute
                 app:attributeName="enabled"
                 app:customBoolean="true" />
         </Constraint>
-        <Constraint android:id="@+id/song_next">
+        <Constraint android:id="@+id/next_image">
             <Layout
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                app:layout_constraintBottom_toBottomOf="@+id/song_play_pause"
-                app:layout_constraintEnd_toStartOf="@+id/song_loop"
-                app:layout_constraintStart_toEndOf="@+id/song_play_pause"
-                app:layout_constraintTop_toTopOf="@+id/song_play_pause" />
+                app:layout_constraintBottom_toBottomOf="@+id/play_pause_image"
+                app:layout_constraintEnd_toStartOf="@+id/loop_image"
+                app:layout_constraintStart_toEndOf="@+id/play_pause_image"
+                app:layout_constraintTop_toTopOf="@+id/play_pause_image" />
             <CustomAttribute
                 app:attributeName="enabled"
                 app:customBoolean="false" />
         </Constraint>
-        <Constraint android:id="@+id/song_loop">
+        <Constraint android:id="@+id/loop_image">
             <Layout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="24dp"
-                app:layout_constraintBottom_toBottomOf="@+id/song_next"
+                app:layout_constraintBottom_toBottomOf="@+id/next_image"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/song_next" />
+                app:layout_constraintTop_toTopOf="@+id/next_image" />
             <CustomAttribute
                 app:attributeName="enabled"
                 app:customBoolean="false" />
         </Constraint>
-        <Constraint android:id="@+id/playing_queue_helper">
+        <Constraint android:id="@+id/recycler_view_helper">
             <Layout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -357,6 +357,6 @@
         app:constraintSetStart="@+id/start">
         <OnSwipe
             app:moveWhenScrollAtTop="true"
-            app:touchAnchorId="@+id/playing_queue_pill" />
+            app:touchAnchorId="@+id/queue_pill" />
     </Transition>
 </MotionScene>

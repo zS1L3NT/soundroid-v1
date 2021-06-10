@@ -2,14 +2,14 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment_options_menu"
+    android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context=".fragments.OptionsMenuFragment">
 
     <ImageView
-        android:id="@+id/options_menu_back"
+        android:id="@+id/back_image"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="16dp"
@@ -21,7 +21,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/options_menu_cover"
+        android:id="@+id/cover_image"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginTop="100dp"
@@ -32,7 +32,7 @@
         app:shapeAppearanceOverlay="@style/RoundImage5dp" />
 
     <TextView
-        android:id="@+id/options_menu_title"
+        android:id="@+id/title_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -45,10 +45,10 @@
         android:textSize="22sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/options_menu_cover" />
+        app:layout_constraintTop_toBottomOf="@+id/cover_image" />
 
     <TextView
-        android:id="@+id/options_menu_description"
+        android:id="@+id/description_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -61,10 +61,10 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/options_menu_title" />
+        app:layout_constraintTop_toBottomOf="@+id/title_text" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/options_menu_recycler_view"
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

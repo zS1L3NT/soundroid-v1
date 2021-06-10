@@ -5,7 +5,7 @@
     <ConstraintSet android:id="@+id/start" />
 
     <ConstraintSet android:id="@+id/end">
-        <Constraint android:id="@+id/playlist_view_cover">
+        <Constraint android:id="@+id/cover_image">
             <Layout
                 android:layout_width="50dp"
                 android:layout_height="50dp"
@@ -16,26 +16,26 @@
             <PropertySet android:alpha="0" />
             <Transform android:elevation="-1dp" />
         </Constraint>
-        <Constraint android:id="@+id/playlist_view_name">
+        <Constraint android:id="@+id/name_text">
             <Layout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/playlist_view_more"
+                app:layout_constraintBottom_toBottomOf="@+id/more_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/playlist_view_more" />
+                app:layout_constraintTop_toTopOf="@id/more_image" />
             <Transform
                 android:scaleX="0.8"
                 android:scaleY="0.8" />
         </Constraint>
-        <Constraint android:id="@+id/playlist_view_break">
+        <Constraint android:id="@+id/break_line">
             <Layout
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                app:layout_constraintBottom_toTopOf="@id/playlist_view_recycler_view" />
+                app:layout_constraintBottom_toTopOf="@id/recycler_view" />
             <PropertySet android:alpha="1" />
         </Constraint>
-        <Constraint android:id="@+id/playlist_view_more">
+        <Constraint android:id="@+id/more_image">
             <Layout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -44,7 +44,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </Constraint>
-        <Constraint android:id="@+id/playlist_view_back">
+        <Constraint android:id="@+id/back_image">
             <Layout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -53,19 +53,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </Constraint>
-        <Constraint android:id="@+id/playlist_view_recycler_view">
+        <Constraint android:id="@+id/recycler_view">
             <Layout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="15dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/playlist_view_name" />
+                app:layout_constraintTop_toBottomOf="@+id/name_text" />
         </Constraint>
     </ConstraintSet>
 
     <Transition
         app:constraintSetEnd="@id/end"
         app:constraintSetStart="@+id/start">
-        <OnSwipe app:touchAnchorId="@+id/playlist_view_recycler_view" />
+        <OnSwipe app:touchAnchorId="@+id/recycler_view" />
     </Transition>
 </MotionScene>

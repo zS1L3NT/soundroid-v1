@@ -6,10 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,42 +16,34 @@ import com.bumptech.glide.Glide;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.OptionsAdapter;
+import com.zectan.soundroid.databinding.FragmentOptionsMenuBinding;
 import com.zectan.soundroid.objects.Option;
 import com.zectan.soundroid.viewmodels.OptionsMenuViewModel;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class OptionsMenuFragment extends Fragment {
     private OptionsAdapter optionsAdapter;
     private MainActivity activity;
-
-    private ConstraintLayout parent;
-    private ImageView coverImage;
-    private TextView titleText, descriptionText;
+    private FragmentOptionsMenuBinding B;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_options_menu, container, false);
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        B = FragmentOptionsMenuBinding.inflate(inflater, container, false);
         activity = (MainActivity) getActivity();
         assert activity != null;
 
         // View Models
         OptionsMenuViewModel optionsMenuVM = new ViewModelProvider(activity).get(OptionsMenuViewModel.class);
 
-        // Reference Views
-        RecyclerView recyclerView = view.findViewById(R.id.options_menu_recycler_view);
-        ImageView backImage = view.findViewById(R.id.options_menu_back);
-        parent = view.findViewById(R.id.fragment_options_menu);
-        coverImage = view.findViewById(R.id.options_menu_cover);
-        titleText = view.findViewById(R.id.options_menu_title);
-        descriptionText = view.findViewById(R.id.options_menu_description);
-
         // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
-        optionsAdapter = new OptionsAdapter(activity);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(optionsAdapter);
-        recyclerView.setHasFixedSize(true);
+        optionsAdapter = new OptionsAdapter();
+        B.recyclerView.setLayoutManager(layoutManager);
+        B.recyclerView.setAdapter(optionsAdapter);
+        B.recyclerView.setHasFixedSize(true);
 
         // Observables
         optionsMenuVM.url.observe(activity, this::onUrlChange);
@@ -62,35 +51,33 @@ public class OptionsMenuFragment extends Fragment {
         optionsMenuVM.colorHex.observe(activity, this::onColorHexChange);
         optionsMenuVM.description.observe(activity, this::onDescriptionChange);
         optionsMenuVM.options.observe(activity, this::onOptionsChange);
-        backImage.setOnClickListener(__ -> activity.onBackPressed());
+        B.backImage.setOnClickListener(__ -> activity.onBackPressed());
 
-        return view;
+        return B.getRoot();
     }
 
     private void onUrlChange(String url) {
         Glide
             .with(activity)
             .load(url)
-            .into(coverImage);
+            .into(B.coverImage);
     }
 
     private void onTitleChange(String title) {
-        titleText.setText(title);
+        B.titleText.setText(title);
     }
 
     private void onColorHexChange(String colorHex) {
         int[] colors = {Color.parseColor(colorHex), activity.getColor(R.color.theme_4)};
         GradientDrawable drawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
-        parent.setBackground(drawable);
+        B.parent.setBackground(drawable);
     }
 
     private void onDescriptionChange(String description) {
-        descriptionText.setText(description);
+        B.descriptionText.setText(description);
     }
 
     private void onOptionsChange(List<Option> options) {
         optionsAdapter.updateOptions(options);
     }
-    
-    
 }

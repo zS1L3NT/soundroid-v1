@@ -12,24 +12,6 @@ public class Animations {
      * @param event Event
      * @return Boolean
      */
-    public static boolean songListItemSqueeze(View v, MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            v.animate().scaleX(1f).scaleY(1f).setDuration(75);
-        }
-
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            v.animate().scaleX(0.98f).scaleY(0.98f).setDuration(75);
-        }
-        return false;
-    }
-
-    /**
-     * Small sized squeeze animation that is accessible everywhere
-     *
-     * @param v     View
-     * @param event Event
-     * @return Boolean
-     */
     public static boolean smallSqueeze(View v, MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_UP) {
             v.animate().scaleX(1f).scaleY(1f).setDuration(100);

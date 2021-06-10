@@ -5,24 +5,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.zectan.soundroid.AnimatedFragment;
 import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.HomeAdapter;
+import com.zectan.soundroid.databinding.FragmentHomeBinding;
 import com.zectan.soundroid.objects.Option;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.PlaylistInfo;
@@ -30,6 +28,8 @@ import com.zectan.soundroid.objects.Song;
 import com.zectan.soundroid.viewmodels.HomeViewModel;
 import com.zectan.soundroid.viewmodels.OptionsMenuViewModel;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,15 +39,12 @@ public class HomeFragment extends AnimatedFragment {
     private static final String TAG = "(SounDroid) HomeFragment";
     private final String USER_ID = "admin";
     private MainActivity activity;
+    private FragmentHomeBinding B;
     private FirebaseRepository repository;
 
     private HomeViewModel homeVM;
     private PlayingViewModel playingVM;
     private OptionsMenuViewModel optionsMenuVM;
-
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private MotionLayout motionLayout;
-    private EditText searchbar;
     
     public HomeFragment() {
         // Required empty public constructor
@@ -60,20 +57,17 @@ public class HomeFragment extends AnimatedFragment {
                 .Builder()
                 .addSharedElement(cover, transitionName)
                 .build();
-            NavDirections action = HomeFragmentDirections
-                .openDownloadedSong()
-                .setTransitionName(transitionName);
+            NavDirections action = HomeFragmentDirections.openDownloadedSong().setTransitionName(transitionName);
             NavHostFragment.findNavController(HomeFragment.this).navigate(action, extras);
             playingVM.selectSong(playlist, position);
-            homeVM.setTransitionState(motionLayout.getTransitionState());
+            homeVM.setTransitionState(B.parent.getTransitionState());
         }
         
         @Override
         public void onMenuClicked(Song song) {
-            NavDirections action = HomeFragmentDirections
-                .openOptionsMenu();
+            NavDirections action = HomeFragmentDirections.openOptionsMenu();
             NavHostFragment.findNavController(HomeFragment.this).navigate(action);
-            homeVM.setTransitionState(motionLayout.getTransitionState());
+            homeVM.setTransitionState(B.parent.getTransitionState());
 
             optionsMenuVM.url.setValue(song.getCover());
             optionsMenuVM.title.setValue(song.getTitle());
@@ -87,62 +81,55 @@ public class HomeFragment extends AnimatedFragment {
             optionsMenuVM.options.setValue(options);
         }
     };
-    
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        B = FragmentHomeBinding.inflate(inflater, container, false);
         activity = (MainActivity) getActivity();
         assert activity != null;
         repository = activity.getRepository();
-        
+
         // ViewModels
         homeVM = new ViewModelProvider(activity).get(HomeViewModel.class);
         playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
         optionsMenuVM = new ViewModelProvider(activity).get(OptionsMenuViewModel.class);
-        
-        // Reference views
-        RecyclerView recyclerView = view.findViewById(R.id.home_recycler_view);
-        swipeRefreshLayout = view.findViewById(R.id.home_swipe_refresh);
-        motionLayout = view.findViewById(R.id.home_motion_layout);
-        searchbar = view.findViewById(R.id.home_searchbar);
-        
+
         // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
         HomeAdapter homeAdapter = new HomeAdapter(homeAdapterCallback);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(homeAdapter);
-        recyclerView.setHasFixedSize(true);
-        
+        B.recyclerView.setLayoutManager(layoutManager);
+        B.recyclerView.setAdapter(homeAdapter);
+
         // Live Observers
         homeVM.playlist.observe(activity, homeAdapter::updatePlaylist);
-        motionLayout.addTransitionListener(activity.getTransitionListener());
-        
+        B.parent.addTransitionListener(activity.getTransitionListener());
+
         if (homeVM.getTransitionState() != null) {
-            motionLayout.setTransitionState(homeVM.getTransitionState());
+            B.parent.setTransitionState(homeVM.getTransitionState());
             homeVM.setTransitionState(null);
         }
-        swipeRefreshLayout.setOnRefreshListener(this::loadFromFirebase);
-        searchbar.setOnClickListener(this::onSearchbarClicked);
-        if (homeVM.playlist.getValue() == null) loadFromFirebase();
+        B.swipeRefresh.setOnRefreshListener(this::loadSongsData);
+        B.searchbar.setOnClickListener(this::onSearchbarClicked);
+        if (homeVM.playlist.getValue() == null) loadSongsData();
         activity.showNavigator();
-        
-        return view;
+
+        return B.getRoot();
     }
     
     private void onSearchbarClicked(View view) {
         FragmentNavigator.Extras extras = new FragmentNavigator.Extras
             .Builder()
-            .addSharedElement(searchbar, getString(R.string.TRANSITION_searchbar)).build();
+            .addSharedElement(B.searchbar, getString(R.string.TRANSITION_searchbar)).build();
         NavDirections action = HomeFragmentDirections.openSearch();
         NavHostFragment.findNavController(this).navigate(action, extras);
-        homeVM.setTransitionState(motionLayout.getTransitionState());
+        homeVM.setTransitionState(B.parent.getTransitionState());
     }
-    
-    private void loadFromFirebase() {
+
+    private void loadSongsData() {
         if (homeVM.requested) return;
-        swipeRefreshLayout.setRefreshing(true);
+        B.swipeRefresh.setRefreshing(true);
         homeVM.requested = true;
-        
+
         repository
             .userSongs(USER_ID)
             .get()
@@ -155,7 +142,7 @@ public class HomeFragment extends AnimatedFragment {
                     .collect(Collectors.toList());
                 songs.forEach(song -> song.setDirectoryWith(requireContext()));
                 homeVM.playlist.setValue(new Playlist(new PlaylistInfo("", "All Songs", order), songs));
-                swipeRefreshLayout.setRefreshing(false);
+                B.swipeRefresh.setRefreshing(false);
                 homeVM.requested = false;
             })
             .addOnFailureListener(this::handleError);

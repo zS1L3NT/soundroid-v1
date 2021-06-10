@@ -5,9 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
@@ -15,14 +13,13 @@ import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.MainActivity;
-import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.PlaylistViewAdapter;
+import com.zectan.soundroid.databinding.FragmentPlaylistViewBinding;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
@@ -30,28 +27,53 @@ import com.zectan.soundroid.sockets.PlaylistLookupSocket;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 public class PlaylistViewFragment extends Fragment {
     private MainActivity activity;
+    private FragmentPlaylistViewBinding B;
     private FirebaseRepository repository;
     private PlaylistViewAdapter playlistViewAdapter;
 
     private PlaylistViewViewModel playlistViewVM;
     private PlayingViewModel playingVM;
 
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private MotionLayout motionLayout;
-    private ImageView coverImage;
-    private TextView nameText;
+    private final PlaylistViewAdapter.Callback callback = new PlaylistViewAdapter.Callback() {
+        @Override
+        public void onSongClicked(ImageView cover, String transitionName, int position) {
+            FragmentNavigator.Extras extras = new FragmentNavigator.Extras
+                .Builder()
+                .addSharedElement(cover, transitionName)
+                .build();
+            NavDirections action = PlaylistViewFragmentDirections
+                .openPlaylistSong()
+                .setTransitionName(transitionName);
+            NavHostFragment.findNavController(PlaylistViewFragment.this).navigate(action, extras);
+
+            PlaylistInfo info = playlistViewVM.info.getValue();
+            List<Song> songs = playlistViewVM.songs.getValue();
+            if (info == null || songs == null) return;
+
+            Playlist playlist = new Playlist(info, songs);
+            playingVM.selectSong(playlist, position);
+            playlistViewVM.setTransitionState(B.parent.getTransitionState());
+        }
+
+        @Override
+        public void onMenuClicked(Song song) {
+
+        }
+    };
 
     public PlaylistViewFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_playlist_view, container, false);
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        B = FragmentPlaylistViewBinding.inflate(inflater, container, false);
         activity = (MainActivity) getActivity();
         assert activity != null;
         repository = activity.getRepository();
@@ -60,54 +82,27 @@ public class PlaylistViewFragment extends Fragment {
         playlistViewVM = new ViewModelProvider(activity).get(PlaylistViewViewModel.class);
         playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
 
-        // Reference Views
-        RecyclerView recyclerView = view.findViewById(R.id.playlist_view_recycler_view);
-        ImageView backImage = view.findViewById(R.id.playlist_view_back);
-        swipeRefreshLayout = view.findViewById(R.id.playlist_view_swipe_refresh);
-        motionLayout = view.findViewById(R.id.playlist_view_motion_layout);
-        coverImage = view.findViewById(R.id.playlist_view_cover);
-        nameText = view.findViewById(R.id.playlist_view_name);
-
         // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
-        playlistViewAdapter = new PlaylistViewAdapter(this::onSongSelected);
-        recyclerView.setAdapter(playlistViewAdapter);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
+        playlistViewAdapter = new PlaylistViewAdapter(callback);
+        B.recyclerView.setAdapter(playlistViewAdapter);
+        B.recyclerView.setLayoutManager(layoutManager);
+        B.recyclerView.setHasFixedSize(true);
 
         // Live Observers
         playlistViewVM.info.observe(activity, this::onInfoChange);
         playlistViewVM.songs.observe(activity, this::onSongsChange);
-        motionLayout.addTransitionListener(activity.getTransitionListener());
-        backImage.setOnClickListener(__ -> activity.onBackPressed());
+        B.parent.addTransitionListener(activity.getTransitionListener());
+        B.backImage.setOnClickListener(__ -> activity.onBackPressed());
 
         if (playlistViewVM.getTransitionState() != null) {
-            motionLayout.setTransitionState(playlistViewVM.getTransitionState());
+            B.parent.setTransitionState(playlistViewVM.getTransitionState());
             playlistViewVM.setTransitionState(null);
         }
-        swipeRefreshLayout.setOnRefreshListener(this::loadPlaylistData);
+        B.swipeRefresh.setOnRefreshListener(this::loadPlaylistData);
         loadPlaylistData();
 
-        return view;
-    }
-
-    private void onSongSelected(ImageView cover, String transitionName, Song song, int position) {
-        FragmentNavigator.Extras extras = new FragmentNavigator.Extras
-            .Builder()
-            .addSharedElement(cover, transitionName)
-            .build();
-        NavDirections action = PlaylistViewFragmentDirections
-            .openPlaylistSong()
-            .setTransitionName(transitionName);
-        NavHostFragment.findNavController(this).navigate(action, extras);
-
-        PlaylistInfo info = playlistViewVM.info.getValue();
-        List<Song> songs = playlistViewVM.songs.getValue();
-        if (info == null || songs == null) return;
-
-        Playlist playlist = new Playlist(info, songs);
-        playingVM.selectSong(playlist, position);
-        playlistViewVM.setTransitionState(motionLayout.getTransitionState());
+        return B.getRoot();
     }
 
     private void onSongsChange(List<Song> songs) {
@@ -118,19 +113,19 @@ public class PlaylistViewFragment extends Fragment {
     }
 
     private void onInfoChange(PlaylistInfo info) {
-        nameText.setText(info.getName());
+        B.nameText.setText(info.getName());
         if (info.getCover() != null) {
             Glide
                 .with(activity)
                 .load(info.getCover())
                 .transition(DrawableTransitionOptions.withCrossFade())
-                .into(coverImage);
+                .into(B.coverImage);
         }
     }
 
     private void loadPlaylistData() {
         if (playlistViewVM.loading) return;
-        swipeRefreshLayout.setRefreshing(true);
+        B.swipeRefresh.setRefreshing(true);
         playlistViewVM.loading = true;
 
         PlaylistInfo info = playlistViewVM.info.getValue();
@@ -155,7 +150,7 @@ public class PlaylistViewFragment extends Fragment {
                             songs.sort((a, b) -> a.getTitle().compareTo(b.getTitle()));
                             songs.forEach(song -> song.setDirectoryWith(requireContext()));
                             playlistViewVM.songs.setValue(songs);
-                            swipeRefreshLayout.setRefreshing(false);
+                            B.swipeRefresh.setRefreshing(false);
                             playlistViewVM.loading = false;
                         })
                         .addOnFailureListener(activity::handleError);
@@ -165,7 +160,7 @@ public class PlaylistViewFragment extends Fragment {
                 @Override
                 public void onFinish(Playlist playlist) {
                     playlistViewVM.songs.postValue(playlist.getSongs());
-                    swipeRefreshLayout.setRefreshing(false);
+                    B.swipeRefresh.setRefreshing(false);
                     playlistViewVM.loading = false;
                 }
 

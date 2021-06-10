@@ -6,8 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.lifecycle.ViewModelProvider;
@@ -20,14 +18,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.zectan.soundroid.AnimatedFragment;
 import com.zectan.soundroid.MainActivity;
-import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.SearchAdapter;
+import com.zectan.soundroid.databinding.FragmentSearchBinding;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 import com.zectan.soundroid.viewmodels.SearchViewModel;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,9 +38,8 @@ import java.util.concurrent.TimeUnit;
 public class SearchFragment extends AnimatedFragment {
     private static final String TAG = "(SounDroid) SearchFragment";
     private MainActivity activity;
+    private FragmentSearchBinding B;
     private NavController navController;
-
-    private EditText searchEditText;
 
     private SearchViewModel searchVM;
     private PlayingViewModel playingVM;
@@ -74,8 +73,8 @@ public class SearchFragment extends AnimatedFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_search, container, false);
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        B = FragmentSearchBinding.inflate(inflater, container, false);
         activity = (MainActivity) getActivity();
         assert activity != null;
         navController = NavHostFragment.findNavController(this);
@@ -85,33 +84,28 @@ public class SearchFragment extends AnimatedFragment {
         playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
         playlistViewVM = new ViewModelProvider(activity).get(PlaylistViewViewModel.class);
 
-        // Reference views
-        RecyclerView recyclerView = view.findViewById(R.id.search_recycler_view);
-        ImageView searchBack = view.findViewById(R.id.search_back);
-        searchEditText = view.findViewById(R.id.search_edit_text);
-
         // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
         SearchAdapter searchAdapter = new SearchAdapter(callback);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(searchAdapter);
-        recyclerView.setHasFixedSize(true);
+        B.recyclerView.setLayoutManager(layoutManager);
+        B.recyclerView.setAdapter(searchAdapter);
+        B.recyclerView.setHasFixedSize(true);
 
         // Observers
         searchVM.results.observe(activity, searchAdapter::updateResults);
         searchVM.error.observe(activity, System.out::println);
-        searchBack.setOnClickListener(this::onBackPressed);
+        B.headerBackImage.setOnClickListener(this::onBackPressed);
 
         RxTextView
-            .textChanges(searchEditText)
+            .textChanges(B.headerTextEditor)
             .debounce(250, TimeUnit.MILLISECONDS)
             .map(CharSequence::toString)
             .subscribe(this::afterSearchDebounce);
         activity.hideNavigator();
         activity.showKeyboard();
-        searchEditText.setOnEditorActionListener(this::onTextChange);
+        B.headerTextEditor.setOnEditorActionListener(this::onTextChange);
 
-        return view;
+        return B.getRoot();
     }
 
     private void onBackPressed(View view) {
@@ -122,7 +116,7 @@ public class SearchFragment extends AnimatedFragment {
     private boolean onTextChange(TextView textView, int actionId, KeyEvent keyEvent) {
         boolean handled = false;
         if (actionId == EditorInfo.IME_ACTION_SEND) {
-            searchVM.search(searchEditText.getText().toString(), getContext());
+            searchVM.search(B.headerTextEditor.getText().toString(), getContext());
             activity.hideKeyboard(this.requireView());
             handled = true;
         }

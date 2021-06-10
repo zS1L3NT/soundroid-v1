@@ -13,15 +13,16 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.MainActivity;
-import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.PlaylistsAdapter;
+import com.zectan.soundroid.databinding.FragmentPlaylistsBinding;
 import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistsViewModel;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,20 +31,19 @@ public class PlaylistsFragment extends Fragment {
     private static final String TAG = "(SounDroid) PlayingFragment";
     private static final String USER_ID = "admin";
     private MainActivity activity;
+    private FragmentPlaylistsBinding B;
     private FirebaseRepository repository;
 
     private PlaylistsViewModel playlistVM;
     private PlaylistViewViewModel playlistViewVM;
-
-    private SwipeRefreshLayout swipeRefreshLayout;
 
     public PlaylistsFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_playlists, container, false);
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        B = FragmentPlaylistsBinding.inflate(inflater, container, false);
         activity = (MainActivity) getActivity();
         assert activity != null;
         repository = activity.getRepository();
@@ -52,25 +52,21 @@ public class PlaylistsFragment extends Fragment {
         playlistVM = new ViewModelProvider(activity).get(PlaylistsViewModel.class);
         playlistViewVM = new ViewModelProvider(activity).get(PlaylistViewViewModel.class);
 
-        // Reference views
-        RecyclerView recyclerView = view.findViewById(R.id.playlists_recycler_view);
-        swipeRefreshLayout = view.findViewById(R.id.playlists_swipe_refresh);
-
         // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
         PlaylistsAdapter playlistsAdapter = new PlaylistsAdapter(this::onPlaylistSelected);
-        recyclerView.setAdapter(playlistsAdapter);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
+        B.recyclerView.setAdapter(playlistsAdapter);
+        B.recyclerView.setLayoutManager(layoutManager);
+        B.recyclerView.setHasFixedSize(true);
 
         // Observers
         playlistVM.infos.observe(activity, playlistsAdapter::updateInfos);
 
-        swipeRefreshLayout.setOnRefreshListener(this::loadFromFirebase);
+        B.swipeRefresh.setOnRefreshListener(this::loadFromFirebase);
         if (playlistVM.infos.getValue() == null) loadFromFirebase();
         activity.showNavigator();
 
-        return view;
+        return B.getRoot();
     }
 
     private void onPlaylistSelected(PlaylistInfo info) {
@@ -83,7 +79,7 @@ public class PlaylistsFragment extends Fragment {
 
     private void loadFromFirebase() {
         if (playlistVM.requested) return;
-        swipeRefreshLayout.setRefreshing(true);
+        B.swipeRefresh.setRefreshing(true);
         playlistVM.requested = true;
 
         repository
@@ -92,7 +88,7 @@ public class PlaylistsFragment extends Fragment {
                 .addOnSuccessListener(snaps -> {
                     List<PlaylistInfo> infos = snaps.toObjects(PlaylistInfo.class);
                     playlistVM.infos.setValue(infos);
-                    swipeRefreshLayout.setRefreshing(false);
+                    B.swipeRefresh.setRefreshing(false);
                     playlistVM.requested = false;
                 })
                 .addOnFailureListener(this::handleError);

@@ -2,18 +2,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context=".fragments.PlaylistsFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/playlists_header"
+        android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="80dp">
 
         <TextView
-            android:id="@+id/playlists_header_title"
+            android:id="@+id/header_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -26,17 +27,17 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/playlists_header_add"
+            android:id="@+id/header_add_image"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="24dp"
             android:contentDescription="@string/add_playlist"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/playlists_header_more"
+            app:layout_constraintEnd_toStartOf="@+id/header_more_image"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/playlists_header_more"
+            android:id="@+id/header_more_image"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="24dp"
@@ -48,13 +49,13 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/playlists_swipe_refresh"
+        android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/playlists_header">
+        android:layout_below="@id/header">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/playlists_recycler_view"
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layoutAnimation="@anim/songs_recycler_animation"

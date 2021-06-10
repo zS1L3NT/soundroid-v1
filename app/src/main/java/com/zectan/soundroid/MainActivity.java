@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -18,7 +19,7 @@ import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.zectan.soundroid.databinding.ActivityMainBinding;
 import com.zectan.soundroid.objects.MarginProxy;
 import com.zectan.soundroid.viewmodels.HomeViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
@@ -27,7 +28,7 @@ import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "(SounDroid) MainActivity";
-    private BottomNavigationView navigator;
+    private ActivityMainBinding B;
     private InputMethodManager imm;
     private FirebaseRepository repository;
     private MarginProxy mp;
@@ -40,30 +41,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-    
-        // TODO View model encapsulation
-    
+        B = ActivityMainBinding.inflate(LayoutInflater.from(this));
+        setContentView(B.getRoot());
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         repository = new FirebaseRepository();
-    
+
         // View Models
         homeVM = new ViewModelProvider(this).get(HomeViewModel.class);
         playlistViewVM = new ViewModelProvider(this).get(PlaylistViewViewModel.class);
-    
-        // Reference views
-        navigator = findViewById(R.id.bottom_navigator);
-    
+
         NavHostFragment navHostFragment = (NavHostFragment)
             getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
         assert navHostFragment != null;
         navController = navHostFragment.getNavController();
-        NavigationUI.setupWithNavController(navigator, navController);
-        mp = new MarginProxy(navigator);
-    
-        navigator.setOnNavigationItemSelectedListener(this::onNavigationItem);
-        navigator.setOnNavigationItemReselectedListener(this::onNavigationItem);
+        NavigationUI.setupWithNavController(B.bottomNavigator, navController);
+        mp = new MarginProxy(B.bottomNavigator);
+
+        B.bottomNavigator.setOnNavigationItemSelectedListener(this::onNavigationItem);
+        B.bottomNavigator.setOnNavigationItemReselectedListener(this::onNavigationItem);
     }
 
     private boolean onNavigationItem(MenuItem item) {
@@ -80,16 +76,16 @@ public class MainActivity extends AppCompatActivity {
         switch (name) {
             case "Home":
                 homeVM.setTransitionState(null);
-                if (navigator.getSelectedItemId() == item.getItemId()) break;
+                if (B.bottomNavigator.getSelectedItemId() == item.getItemId()) break;
                 navController.navigate(R.id.fragment_home, null, options);
                 break;
             case "Playing":
-                if (navigator.getSelectedItemId() == item.getItemId()) break;
+                if (B.bottomNavigator.getSelectedItemId() == item.getItemId()) break;
                 navController.navigate(R.id.fragment_playing, null, options);
                 break;
             case "Playlist":
                 playlistViewVM.setTransitionState(null);
-                if (navigator.getSelectedItemId() == item.getItemId()) break;
+                if (B.bottomNavigator.getSelectedItemId() == item.getItemId()) break;
                 navController.navigate(R.id.fragment_playlists, null, options);
                 break;
             default:
@@ -105,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
     }
     
     public void hideNavigator() {
-        ValueAnimator va = ValueAnimator.ofInt(mp.getBottomMargin(), -navigator.getHeight()).setDuration(250);
+        ValueAnimator va = ValueAnimator.ofInt(mp.getBottomMargin(), -B.bottomNavigator.getHeight()).setDuration(250);
         va.addUpdateListener(animation -> mp.setBottomMargin((int) animation.getAnimatedValue()));
         va.start();
     }
@@ -140,13 +136,13 @@ public class MainActivity extends AppCompatActivity {
             
             @Override
             public void onTransitionChange(MotionLayout motionLayout, int i, int i1, float v) {
-                mp.setBottomMargin((int) (v * -navigator.getHeight()));
+                mp.setBottomMargin((int) (v * -B.bottomNavigator.getHeight()));
             }
             
             @Override
             public void onTransitionCompleted(MotionLayout motionLayout, int i) {
                 if (i == motionLayout.getEndState()) {
-                    mp.setBottomMargin(-navigator.getHeight());
+                    mp.setBottomMargin(-B.bottomNavigator.getHeight());
                 } else {
                     mp.setBottomMargin(0);
                 }
@@ -159,6 +155,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public RelativeLayout getView() {
-        return findViewById(R.id.activity_main);
+        return findViewById(R.id.parent);
     }
 }

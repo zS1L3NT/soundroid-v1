@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:orientation="vertical">
 
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/playlist_list_item_cover"
+        android:id="@+id/cover_image"
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:layout_marginStart="15dp"
@@ -23,11 +24,11 @@
         android:layout_marginStart="16dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/playlist_list_item_cover"
+        app:layout_constraintStart_toEndOf="@+id/cover_image"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/playlist_list_item_name"
+            android:id="@+id/title_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/Nil"
@@ -35,7 +36,7 @@
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/playlist_list_item_song_count"
+            android:id="@+id/description_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:alpha="0.8"

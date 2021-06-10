@@ -8,17 +8,20 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 
 import com.zectan.soundroid.MainActivity;
-import com.zectan.soundroid.R;
+import com.zectan.soundroid.databinding.FragmentSettingsBinding;
+
+import org.jetbrains.annotations.NotNull;
 
 public class SettingsFragment extends Fragment {
+    private FragmentSettingsBinding B;
 
     public SettingsFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_settings, container, false);
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        B = FragmentSettingsBinding.inflate(inflater, container, false);
         MainActivity activity = (MainActivity) getActivity();
         assert activity != null;
 
@@ -27,6 +30,6 @@ public class SettingsFragment extends Fragment {
         // TODO Download quality
         // TODO Stream quality
 
-        return view;
+        return B.getRoot();
     }
 }

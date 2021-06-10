@@ -34,7 +34,7 @@
             app:popExitAnim="@anim/fade_out" />
         <action
             android:id="@+id/open_options_menu"
-            app:destination="@id/fragment_options_menu"
+            app:destination="@id/parent"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -115,7 +115,7 @@
             app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
-        android:id="@+id/fragment_options_menu"
+        android:id="@+id/parent"
         android:name="com.zectan.soundroid.fragments.OptionsMenuFragment"
         android:label="fragment_options_menu"
         tools:layout="@layout/fragment_options_menu" />

@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/back_icon"
+    android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
@@ -10,13 +10,13 @@
     tools:context=".fragments.SearchFragment">
 
     <LinearLayout
-        android:id="@+id/search_layout"
+        android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp">
 
         <ImageView
-            android:id="@+id/search_back"
+            android:id="@+id/header_back_image"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_gravity="center_vertical"
@@ -27,7 +27,7 @@
             app:tint="@color/white" />
 
         <EditText
-            android:id="@+id/search_edit_text"
+            android:id="@+id/header_text_editor"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_gravity="center_vertical"
@@ -49,17 +49,18 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/search_layout">
+        android:layout_below="@+id/header">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/search_recycler_view"
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layoutAnimation="@anim/songs_recycler_animation"
             android:overScrollMode="never"
             tools:listitem="@layout/song_list_item" />
 
         <ProgressBar
-            android:id="@+id/search_loading"
+            android:id="@+id/loading_circle"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_gravity="center_horizontal"
