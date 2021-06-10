@@ -6,8 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.fragment.NavHostFragment;
@@ -16,40 +14,26 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.zectan.soundroid.FirebaseRepository;
-import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.adapters.PlaylistViewAdapter;
 import com.zectan.soundroid.databinding.FragmentPlaylistViewBinding;
+import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
 import com.zectan.soundroid.sockets.PlaylistLookupSocket;
-import com.zectan.soundroid.viewmodels.PlayingViewModel;
-import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class PlaylistViewFragment extends Fragment {
-    private MainActivity activity;
-    private FragmentPlaylistViewBinding B;
-    private FirebaseRepository repository;
+public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> {
     private PlaylistViewAdapter playlistViewAdapter;
-
-    private PlaylistViewViewModel playlistViewVM;
-    private PlayingViewModel playingVM;
 
     private final PlaylistViewAdapter.Callback callback = new PlaylistViewAdapter.Callback() {
         @Override
         public void onSongClicked(ImageView cover, String transitionName, int position) {
-            FragmentNavigator.Extras extras = new FragmentNavigator.Extras
-                .Builder()
-                .addSharedElement(cover, transitionName)
-                .build();
-            NavDirections action = PlaylistViewFragmentDirections
-                .openPlaylistSong()
-                .setTransitionName(transitionName);
+            FragmentNavigator.Extras extras = Anonymous.makeExtras(cover, transitionName);
+            NavDirections action = PlaylistViewFragmentDirections.openPlaylistSong().setTransitionName(transitionName);
             NavHostFragment.findNavController(PlaylistViewFragment.this).navigate(action, extras);
 
             PlaylistInfo info = playlistViewVM.info.getValue();
@@ -67,20 +51,10 @@ public class PlaylistViewFragment extends Fragment {
         }
     };
 
-    public PlaylistViewFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         B = FragmentPlaylistViewBinding.inflate(inflater, container, false);
-        activity = (MainActivity) getActivity();
-        assert activity != null;
-        repository = activity.getRepository();
-
-        // ViewModels
-        playlistViewVM = new ViewModelProvider(activity).get(PlaylistViewViewModel.class);
-        playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
+        super.onCreateView(inflater, container, savedInstanceState);
 
         // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);

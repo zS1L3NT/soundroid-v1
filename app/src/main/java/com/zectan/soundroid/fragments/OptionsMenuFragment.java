@@ -7,36 +7,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.OptionsAdapter;
 import com.zectan.soundroid.databinding.FragmentOptionsMenuBinding;
 import com.zectan.soundroid.objects.Option;
-import com.zectan.soundroid.viewmodels.OptionsMenuViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class OptionsMenuFragment extends Fragment {
+public class OptionsMenuFragment extends Fragment<FragmentOptionsMenuBinding> {
     private OptionsAdapter optionsAdapter;
-    private MainActivity activity;
-    private FragmentOptionsMenuBinding B;
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         B = FragmentOptionsMenuBinding.inflate(inflater, container, false);
-        activity = (MainActivity) getActivity();
-        assert activity != null;
-
-        // View Models
-        OptionsMenuViewModel optionsMenuVM = new ViewModelProvider(activity).get(OptionsMenuViewModel.class);
+        super.onCreateView(inflater, container, savedInstanceState);
 
         // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);

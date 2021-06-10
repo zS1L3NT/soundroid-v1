@@ -9,7 +9,7 @@ import java.util.TimerTask;
 
 public class MusicPlayer {
     private static final String TAG = "(SounDroid) MusicPlayer";
-    final int FADE_DURATION = 500;
+    final int FADE_DURATION = 250;
     final int FADE_INTERVAL = 25;
     final int MAX_VOLUME = 1;
     final int FADE_STEPS = FADE_DURATION / FADE_INTERVAL;
@@ -181,7 +181,7 @@ public class MusicPlayer {
     /**
      * Fade song out
      */
-    public void fadeOut(FadeOutCallback fadeOutCallback) {
+    public void fadeOut(Runnable callback) {
         stopInTimerIfExists();
         stopOutTimerIfExists();
 
@@ -192,7 +192,7 @@ public class MusicPlayer {
                 stopInTimerIfExists();
 
                 if (volume <= 0f) {
-                    fadeOutCallback.run();
+                    callback.run();
                     stopOutTimerIfExists();
                     player.pause();
                 } else {
@@ -225,9 +225,5 @@ public class MusicPlayer {
 
     public interface JitteringCallback {
         void set(boolean jittering);
-    }
-
-    public interface FadeOutCallback {
-        void run();
     }
 }

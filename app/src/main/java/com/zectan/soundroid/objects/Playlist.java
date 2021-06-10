@@ -13,7 +13,7 @@ public class Playlist {
     
     public Playlist(PlaylistInfo info, List<Song> songs) {
         this.info = info;
-        this.songs = Functions.sortSongs(songs, info.getOrder());
+        this.songs = Anonymous.sortSongs(songs, info.getOrder());
     }
     
     public PlaylistInfo getInfo() {

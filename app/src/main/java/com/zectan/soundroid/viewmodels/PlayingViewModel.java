@@ -5,7 +5,7 @@ import android.util.Log;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.zectan.soundroid.objects.Functions;
+import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.objects.MusicPlayer;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.PlaylistInfo;
@@ -80,9 +80,9 @@ public class PlayingViewModel extends ViewModel {
     
         queueNumber = 0;
         if (shufflingState) {
-            sequence.setValue(Functions.shuffleOrder(startPosition, playlist.size()));
+            sequence.setValue(Anonymous.shuffleOrder(playlist.size(), startPosition));
         } else {
-            sequence.setValue(Functions.createOrder(startPosition, playlist.size()));
+            sequence.setValue(Anonymous.createOrder(playlist.size(), startPosition));
         }
         recursivelyRunPlaylist();
     }
@@ -171,7 +171,7 @@ public class PlayingViewModel extends ViewModel {
     
         if (sequence.size() == 0) return;
         int lastItemInOrder = sequence.get(sequence.size() - 1);
-        this.sequence.setValue(Functions.changeOrder(sequence, lastItemInOrder));
+        this.sequence.setValue(Anonymous.changeOrder(sequence, lastItemInOrder));
         recursivelyRunPlaylist();
     }
     
@@ -198,7 +198,7 @@ public class PlayingViewModel extends ViewModel {
             if (!loopingState) {
                 sequence.remove(0);
             }
-            this.sequence.setValue(Functions.changeOrder(sequence, secondItemInOrder));
+            this.sequence.setValue(Anonymous.changeOrder(sequence, secondItemInOrder));
         } else {
             if (!loopingState) {
                 this.sequence.setValue(Collections.singletonList(-1));
@@ -253,9 +253,9 @@ public class PlayingViewModel extends ViewModel {
         int value = sequence.get(0);
     
         if (shufflingState) {
-            this.sequence.setValue(Functions.shuffleOrder(value, sequence));
+            this.sequence.setValue(Anonymous.shuffleOrder(sequence, value));
         } else {
-            this.sequence.setValue(Functions.createOrder(value, sequence));
+            this.sequence.setValue(Anonymous.createOrder(sequence, value));
         }
     }
     

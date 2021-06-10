@@ -1,12 +1,14 @@
-package com.zectan.soundroid;
+package com.zectan.soundroid.fragments;
 
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.transition.TransitionInflater;
+import androidx.viewbinding.ViewBinding;
 
-public class AnimatedFragment extends Fragment {
+import com.zectan.soundroid.R;
+
+public class FragmentAnimated<T extends ViewBinding> extends Fragment<T> {
 
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {

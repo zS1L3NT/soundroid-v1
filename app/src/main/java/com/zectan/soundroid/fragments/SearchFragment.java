@@ -8,24 +8,16 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.jakewharton.rxbinding.widget.RxTextView;
-import com.zectan.soundroid.AnimatedFragment;
-import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.adapters.SearchAdapter;
 import com.zectan.soundroid.databinding.FragmentSearchBinding;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
-import com.zectan.soundroid.viewmodels.PlayingViewModel;
-import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
-import com.zectan.soundroid.viewmodels.SearchViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,15 +27,8 @@ import java.util.concurrent.TimeUnit;
 
 // TODO Animate search results
 
-public class SearchFragment extends AnimatedFragment {
+public class SearchFragment extends FragmentAnimated<FragmentSearchBinding> {
     private static final String TAG = "(SounDroid) SearchFragment";
-    private MainActivity activity;
-    private FragmentSearchBinding B;
-    private NavController navController;
-
-    private SearchViewModel searchVM;
-    private PlayingViewModel playingVM;
-    private PlaylistViewViewModel playlistViewVM;
 
     private final SearchAdapter.Callback callback = new SearchAdapter.Callback() {
         @Override
@@ -68,21 +53,10 @@ public class SearchFragment extends AnimatedFragment {
         }
     };
 
-    public SearchFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         B = FragmentSearchBinding.inflate(inflater, container, false);
-        activity = (MainActivity) getActivity();
-        assert activity != null;
-        navController = NavHostFragment.findNavController(this);
-
-        // ViewModels
-        searchVM = new ViewModelProvider(activity).get(SearchViewModel.class);
-        playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
-        playlistViewVM = new ViewModelProvider(activity).get(PlaylistViewViewModel.class);
+        super.onCreateView(inflater, container, savedInstanceState);
 
         // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);

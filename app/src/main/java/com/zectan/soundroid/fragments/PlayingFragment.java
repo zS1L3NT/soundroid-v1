@@ -20,23 +20,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView;
-import com.zectan.soundroid.AnimatedFragment;
-import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.QueueAdapter;
 import com.zectan.soundroid.databinding.FragmentPlayingBinding;
-import com.zectan.soundroid.objects.Animations;
-import com.zectan.soundroid.objects.Functions;
+import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.Song;
-import com.zectan.soundroid.viewmodels.PlayingViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -44,12 +39,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressLint("UseCompatLoadingForDrawables")
-public class PlayingFragment extends AnimatedFragment {
+public class PlayingFragment extends FragmentAnimated<FragmentPlayingBinding> {
     private static final String TAG = "(SounDroid) PlayingFragment";
-    private MainActivity activity;
-    private FragmentPlayingBinding B;
-
-    private PlayingViewModel playingVM;
 
     private final QueueAdapter.Callback callback = new QueueAdapter.Callback() {
         @Override
@@ -66,13 +57,10 @@ public class PlayingFragment extends AnimatedFragment {
             playingVM.reorderQueue(songs);
         }
     };
+
     private QueueAdapter queueAdapter;
     private boolean touchingSeekbar = false;
     private int finalTouch = 0;
-
-    public PlayingFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public void onViewCreated(@NonNull @NotNull View view,
@@ -87,11 +75,7 @@ public class PlayingFragment extends AnimatedFragment {
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         B = FragmentPlayingBinding.inflate(inflater, container, false);
-        activity = (MainActivity) getActivity();
-        assert activity != null;
-
-        // View Models
-        playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
+        super.onCreateView(inflater, container, savedInstanceState);
 
         // Recycler Views
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
@@ -119,13 +103,13 @@ public class PlayingFragment extends AnimatedFragment {
         updateLoopColor();
         activity.showNavigator();
         B.shuffleImage.setOnClickListener(this::shufflePlaylist);
-        B.shuffleImage.setOnTouchListener(Animations::mediumSqueeze);
+        B.shuffleImage.setOnTouchListener(Anonymous::animationMediumSqueeze);
         B.backImage.setOnClickListener(this::backSong);
-        B.backImage.setOnTouchListener(Animations::mediumSqueeze);
+        B.backImage.setOnTouchListener(Anonymous::animationMediumSqueeze);
         B.nextImage.setOnClickListener(this::nextSong);
-        B.nextImage.setOnTouchListener(Animations::mediumSqueeze);
+        B.nextImage.setOnTouchListener(Anonymous::animationMediumSqueeze);
         B.loopImage.setOnClickListener(this::loopPlaylist);
-        B.loopImage.setOnTouchListener(Animations::mediumSqueeze);
+        B.loopImage.setOnTouchListener(Anonymous::animationMediumSqueeze);
 
         return B.getRoot();
     }
@@ -179,9 +163,9 @@ public class PlayingFragment extends AnimatedFragment {
     @SuppressLint("ClickableViewAccessibility")
     private void enableControls() {
         B.playPauseImage.setOnClickListener(this::playPauseSong);
-        B.playPauseImage.setOnTouchListener(Animations::smallSqueeze);
+        B.playPauseImage.setOnTouchListener(Anonymous::animationSmallSqueeze);
         B.playPauseMiniImage.setOnClickListener(this::playPauseSong);
-        B.playPauseMiniImage.setOnTouchListener(Animations::mediumSqueeze);
+        B.playPauseMiniImage.setOnTouchListener(Anonymous::animationMediumSqueeze);
         B.playingSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -191,7 +175,7 @@ public class PlayingFragment extends AnimatedFragment {
                     double percent = (double) progress / 1000;
                     double durationS = (double) playingVM.getDuration() / 1000;
                     int selectedTime = (int) (percent * durationS);
-                    B.timeText.setText(Functions.formatDate(selectedTime));
+                    B.timeText.setText(Anonymous.formatDuration(selectedTime));
                 }
             }
 
@@ -258,7 +242,7 @@ public class PlayingFragment extends AnimatedFragment {
             B.descriptionText.setText("-");
             colorHex = "#7b828b";
         } else {
-            queueAdapter.updateQueue(Functions.formQueue(queue.getSongs(), order));
+            queueAdapter.updateQueue(Anonymous.formatQueue(queue.getSongs(), order));
 
             Song song = queue.getSong(order.get(0));
             String title = song.getTitle();
@@ -289,7 +273,7 @@ public class PlayingFragment extends AnimatedFragment {
     }
 
     private void onSongDurationChange(int duration) {
-        B.lengthText.setText(Functions.formatDate(duration));
+        B.lengthText.setText(Anonymous.formatDuration(duration));
     }
 
     private void onJitteringStateChange(boolean jittering) {
@@ -337,7 +321,7 @@ public class PlayingFragment extends AnimatedFragment {
 
     private void onPlayTimeChange(int time) {
         if (!touchingSeekbar) {
-            B.timeText.setText(Functions.formatDate(time));
+            B.timeText.setText(Anonymous.formatDuration(time));
         }
     }
 

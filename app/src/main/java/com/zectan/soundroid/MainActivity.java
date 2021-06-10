@@ -20,7 +20,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.zectan.soundroid.databinding.ActivityMainBinding;
-import com.zectan.soundroid.objects.MarginProxy;
+import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.viewmodels.HomeViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 
@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding B;
     private InputMethodManager imm;
     private FirebaseRepository repository;
-    private MarginProxy mp;
+    private Anonymous.MarginProxy mp;
 
     private HomeViewModel homeVM;
     private PlaylistViewViewModel playlistViewVM;
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         assert navHostFragment != null;
         navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(B.bottomNavigator, navController);
-        mp = new MarginProxy(B.bottomNavigator);
+        mp = new Anonymous.MarginProxy(B.bottomNavigator);
 
         B.bottomNavigator.setOnNavigationItemSelectedListener(this::onNavigationItem);
         B.bottomNavigator.setOnNavigationItemReselectedListener(this::onNavigationItem);

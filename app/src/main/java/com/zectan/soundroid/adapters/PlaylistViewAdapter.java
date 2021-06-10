@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.SongListItemBinding;
-import com.zectan.soundroid.objects.Functions;
+import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.objects.Song;
 
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +42,7 @@ public class PlaylistViewAdapter extends RecyclerView.Adapter<PlaylistViewViewHo
 
     public void updateSongs(List<Song> songs, List<String> order) {
         mSongs.clear();
-        mSongs.addAll(Functions.sortSongs(songs, order));
+        mSongs.addAll(Anonymous.sortSongs(songs, order));
         notifyDataSetChanged();
     }
 
