@@ -34,16 +34,6 @@ public class Song {
         this.colorHex = colorHex;
     }
 
-    public static Song getDefault() {
-        return new Song(
-            "",
-            "-",
-            "-",
-            "-",
-            "#7b828b"
-        );
-    }
-
     public String getId() {
         return id;
     }
@@ -68,17 +58,31 @@ public class Song {
         this.colorHex = colorHex;
     }
 
+    public static Song getDefault() {
+        return new Song(
+            "",
+            "-",
+            "-",
+            "-",
+            "#7b828b"
+        );
+    }
+
+    public List<String> getPlaylists() {
+        return playlists;
+    }
+
     public File getDirectory() {
         return this.directory;
+    }
+
+    public List<String> getUsers() {
+        return users;
     }
 
     public Song setDirectoryWith(Context context) {
         this.directory = new File(context.getFilesDir().getPath(), id + ".mp3");
         return this;
-    }
-
-    public List<String> getPlaylists() {
-        return playlists;
     }
 
     public void getFileLocation(ConvertSongSocket.Callback callback) {
@@ -90,11 +94,6 @@ public class Song {
             Log.d(TAG, "STREAMING_SONG");
             new ConvertSongSocket(id, callback);
         }
-
-    }
-
-    public List<String> getUsers() {
-        return users;
     }
 
     @Override

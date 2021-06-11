@@ -1,7 +1,5 @@
 package com.zectan.soundroid.objects;
 
-import android.annotation.SuppressLint;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -47,10 +45,9 @@ public class Playlist {
     public int size() {
         return songs.size();
     }
-    
-    @SuppressLint("DefaultLocale")
+
     @Override
     public @NotNull String toString() {
-        return String.format("Playlist { info: %s, size: %d }", info, songs.size());
+        return String.format("Playlist { info: %s, size: %s }", info, songs.size());
     }
 }

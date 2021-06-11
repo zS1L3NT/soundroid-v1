@@ -22,13 +22,14 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.TransitionInflater;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.QueueAdapter;
-import com.zectan.soundroid.classes.FragmentAnimated;
+import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlayingBinding;
 import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.objects.Playlist;
@@ -40,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressLint("UseCompatLoadingForDrawables")
-public class PlayingFragment extends FragmentAnimated<FragmentPlayingBinding> {
+public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     private static final String TAG = "(SounDroid) PlayingFragment";
     private QueueAdapter queueAdapter;
 
@@ -69,6 +70,13 @@ public class PlayingFragment extends FragmentAnimated<FragmentPlayingBinding> {
         super.onViewCreated(view, savedInstanceState);
         String transitionName = PlayingFragmentArgs.fromBundle(getArguments()).getTransitionName();
         ViewCompat.setTransitionName(view.findViewById(R.id.cover_image), transitionName);
+    }
+
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        TransitionInflater inflater = TransitionInflater.from(requireContext());
+        setSharedElementEnterTransition(inflater.inflateTransition(R.transition.shared_image));
     }
 
     @SuppressLint("ClickableViewAccessibility")

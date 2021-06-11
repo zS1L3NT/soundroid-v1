@@ -5,22 +5,38 @@ import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.zectan.soundroid.FirebaseRepository;
+import com.zectan.soundroid.classes.StrictLiveData;
+import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.SearchResult;
+import com.zectan.soundroid.objects.Song;
 import com.zectan.soundroid.sockets.SearchSocket;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SearchViewModel extends ViewModel {
     private static final String TAG = "(SounDroid) SearchViewModel";
-    public MutableLiveData<List<SearchResult>> results = new MutableLiveData<>(new ArrayList<>());
+    private static final String USER_ID = "admin";
+    private static final int LOCATIONS = 3;
+    private final FirebaseRepository repository = new FirebaseRepository();
     public MutableLiveData<String> error = new MutableLiveData<>();
-    public MutableLiveData<String> search = new MutableLiveData<>();
+    public StrictLiveData<List<SearchResult>> results = new StrictLiveData<>(new ArrayList<>());
+    public StrictLiveData<String> query = new StrictLiveData<>("");
+    public StrictLiveData<Boolean> loading = new StrictLiveData<>(false);
 
     private int search_count = 0;
 
     public SearchViewModel() {
         // Required empty public constructor
+    }
+
+    private void pushToResults(SearchResult result) {
+        List<SearchResult> results = this.results.getValue();
+        results.add(result);
+        this.results.postValue(results);
     }
 
     /**
@@ -32,25 +48,33 @@ public class SearchViewModel extends ViewModel {
     public void search(String query, Context context) {
         int search_id = ++search_count;
         this.results.postValue(new ArrayList<>());
-        if (query.isEmpty()) return;
+        if (query.isEmpty()) {
+            loading.postValue(false);
+            return;
+        }
 
+        loading.postValue(true);
+        AtomicInteger responses = new AtomicInteger(0);
         new SearchSocket(query, context, new SearchSocket.Callback() {
             @Override
             public void onResult(SearchResult result) {
-                List<SearchResult> results = SearchViewModel.this.results.getValue();
-                assert results != null;
-                results.add(result);
-                SearchViewModel.this.results.postValue(results);
+                pushToResults(result);
+                error.postValue(null);
             }
 
             @Override
             public void onDone() {
-
+                if (responses.incrementAndGet() == LOCATIONS) {
+                    loading.postValue(false);
+                }
             }
 
             @Override
             public void onError(String message) {
                 error.postValue(message);
+                if (responses.incrementAndGet() == LOCATIONS) {
+                    loading.postValue(false);
+                }
             }
 
             @Override
@@ -58,6 +82,44 @@ public class SearchViewModel extends ViewModel {
                 return search_id != search_count;
             }
         });
+
+        repository.searchSong(USER_ID, query).get()
+            .addOnSuccessListener(snaps -> {
+                for (int i = 0; i < snaps.size(); i++) {
+                    DocumentSnapshot snap = snaps.getDocuments().get(i);
+                    Song song = snap.toObject(Song.class);
+                    assert song != null;
+                    pushToResults(new SearchResult(song, context));
+                }
+                if (responses.incrementAndGet() == LOCATIONS) {
+                    loading.postValue(false);
+                }
+            })
+            .addOnFailureListener(err -> {
+                error.postValue(err.getMessage());
+                if (responses.incrementAndGet() == LOCATIONS) {
+                    loading.postValue(false);
+                }
+            });
+
+        repository.searchPlaylist(USER_ID, query).get()
+            .addOnSuccessListener(snaps -> {
+                for (int i = 0; i < snaps.size(); i++) {
+                    DocumentSnapshot snap = snaps.getDocuments().get(i);
+                    PlaylistInfo info = snap.toObject(PlaylistInfo.class);
+                    assert info != null;
+                    pushToResults(new SearchResult(info));
+                }
+                if (responses.incrementAndGet() == LOCATIONS) {
+                    loading.postValue(false);
+                }
+            })
+            .addOnFailureListener(err -> {
+                error.postValue(err.getMessage());
+                if (responses.incrementAndGet() == LOCATIONS) {
+                    loading.postValue(false);
+                }
+            });
     }
 
 }

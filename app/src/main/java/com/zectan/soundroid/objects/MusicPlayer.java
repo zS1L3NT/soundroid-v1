@@ -67,7 +67,7 @@ public class MusicPlayer {
         try {
             player.prepareAsync();
         } catch (IllegalStateException e) {
-            Log.e(TAG, "Illegal Stat Exception caught!");
+            Log.e(TAG, "Illegal State Exception caught!");
             return;
         }
 

@@ -48,8 +48,8 @@ public class PlaylistLookupSocket extends Socket {
                 String title = song.getString("title");
                 String artiste = song.getString("artiste");
                 String cover = song.getString("cover");
-                String songColorHex = song.getString("colorHex");
-                songs.add(new Song(id, title, artiste, cover, songColorHex).setDirectoryWith(context));
+                String colorHex = song.getString("colorHex");
+                songs.add(new Song(id, title, artiste, cover, colorHex).setDirectoryWith(context));
                 order.add(id);
             }
 

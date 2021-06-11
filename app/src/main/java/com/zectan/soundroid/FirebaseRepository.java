@@ -23,8 +23,22 @@ public class FirebaseRepository {
         return db.collection("songs").whereArrayContains("playlists", playlistId);
     }
 
+    public Query searchPlaylist(String userId, String query) {
+        // ! REALLY NEEDS DATABASE REWORK
+        return db.collection("playlists")
+            .whereArrayContains("users", userId)
+            .whereEqualTo("name", query);
+    }
+
     public Query userSongs(String userId) {
         return db.collection("songs").whereArrayContains("users", userId);
+    }
+
+    public Query searchSong(String userId, String query) {
+        // ! REALLY NEEDS DATABASE REWORK
+        return db.collection("songs")
+            .whereArrayContains("users", userId)
+            .whereEqualTo("title", query);
     }
 
     public DocumentReference song(String songId) {

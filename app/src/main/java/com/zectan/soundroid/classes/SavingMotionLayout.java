@@ -66,48 +66,50 @@ public class SavingMotionLayout extends MotionLayout {
         }
     }
 
-}
+    public static class State implements Parcelable {
+        public static final Creator<State> CREATOR = new Creator<State>() {
+            @Override
+            public State createFromParcel(Parcel in) {
+                return new State(in);
+            }
 
-class State implements Parcelable {
-    public static final Creator<State> CREATOR = new Creator<State>() {
-        @Override
-        public State createFromParcel(Parcel in) {
-            return new State(in);
+            @Override
+            public State[] newArray(int size) {
+                return new State[size];
+            }
+        };
+        public final Parcelable superParcel;
+        public final int startState;
+        public final int endState;
+        public final float progress;
+
+        public State(Parcelable superParcel, int startState, int endState, float progress) {
+            this.superParcel = superParcel;
+            this.startState = startState;
+            this.endState = endState;
+            this.progress = progress;
+        }
+
+        public State(Parcel in) {
+            this.superParcel = in.readParcelable(getClass().getClassLoader());
+            this.startState = in.readInt();
+            this.endState = in.readInt();
+            this.progress = in.readFloat();
         }
 
         @Override
-        public State[] newArray(int size) {
-            return new State[size];
+        public int describeContents() {
+            return 0;
         }
-    };
-    public final Parcelable superParcel;
-    public final int startState;
-    public final int endState;
-    public final float progress;
 
-    public State(Parcelable superParcel, int startState, int endState, float progress) {
-        this.superParcel = superParcel;
-        this.startState = startState;
-        this.endState = endState;
-        this.progress = progress;
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeInt(this.startState);
+            dest.writeInt(this.endState);
+            dest.writeFloat(this.progress);
+        }
     }
 
-    public State(Parcel in) {
-        this.superParcel = in.readParcelable(getClass().getClassLoader());
-        this.startState = in.readInt();
-        this.endState = in.readInt();
-        this.progress = in.readFloat();
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.startState);
-        dest.writeInt(this.endState);
-        dest.writeFloat(this.progress);
-    }
 }
+
+
