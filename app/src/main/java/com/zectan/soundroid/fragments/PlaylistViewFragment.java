@@ -18,8 +18,8 @@ import com.zectan.soundroid.adapters.PlaylistViewAdapter;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlaylistViewBinding;
 import com.zectan.soundroid.objects.Anonymous;
+import com.zectan.soundroid.objects.Info;
 import com.zectan.soundroid.objects.Playlist;
-import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
 import com.zectan.soundroid.sockets.PlaylistLookupSocket;
 
@@ -32,17 +32,13 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
 
     private final PlaylistViewAdapter.Callback callback = new PlaylistViewAdapter.Callback() {
         @Override
-        public void onSongClicked(ImageView cover, String transitionName, int position) {
+        public void onSongClicked(ImageView cover, String transitionName, String songId) {
             FragmentNavigator.Extras extras = Anonymous.makeExtras(cover, transitionName);
             NavDirections action = PlaylistViewFragmentDirections.openPlaylistSong().setTransitionName(transitionName);
             NavHostFragment.findNavController(PlaylistViewFragment.this).navigate(action, extras);
 
-            PlaylistInfo info = playlistViewVM.info.getValue();
-            List<Song> songs = playlistViewVM.songs.getValue();
-            if (info == null || songs == null) return;
-
-            Playlist playlist = new Playlist(info, songs);
-            playingVM.selectSong(playlist, position);
+            Playlist playlist = new Playlist(playlistViewVM.info.getValue(), playlistViewVM.songs.getValue());
+            playingVM.startPlaylist(playlist, songId);
         }
 
         @Override
@@ -76,13 +72,13 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
     }
 
     private void onSongsChange(List<Song> songs) {
-        PlaylistInfo info = playlistViewVM.info.getValue();
+        Info info = playlistViewVM.info.getValue();
         if (info == null) return;
 
         playlistViewAdapter.updateSongs(songs, info.getOrder());
     }
 
-    private void onInfoChange(PlaylistInfo info) {
+    private void onInfoChange(Info info) {
         B.nameText.setText(info.getName());
         if (info.getCover() != null) {
             Glide
@@ -98,7 +94,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         B.swipeRefresh.setRefreshing(true);
         playlistViewVM.loading = true;
 
-        PlaylistInfo info = playlistViewVM.info.getValue();
+        Info info = playlistViewVM.info.getValue();
         if (info == null) {
             mainVM.error.postValue(new Exception("Info not initialised"));
             return;
@@ -109,7 +105,8 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
                 .playlist(info.getId())
                 .get()
                 .addOnSuccessListener(snap -> {
-                    PlaylistInfo newInfo = snap.toObject(PlaylistInfo.class);
+                    Info newInfo = snap.toObject(Info.class);
+                    assert newInfo != null;
                     playlistViewVM.info.setValue(newInfo);
 
                     repository
@@ -118,7 +115,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
                         .addOnSuccessListener(snaps -> {
                             List<Song> songs = snaps.toObjects(Song.class);
                             songs.sort((a, b) -> a.getTitle().compareTo(b.getTitle()));
-                            songs.forEach(song -> song.setDirectoryWith(requireContext()));
+                            songs.forEach(song -> song.setDirectoryWith(activity));
                             playlistViewVM.songs.setValue(songs);
                             B.swipeRefresh.setRefreshing(false);
                             playlistViewVM.loading = false;
@@ -134,6 +131,11 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
                     playlistViewVM.songs.postValue(playlist.getSongs());
                     B.swipeRefresh.setRefreshing(false);
                     playlistViewVM.loading = false;
+                }
+
+                @Override
+                public void onSong(Song song) {
+
                 }
 
                 @Override

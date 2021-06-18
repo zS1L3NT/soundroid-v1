@@ -4,8 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.zectan.soundroid.classes.Socket;
+import com.zectan.soundroid.objects.Info;
 import com.zectan.soundroid.objects.Playlist;
-import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
 
 import org.json.JSONArray;
@@ -17,22 +17,40 @@ import java.util.List;
 
 public class PlaylistLookupSocket extends Socket {
     private static final String TAG = "(SounDroid) PlaylistLookupSocket";
-    private final Callback callback;
-    private final PlaylistInfo info;
-    private final Context context;
+    private final Callback mCallback;
+    private final Info mInfo;
+    private final Context mContext;
+    private final List<Song> mSongs;
 
-    public PlaylistLookupSocket(PlaylistInfo info, Context context, Callback callback) {
+    public PlaylistLookupSocket(Info info, Context context, Callback callback) {
         super(TAG, callback, "playlist_lookup", info.getId(), info.getCover());
-        this.callback = callback;
-        this.context = context;
-        this.info = info;
+        mCallback = callback;
+        mContext = context;
+        mInfo = info;
+        mSongs = new ArrayList<>();
 
         Log.d(TAG, "(SOCKET) Playlist Lookup: " + info.getId());
+        super.on("playlist_item", this::onSong);
         super.on("playlist_lookup", this::onResult);
     }
 
+    private void onSong(Object... args) {
+        try {
+            JSONObject object = new JSONObject(args[0].toString());
+            String id = object.getString("id");
+            String title = object.getString("title");
+            String artiste = object.getString("artiste");
+            String cover = object.getString("cover");
+            String colorHex = object.getString("colorHex");
+            Song song = new Song(id, title, artiste, cover, colorHex).setDirectoryWith(mContext);
+            mSongs.add(song);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void onResult(Object... args) {
-        if (callback.isInactive()) {
+        if (mCallback.isInactive()) {
             closeSocket();
             Log.i(TAG, "(SOCKET) <close>");
             return;
@@ -40,24 +58,16 @@ public class PlaylistLookupSocket extends Socket {
 
         try {
             JSONArray objects = new JSONArray(args[0].toString());
-            List<Song> songs = new ArrayList<>();
             List<String> order = new ArrayList<>();
             for (int i = 0; i < objects.length(); i++) {
-                JSONObject song = objects.getJSONObject(i);
-                String id = song.getString("id");
-                String title = song.getString("title");
-                String artiste = song.getString("artiste");
-                String cover = song.getString("cover");
-                String colorHex = song.getString("colorHex");
-                songs.add(new Song(id, title, artiste, cover, colorHex).setDirectoryWith(context));
-                order.add(id);
+                order.add(objects.getString(i));
             }
 
-            info.setOrder(order);
-            Playlist playlist = new Playlist(info, songs);
-            callback.onFinish(playlist);
+            mInfo.setOrder(order);
+            Playlist playlist = new Playlist(mInfo, mSongs);
+            mCallback.onFinish(playlist);
         } catch (JSONException err) {
-            callback.onError("Could not parse server response");
+            mCallback.onError("Could not parse server response");
         }
 
         closeSocket();
@@ -65,6 +75,8 @@ public class PlaylistLookupSocket extends Socket {
 
     public interface Callback extends Socket.Callback {
         void onFinish(Playlist playlist);
+
+        void onSong(Song song);
     }
 
 }

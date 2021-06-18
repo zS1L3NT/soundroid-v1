@@ -11,10 +11,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.SongListItemBinding;
+import com.zectan.soundroid.objects.Info;
 import com.zectan.soundroid.objects.Playlist;
-import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
 
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +28,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
     private Playlist mPlaylist;
 
     public HomeAdapter(Callback callback) {
-        mPlaylist = new Playlist(new PlaylistInfo("", "All Songs", new ArrayList<>()), new ArrayList<>());
+        mPlaylist = new Playlist(new Info("", "All Songs", new ArrayList<>()), new ArrayList<>());
         mCallback = callback;
     }
 
@@ -57,7 +58,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
     }
 
     public interface Callback {
-        void onSongClicked(ImageView cover, String transitionName, Playlist playlist, int position);
+        void onSongClicked(ImageView cover, String transitionName, Playlist playlist, String songId);
 
         void onMenuClicked(Song song);
     }
@@ -90,9 +91,11 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
         Glide
             .with(context)
             .load(cover)
+            .placeholder(R.drawable.playing_cover_default)
             .error(R.drawable.playing_cover_default)
+            .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
-        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, playlist, position));
+        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, playlist, id));
     }
 }

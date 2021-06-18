@@ -9,9 +9,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.PlaylistListItemBinding;
-import com.zectan.soundroid.objects.PlaylistInfo;
+import com.zectan.soundroid.objects.Info;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +21,7 @@ import java.util.List;
 
 public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistViewHolder> {
     private final Callback mCallback;
-    private final List<PlaylistInfo> mInfos = new ArrayList<>();
+    private final List<Info> mInfos = new ArrayList<>();
 
     public PlaylistsAdapter(Callback callback) {
         mCallback = callback;
@@ -37,7 +38,7 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistViewHolder> {
         return new PlaylistViewHolder(itemView, mCallback);
     }
 
-    public void updateInfos(List<PlaylistInfo> infos) {
+    public void updateInfos(List<Info> infos) {
         mInfos.clear();
         mInfos.addAll(infos);
         notifyDataSetChanged();
@@ -54,7 +55,7 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistViewHolder> {
     }
 
     public interface Callback {
-        void run(PlaylistInfo info);
+        void run(Info info);
     }
 
 }
@@ -69,7 +70,7 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
         mCallback = callback;
     }
 
-    public void bind(PlaylistInfo info) {
+    public void bind(Info info) {
         Context context = B.parent.getContext();
 
         String name = info.getName();
@@ -82,7 +83,9 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
         Glide
             .with(context)
             .load(cover)
+            .placeholder(R.drawable.playing_cover_default)
             .error(R.drawable.playing_cover_default)
+            .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
     }

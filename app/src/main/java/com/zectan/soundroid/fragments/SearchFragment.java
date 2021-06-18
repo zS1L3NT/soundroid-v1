@@ -17,8 +17,8 @@ import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.SearchAdapter;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentSearchBinding;
+import com.zectan.soundroid.objects.Info;
 import com.zectan.soundroid.objects.Playlist;
-import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.SearchResult;
 import com.zectan.soundroid.objects.Song;
 
@@ -37,17 +37,17 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
     private final SearchAdapter.Callback callback = new SearchAdapter.Callback() {
         @Override
         public void onSongClicked(Song song) {
-            PlaylistInfo info = new PlaylistInfo(song.getId(), "Search Result", Collections.singletonList(song.getId()));
+            Info info = new Info(song.getId(), "Search Result", Collections.singletonList(song.getId()));
             Playlist playlist = new Playlist(info, Collections.singletonList(song));
 
             NavDirections action = SearchFragmentDirections.openSearchSong();
             navController.navigate(action);
-            playingVM.selectSong(playlist, 0);
+            playingVM.startPlaylist(playlist, song.getId());
             activity.hideKeyboard(SearchFragment.this.requireView());
         }
 
         @Override
-        public void onPlaylistClicked(PlaylistInfo info) {
+        public void onPlaylistClicked(Info info) {
             playlistViewVM.info.postValue(info);
             playlistViewVM.songs.postValue(new ArrayList<>());
 

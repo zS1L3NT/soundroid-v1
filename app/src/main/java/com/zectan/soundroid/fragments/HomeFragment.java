@@ -17,9 +17,9 @@ import com.zectan.soundroid.adapters.HomeAdapter;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentHomeBinding;
 import com.zectan.soundroid.objects.Anonymous;
+import com.zectan.soundroid.objects.Info;
 import com.zectan.soundroid.objects.Option;
 import com.zectan.soundroid.objects.Playlist;
-import com.zectan.soundroid.objects.PlaylistInfo;
 import com.zectan.soundroid.objects.Song;
 
 import org.jetbrains.annotations.NotNull;
@@ -38,11 +38,11 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
 
     private final HomeAdapter.Callback callback = new HomeAdapter.Callback() {
         @Override
-        public void onSongClicked(ImageView cover, String transitionName, Playlist playlist, int position) {
+        public void onSongClicked(ImageView cover, String transitionName, Playlist playlist, String songId) {
             FragmentNavigator.Extras extras = Anonymous.makeExtras(cover, transitionName);
             NavDirections action = HomeFragmentDirections.openDownloadedSong().setTransitionName(transitionName);
             NavHostFragment.findNavController(HomeFragment.this).navigate(action, extras);
-            playingVM.selectSong(playlist, position);
+            playingVM.startPlaylist(playlist, songId);
         }
 
         @Override
@@ -108,7 +108,7 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
                     .map(Song::getId)
                     .collect(Collectors.toList());
                 songs.forEach(song -> song.setDirectoryWith(requireContext()));
-                homeVM.playlist.setValue(new Playlist(new PlaylistInfo("", "All Songs", order), songs));
+                homeVM.playlist.setValue(new Playlist(new Info("", "All Songs", order), songs));
                 B.swipeRefresh.setRefreshing(false);
                 homeVM.requested = false;
             })

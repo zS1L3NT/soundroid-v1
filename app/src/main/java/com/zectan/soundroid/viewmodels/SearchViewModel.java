@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.classes.StrictLiveData;
-import com.zectan.soundroid.objects.PlaylistInfo;
+import com.zectan.soundroid.objects.Info;
 import com.zectan.soundroid.objects.SearchResult;
 import com.zectan.soundroid.objects.Song;
 import com.zectan.soundroid.sockets.SearchSocket;
@@ -106,7 +106,7 @@ public class SearchViewModel extends ViewModel {
             .addOnSuccessListener(snaps -> {
                 for (int i = 0; i < snaps.size(); i++) {
                     DocumentSnapshot snap = snaps.getDocuments().get(i);
-                    PlaylistInfo info = snap.toObject(PlaylistInfo.class);
+                    Info info = snap.toObject(Info.class);
                     assert info != null;
                     pushToResults(new SearchResult(info));
                 }

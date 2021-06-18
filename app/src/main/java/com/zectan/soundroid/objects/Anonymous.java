@@ -6,58 +6,16 @@ import android.view.ViewGroup;
 
 import androidx.navigation.fragment.FragmentNavigator;
 
+import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.source.ShuffleOrder;
+
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Anonymous {
-
-    /**
-     * Formats the duration for {@link com.zectan.soundroid.fragments.PlayingFragment}
-     *
-     * @param duration Time to format
-     * @return Formatted version of the duration
-     */
-    public static String formatDuration(int duration) {
-        StringBuilder hours = new StringBuilder();
-        StringBuilder minutes = new StringBuilder();
-        StringBuilder seconds = new StringBuilder();
-
-        if (duration >= 3600) {
-            hours.append(duration / 3600);
-        }
-        if (duration >= 60) {
-            if (duration >= 3600) {
-                // Hours, minutes must be double digits
-                int sDuration = duration % 3600;
-                minutes.append(sDuration / 60);
-                if (minutes.length() == 1) {
-                    minutes.insert(0, "0");
-                }
-            } else {
-                // No hours, minutes can be single digit
-                minutes.append(duration / 60);
-            }
-        }
-        seconds.append(duration % 60);
-        if (seconds.length() == 1) {
-            seconds.insert(0, "0");
-        }
-
-        StringBuilder formatted = new StringBuilder();
-        if (!hours.toString().equals("")) {
-            formatted.append(hours).append(":");
-        }
-        if (minutes.toString().equals("")) {
-            formatted.append("0").append(":");
-        } else {
-            formatted.append(minutes).append(":");
-        }
-        formatted.append(seconds);
-
-        return formatted.toString();
-    }
 
     /**
      * Creates a list order starting
@@ -74,64 +32,19 @@ public class Anonymous {
     }
 
     /**
-     * Creates a list from an old order starting from a certain index
-     *
-     * @param order      Order to rearrange
-     * @param startIndex Index to start list from
-     * @return New list
-     */
-    public static List<Integer> createOrder(List<Integer> order, int startIndex) {
-        List<Integer> newOrder = new ArrayList<>();
-        for (int i = startIndex; i < order.size(); i++) newOrder.add(order.get(i));
-        for (int i = 0; i < startIndex; i++) newOrder.add(i);
-        return newOrder;
-    }
-
-    /**
      * Changes the order of a list but maintaining an item as the first in the list
      *
-     * @param order      Order to rearrange
-     * @param startValue Value to start list from
+     * @param order         Order to rearrange
+     * @param startPosition Position to start list from
      * @return New list
      */
-    public static List<Integer> changeOrder(List<Integer> order, int startValue) {
-        int position = order.indexOf(startValue);
-        if (position < 0) return order;
+    public static List<Integer> changeOrder(List<Integer> order, int startPosition) {
+        if (startPosition < 0) return order;
 
         List<Integer> newOrder = new ArrayList<>();
-        for (int i = position; i < order.size(); i++) newOrder.add(order.get(i));
-        for (int i = 0; i < position; i++) newOrder.add(order.get(i));
+        for (int i = startPosition; i < order.size(); i++) newOrder.add(order.get(i));
+        for (int i = 0; i < startPosition; i++) newOrder.add(order.get(i));
         return newOrder;
-    }
-
-    /**
-     * Shuffles the order but maintaining an item as the first item in the list
-     *
-     * @param startIndex Index to preserve the order of
-     * @param length     Length of the list
-     * @return New list
-     */
-    public static List<Integer> shuffleOrder(int length, int startIndex) {
-        List<Integer> shuffle = new ArrayList<>();
-        for (int i = 0; i < length; i++) if (i != startIndex) shuffle.add(i);
-        Collections.shuffle(shuffle);
-        shuffle.add(0, startIndex);
-        return shuffle;
-    }
-
-    /**
-     * Shuffles the order but maintaining an item as the first item in the list
-     *
-     * @param order      Order
-     * @param startIndex Index to preserve the order of
-     * @return New list
-     */
-    public static List<Integer> shuffleOrder(List<Integer> order, int startIndex) {
-        List<Integer> shuffle = new ArrayList<>();
-        for (int i = 0; i < order.size(); i++) if (i != startIndex) shuffle.add(order.get(i));
-        Collections.shuffle(shuffle);
-        shuffle.add(0, startIndex);
-        return shuffle;
     }
 
     /**
@@ -149,24 +62,58 @@ public class Anonymous {
     }
 
     /**
-     * Formats a queue and removes the first item in the queue
+     * Makes the order for display of the queue. All logic will be done here, just pass the values
      *
-     * @param songs Songs to reorder
-     * @param order Order to sort the songs by
-     * @return New list
+     * @param songs        All the songs in default order in a list
+     * @param order        Order of the song indexes in an array
+     * @param currentIndex Current index of the player
+     * @param isLooping    If the player is looping the tracks
+     * @return Formatted version of the queue
      */
-    public static List<Song> formatQueue(List<Song> songs, List<Integer> order) {
+    public static List<Song> formatQueue(List<Song> songs, int[] order, int currentIndex, boolean isLooping) {
         List<Song> queue = new ArrayList<>();
-        for (int i = 0; i < order.size(); i++) {
-            int songsIndex = order.get(i);
-            if (songsIndex == -1) {
-                queue.add(Song.getDefault());
-            } else {
-                queue.add(songs.get(songsIndex));
-            }
-        }
 
-        return order.size() > 0 ? queue.subList(1, order.size()) : new ArrayList<>();
+        List<Integer> listOrder = toListInteger(order);
+        int indexOfCurrent = listOrder.indexOf(currentIndex);
+        order = toIntArray(
+            isLooping
+                ? changeOrder(listOrder, indexOfCurrent)
+                : listOrder.subList(indexOfCurrent, order.length)
+        );
+
+        for (int i = 0; i < order.length; i++)
+            if (i != 0)
+                queue.add(songs.get(order[i]));
+
+        return queue;
+    }
+
+    /**
+     * Convert an array of int to a list of integer
+     *
+     * @param array The array to convert
+     * @return The list produced
+     */
+    public static List<Integer> toListInteger(int[] array) {
+        List<Integer> list = new ArrayList<>();
+        for (int item : array) {
+            list.add(item);
+        }
+        return list;
+    }
+
+    /**
+     * Convert a list of integer to an array of int
+     *
+     * @param list The list to convert
+     * @return The array produced
+     */
+    public static int[] toIntArray(List<Integer> list) {
+        int[] array = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            array[i] = list.get(i);
+        }
+        return array;
     }
 
     /**
@@ -205,10 +152,21 @@ public class Anonymous {
         return false;
     }
 
+    /**
+     * Shortcut to make navigator extras
+     * This method reduces the length of the code
+     *
+     * @param view           Shared View
+     * @param transitionName Transition Name
+     * @return Navigator Extras
+     */
     public static FragmentNavigator.Extras makeExtras(View view, String transitionName) {
         return new FragmentNavigator.Extras.Builder().addSharedElement(view, transitionName).build();
     }
 
+    /**
+     * Class to handle margins in an element
+     */
     public static class MarginProxy {
         private final View mView;
 
@@ -259,6 +217,143 @@ public class Anonymous {
             lp.setMargins(lp.leftMargin, lp.topMargin, lp.rightMargin, margin);
             mView.requestLayout();
         }
+    }
+
+    /**
+     * I COPIED THIS CLASS FROM {@link com.google.android.exoplayer2.source.ShuffleOrder.DefaultShuffleOrder}
+     */
+    public static class CustomPlaybackOrder implements ShuffleOrder {
+
+        private final Random random;
+        private final int[] order;
+        private final int[] indexInOrdered;
+
+        private CustomPlaybackOrder(int[] order, Random random) {
+            this.order = order;
+            this.random = random;
+            this.indexInOrdered = new int[order.length];
+            for (int i = 0; i < order.length; i++) {
+                indexInOrdered[order[i]] = i;
+            }
+        }
+
+        public static CustomPlaybackOrder createShuffled(int length) {
+            Random random = new Random();
+            return new CustomPlaybackOrder(createShuffledList(length, random), random);
+        }
+
+        public static CustomPlaybackOrder createOrdered(int length) {
+            return new CustomPlaybackOrder(createUnshuffledList(length), new Random());
+        }
+
+        private static int[] createShuffledList(int length, Random random) {
+            int[] order = new int[length];
+            for (int i = 0; i < length; i++) {
+                int swapIndex = random.nextInt(i + 1);
+                order[i] = order[swapIndex];
+                order[swapIndex] = i;
+            }
+            // My code to set 0 as 0
+            int[] my_order = new int[length];
+            my_order[0] = 0;
+            for (int i = 0, j = 0; i < order.length; i++) {
+                if (order[i] == 0) continue;
+                my_order[++j] = order[i];
+            }
+            return my_order;
+        }
+
+        private static int[] createUnshuffledList(int length) {
+            return toIntArray(createOrder(length, 0));
+        }
+
+        public int[] getOrder() {
+            return order;
+        }
+
+        @Override
+        public int getLength() {
+            return order.length;
+        }
+
+        @Override
+        public int getNextIndex(int index) {
+            int orderedIndex = indexInOrdered[index];
+            return ++orderedIndex < order.length ? order[orderedIndex] : C.INDEX_UNSET;
+        }
+
+        @Override
+        public int getPreviousIndex(int index) {
+            int orderedIndex = indexInOrdered[index];
+            return --orderedIndex >= 0 ? order[orderedIndex] : C.INDEX_UNSET;
+        }
+
+        @Override
+        public int getLastIndex() {
+            return order.length > 0 ? order[order.length - 1] : C.INDEX_UNSET;
+        }
+
+        @Override
+        public int getFirstIndex() {
+            return order.length > 0 ? order[0] : C.INDEX_UNSET;
+        }
+
+        @Override
+        public CustomPlaybackOrder cloneAndInsert(int insertionIndex, int insertionCount) {
+            int[] insertionPoints = new int[insertionCount];
+            int[] insertionValues = new int[insertionCount];
+            for (int i = 0; i < insertionCount; i++) {
+                insertionPoints[i] = random.nextInt(order.length + 1);
+                int swapIndex = random.nextInt(i + 1);
+                insertionValues[i] = insertionValues[swapIndex];
+                insertionValues[swapIndex] = i + insertionIndex;
+            }
+            Arrays.sort(insertionPoints);
+            int[] newOrdered = new int[order.length + insertionCount];
+            int indexInOldOrdered = 0;
+            int indexInInsertionList = 0;
+            for (int i = 0; i < order.length + insertionCount; i++) {
+                if (indexInInsertionList < insertionCount
+                    && indexInOldOrdered == insertionPoints[indexInInsertionList]) {
+                    newOrdered[i] = insertionValues[indexInInsertionList++];
+                } else {
+                    newOrdered[i] = order[indexInOldOrdered++];
+                    if (newOrdered[i] >= insertionIndex) {
+                        newOrdered[i] += insertionCount;
+                    }
+                }
+            }
+            return new CustomPlaybackOrder(newOrdered, new Random(random.nextLong()));
+        }
+
+        @Override
+        public CustomPlaybackOrder cloneAndRemove(int indexFrom, int indexToExclusive) {
+            int numberOfElementsToRemove = indexToExclusive - indexFrom;
+            int[] newOrdered = new int[order.length - numberOfElementsToRemove];
+            int foundElementsCount = 0;
+            for (int i = 0; i < order.length; i++) {
+                if (order[i] >= indexFrom && order[i] < indexToExclusive) {
+                    foundElementsCount++;
+                } else {
+                    newOrdered[i - foundElementsCount] =
+                        order[i] >= indexFrom ? order[i] - numberOfElementsToRemove : order[i];
+                }
+            }
+            return new CustomPlaybackOrder(newOrdered, new Random(random.nextLong()));
+        }
+
+        public CustomPlaybackOrder closeAndMove(int oldPosition, int newPosition) {
+            List<Integer> list = Anonymous.toListInteger(order);
+            int item = list.remove(oldPosition);
+            list.add(newPosition, item);
+            return new CustomPlaybackOrder(Anonymous.toIntArray(list), new Random(random.nextLong()));
+        }
+
+        @Override
+        public CustomPlaybackOrder cloneAndClear() {
+            return new CustomPlaybackOrder(createUnshuffledList(/* length= */ 0), new Random(random.nextLong()));
+        }
+
     }
 
 }

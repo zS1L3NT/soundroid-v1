@@ -1,9 +1,8 @@
 package com.zectan.soundroid.objects;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.zectan.soundroid.sockets.ConvertSongSocket;
+import com.google.android.exoplayer2.MediaItem;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -13,6 +12,7 @@ import java.util.Objects;
 
 public class Song {
     private static final String TAG = "(SounDroid) Song";
+    private static final String SongsURL = "http://soundroid.zectan.com/songs";
     private String id;
     private String title;
     private String artiste;
@@ -20,7 +20,7 @@ public class Song {
     private String colorHex;
     private File directory;
     private List<String> playlists;
-    private List<String> users;
+    private List<String> owners;
 
     public Song() {
 
@@ -54,11 +54,12 @@ public class Song {
         return colorHex;
     }
 
-    public void setColorHex(String colorHex) {
-        this.colorHex = colorHex;
-    }
-
-    public static Song getDefault() {
+    /**
+     * Creates an empty placeholder Song
+     *
+     * @return Song
+     */
+    public static Song getEmpty() {
         return new Song(
             "",
             "-",
@@ -68,16 +69,28 @@ public class Song {
         );
     }
 
-    public List<String> getPlaylists() {
-        return playlists;
+    public String getUrl() {
+        return String.format("%s/%s.mp3", SongsURL, id);
     }
 
     public File getDirectory() {
         return this.directory;
     }
 
-    public List<String> getUsers() {
-        return users;
+    public List<String> getPlaylists() {
+        return playlists;
+    }
+
+    public void setColorHex(String colorHex) {
+        this.colorHex = colorHex;
+    }
+
+    public List<String> getOwners() {
+        return owners;
+    }
+
+    public MediaItem getMediaItem() {
+        return new MediaItem.Builder().setUri(getUrl()).setMediaId(id).build();
     }
 
     public Song setDirectoryWith(Context context) {
@@ -85,26 +98,13 @@ public class Song {
         return this;
     }
 
-    public void getFileLocation(ConvertSongSocket.Callback callback) {
-        File file = getDirectory();
-        if (file.exists()) {
-            Log.d(TAG, "READING_SONG");
-            callback.onFinish(file.getPath());
-        } else {
-            Log.d(TAG, "STREAMING_SONG");
-            new ConvertSongSocket(id, callback);
-        }
-    }
-
     @Override
     public @NotNull String toString() {
         return String.format(
-            "Song { id: '%s', title: '%s', artiste: '%s', cover: '%s', colorHex: '%s' }",
+            "([%s] %s by %s)",
             id,
             title,
-            artiste,
-            cover,
-            colorHex
+            artiste
         );
     }
 
@@ -120,11 +120,11 @@ public class Song {
             Objects.equals(colorHex, song.colorHex) &&
             Objects.equals(directory, song.directory) &&
             Objects.equals(playlists, song.playlists) &&
-            Objects.equals(users, song.users);
+            Objects.equals(owners, song.owners);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, artiste, cover, colorHex, directory, playlists, users);
+        return Objects.hash(id, title, artiste, cover, colorHex, directory, playlists, owners);
     }
 }

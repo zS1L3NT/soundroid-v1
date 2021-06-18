@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public class SearchResult {
     private final String mLocation;
-    private PlaylistInfo mInfo;
+    private Info mInfo;
     private Song mSong;
 
     public SearchResult(JSONObject object, Context context) throws JSONException {
@@ -31,7 +31,7 @@ public class SearchResult {
             String cover = object.getString("cover");
             String colorHex = object.getString("colorHex");
 
-            mInfo = new PlaylistInfo(id, name, cover, new ArrayList<>());
+            mInfo = new Info(id, name, cover, new ArrayList<>());
         } else {
             throw new RuntimeException(String.format("Undefined data type: %s", type));
         }
@@ -42,7 +42,7 @@ public class SearchResult {
         mSong = song.setDirectoryWith(context);
     }
 
-    public SearchResult(PlaylistInfo info) {
+    public SearchResult(Info info) {
         mLocation = "Local";
         mInfo = info;
     }
@@ -51,7 +51,7 @@ public class SearchResult {
         return mSong;
     }
 
-    public PlaylistInfo getPlaylistInfo() {
+    public Info getPlaylistInfo() {
         return mInfo;
     }
 

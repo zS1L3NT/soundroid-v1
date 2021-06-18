@@ -12,7 +12,7 @@ public class FirebaseRepository {
     }
 
     public Query playlists(String userId) {
-        return db.collection("playlists").whereArrayContains("users", userId);
+        return db.collection("playlists").whereArrayContains("owners", userId);
     }
 
     public DocumentReference playlist(String playlistId) {
@@ -26,18 +26,18 @@ public class FirebaseRepository {
     public Query searchPlaylist(String userId, String query) {
         // ! REALLY NEEDS DATABASE REWORK
         return db.collection("playlists")
-            .whereArrayContains("users", userId)
+            .whereArrayContains("owners", userId)
             .whereEqualTo("name", query);
     }
 
     public Query userSongs(String userId) {
-        return db.collection("songs").whereArrayContains("users", userId);
+        return db.collection("songs").whereArrayContains("owners", userId);
     }
 
     public Query searchSong(String userId, String query) {
         // ! REALLY NEEDS DATABASE REWORK
         return db.collection("songs")
-            .whereArrayContains("users", userId)
+            .whereArrayContains("owners", userId)
             .whereEqualTo("title", query);
     }
 
@@ -46,7 +46,7 @@ public class FirebaseRepository {
     }
 
     public DocumentReference user(String userId) {
-        return db.collection("users").document(userId);
+        return db.collection("owners").document(userId);
     }
 
 }

@@ -15,24 +15,41 @@ import com.zectan.soundroid.MainActivity;
 import org.jetbrains.annotations.NotNull;
 
 public class SavingMotionLayout extends MotionLayout {
+    private MainActivity mActivity;
 
     public SavingMotionLayout(@NonNull @NotNull Context context) {
         super(context);
+        try {
+            mActivity = (MainActivity) context;
+        } catch (Exception ignored) {
+
+        }
     }
 
     public SavingMotionLayout(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs) {
         super(context, attrs);
+        try {
+            mActivity = (MainActivity) context;
+        } catch (Exception ignored) {
+
+        }
     }
 
     public SavingMotionLayout(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        try {
+            mActivity = (MainActivity) context;
+        } catch (Exception ignored) {
+
+        }
+
+
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        MainActivity activity = (MainActivity) getContext();
-        activity.showNavigator();
+        if (mActivity != null) mActivity.showNavigator();
     }
 
     @Nullable
@@ -56,12 +73,13 @@ public class SavingMotionLayout extends MotionLayout {
             setTransition(state.startState, state.endState);
             setProgress(state.progress);
 
-            MainActivity activity = (MainActivity) getContext();
-            if (state.progress == 0) {
-                activity.showNavigator();
-            }
-            if (state.progress == 1) {
-                activity.hideNavigator();
+            if (mActivity != null) {
+                if (state.progress == 0) {
+                    mActivity.showNavigator();
+                }
+                if (state.progress == 1) {
+                    mActivity.hideNavigator();
+                }
             }
         }
     }

@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.SongListItemBinding;
-import com.zectan.soundroid.objects.PlaylistInfo;
+import com.zectan.soundroid.objects.Info;
 import com.zectan.soundroid.objects.SearchResult;
 import com.zectan.soundroid.objects.Song;
 
@@ -114,7 +114,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     public interface Callback {
         void onSongClicked(Song song);
 
-        void onPlaylistClicked(PlaylistInfo info);
+        void onPlaylistClicked(Info info);
     }
 
 }
@@ -156,12 +156,12 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
                 .with(context)
                 .load(cover)
                 .placeholder(R.drawable.playing_cover_default)
-                .transition(new DrawableTransitionOptions())
                 .error(R.drawable.playing_cover_default)
+                .transition(new DrawableTransitionOptions().crossFade())
                 .centerCrop()
                 .into(B.coverImage);
         } else if (result.getPlaylistInfo() != null) {
-            PlaylistInfo info = result.getPlaylistInfo();
+            Info info = result.getPlaylistInfo();
             String id = info.getId();
             String name = info.getName();
             String cover = info.getCover();

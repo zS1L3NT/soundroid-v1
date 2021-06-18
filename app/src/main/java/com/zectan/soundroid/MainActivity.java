@@ -19,9 +19,11 @@ import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.zectan.soundroid.databinding.ActivityMainBinding;
 import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.viewmodels.MainViewModel;
+import com.zectan.soundroid.viewmodels.PlayingViewModel;
 
 // https://www.glyric.com/2018/merlin/aagaya-nilave
 
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private Anonymous.MarginProxy mp;
 
     private MainViewModel mainVM;
+    private PlayingViewModel playingVM;
 
     private NavController navController;
 
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         // View Model
         mainVM = new ViewModelProvider(this).get(MainViewModel.class);
+        playingVM = new ViewModelProvider(this).get(PlayingViewModel.class);
 
         B.bottomNavigator.setOnNavigationItemSelectedListener(this::onNavigationItem);
         B.bottomNavigator.setOnNavigationItemReselectedListener(this::onNavigationItem);
@@ -58,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
         navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(B.bottomNavigator, navController);
         mp = new Anonymous.MarginProxy(B.bottomNavigator);
+
+        SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
+        player.setShuffleModeEnabled(true);
+        playingVM.setPlayer(player);
     }
 
     private boolean onNavigationItem(MenuItem item) {

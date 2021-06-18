@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.SongListItemBinding;
 import com.zectan.soundroid.objects.Anonymous;
@@ -57,7 +58,7 @@ public class PlaylistViewAdapter extends RecyclerView.Adapter<PlaylistViewViewHo
     }
 
     public interface Callback {
-        void onSongClicked(ImageView cover, String transitionName, int position);
+        void onSongClicked(ImageView cover, String transitionName, String songId);
 
         void onMenuClicked(Song song);
     }
@@ -90,9 +91,11 @@ class PlaylistViewViewHolder extends RecyclerView.ViewHolder {
         Glide
             .with(context)
             .load(cover)
+            .placeholder(R.drawable.playing_cover_default)
             .error(R.drawable.playing_cover_default)
+            .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
-        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, position));
+        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, id));
     }
 }

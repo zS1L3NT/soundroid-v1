@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.zectan.soundroid.adapters.PlaylistsAdapter;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlaylistsBinding;
-import com.zectan.soundroid.objects.PlaylistInfo;
+import com.zectan.soundroid.objects.Info;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,7 +46,7 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
         return B.getRoot();
     }
 
-    private void onPlaylistSelected(PlaylistInfo info) {
+    private void onPlaylistSelected(Info info) {
         NavDirections action = PlaylistsFragmentDirections.openPlaylistView();
         NavHostFragment.findNavController(this).navigate(action);
         playlistViewVM.info.setValue(info);
@@ -63,7 +63,7 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
             .playlists(USER_ID)
             .get()
             .addOnSuccessListener(snaps -> {
-                List<PlaylistInfo> infos = snaps.toObjects(PlaylistInfo.class);
+                List<Info> infos = snaps.toObjects(Info.class);
                 playlistsVM.infos.setValue(infos);
                 B.swipeRefresh.setRefreshing(false);
                 playlistsVM.requested = false;

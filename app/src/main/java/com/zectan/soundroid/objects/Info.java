@@ -2,25 +2,27 @@ package com.zectan.soundroid.objects;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class PlaylistInfo {
+public class Info {
     private String id;
     private String name;
     private String cover;
     private List<String> order;
+    private List<String> owners;
 
-    public PlaylistInfo() {
+    public Info() {
     }
 
-    public PlaylistInfo(String id, String name, List<String> order) {
+    public Info(String id, String name, List<String> order) {
         this.id = id;
         this.name = name;
         this.order = order;
     }
 
-    public PlaylistInfo(String id, String name, String cover, List<String> order) {
+    public Info(String id, String name, String cover, List<String> order) {
         this.id = id;
         this.name = name;
         this.cover = cover;
@@ -59,6 +61,14 @@ public class PlaylistInfo {
         this.order = order;
     }
 
+    public static Info getEmpty() {
+        return new Info("", "", new ArrayList<>());
+    }
+
+    public List<String> getOwners() {
+        return owners;
+    }
+
     @Override
     public @NotNull String toString() {
         return String.format("PlaylistInfo { id: '%s', name: '%s', cover: '%s' }", id, name, cover);
@@ -67,8 +77,8 @@ public class PlaylistInfo {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PlaylistInfo)) return false;
-        PlaylistInfo that = (PlaylistInfo) o;
+        if (!(o instanceof Info)) return false;
+        Info that = (Info) o;
         return Objects.equals(id, that.id) &&
             Objects.equals(name, that.name) &&
             Objects.equals(cover, that.cover) &&

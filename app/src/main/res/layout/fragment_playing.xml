@@ -10,18 +10,6 @@
     app:layoutDescription="@xml/fragment_playing_scene"
     tools:context=".fragments.PlayingFragment">
 
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/converting_progress_indicator"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:alpha="0"
-        app:indicatorColor="@color/theme_1"
-        app:layout_constraintBottom_toBottomOf="@id/playing_seekbar"
-        app:layout_constraintTop_toTopOf="@id/playing_seekbar"
-        app:trackColor="@android:color/transparent" />
-
     <TextView
         android:id="@+id/playing_from_text"
         android:layout_width="wrap_content"
@@ -115,45 +103,13 @@
         app:layout_constraintEnd_toStartOf="@id/loading_circle"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <SeekBar
+    <com.google.android.exoplayer2.ui.PlayerControlView
         android:id="@+id/playing_seekbar"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="150dp"
-        android:max="1000"
-        android:maxHeight="2dp"
-        android:minHeight="2dp"
-        android:progressDrawable="@drawable/controls_seekbar"
-        android:thumbTint="@color/white"
+        android:layout_marginBottom="140dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/time_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="18dp"
-        android:alpha="0.5"
-        android:text="@string/playing_default_time"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="@+id/playing_seekbar"
-        app:layout_constraintTop_toBottomOf="@+id/playing_seekbar" />
-
-    <TextView
-        android:id="@+id/length_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="18dp"
-        android:alpha="0.5"
-        android:text="@string/playing_default_time"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="@+id/playing_seekbar"
-        app:layout_constraintTop_toBottomOf="@+id/playing_seekbar" />
+        app:controller_layout_id="@layout/controls_time_bar" />
 
     <ProgressBar
         android:id="@+id/loading_circle"
@@ -194,7 +150,6 @@
         android:id="@+id/play_pause_image"
         android:layout_width="85dp"
         android:layout_height="85dp"
-        android:layout_marginTop="8dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/playing_play_song"
         android:elevation="1dp"
