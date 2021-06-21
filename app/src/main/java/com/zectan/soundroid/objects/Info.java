@@ -10,6 +10,7 @@ public class Info {
     private String id;
     private String name;
     private String cover;
+    private String colorHex;
     private List<String> order;
     private List<String> owners;
 
@@ -22,10 +23,11 @@ public class Info {
         this.order = order;
     }
 
-    public Info(String id, String name, String cover, List<String> order) {
+    public Info(String id, String name, String cover, String colorHex, List<String> order) {
         this.id = id;
         this.name = name;
         this.cover = cover;
+        this.colorHex = colorHex;
         this.order = order;
     }
 
@@ -47,6 +49,10 @@ public class Info {
 
     public String getCover() {
         return cover;
+    }
+
+    public String getColorHex() {
+        return colorHex;
     }
 
     public void setCover(String cover) {

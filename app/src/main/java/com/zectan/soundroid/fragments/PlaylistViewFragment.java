@@ -1,5 +1,9 @@
 package com.zectan.soundroid.fragments;
 
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.PlaylistViewAdapter;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlaylistViewBinding;
@@ -28,8 +33,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> {
-    private PlaylistViewAdapter playlistViewAdapter;
-
     private final PlaylistViewAdapter.Callback callback = new PlaylistViewAdapter.Callback() {
         @Override
         public void onSongClicked(ImageView cover, String transitionName, String songId) {
@@ -46,6 +49,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
 
         }
     };
+    private PlaylistViewAdapter playlistViewAdapter;
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,20 +77,26 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
 
     private void onSongsChange(List<Song> songs) {
         Info info = playlistViewVM.info.getValue();
-        if (info == null) return;
 
         playlistViewAdapter.updateSongs(songs, info.getOrder());
     }
 
     private void onInfoChange(Info info) {
         B.nameText.setText(info.getName());
-        if (info.getCover() != null) {
-            Glide
-                .with(activity)
-                .load(info.getCover())
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(B.coverImage);
-        }
+        Glide
+            .with(activity)
+            .load(info.getCover())
+            .transition(DrawableTransitionOptions.withCrossFade())
+            .into(B.coverImage);
+
+        Drawable oldGD = B.background.getBackground();
+        int[] colors = {Color.parseColor(info.getColorHex()), activity.getColor(R.color.theme_playing_bottom)};
+        GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
+
+        Drawable[] layers = {oldGD, newGD};
+        TransitionDrawable transition = new TransitionDrawable(layers);
+        B.background.setBackground(transition);
+        transition.startTransition(1000);
     }
 
     private void loadPlaylistData() {
@@ -95,10 +105,6 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         playlistViewVM.loading = true;
 
         Info info = playlistViewVM.info.getValue();
-        if (info == null) {
-            mainVM.error.postValue(new Exception("Info not initialised"));
-            return;
-        }
 
         if (playlistViewVM.firebase) {
             repository
@@ -149,6 +155,5 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
                 }
             });
         }
-
     }
 }

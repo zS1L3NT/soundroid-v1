@@ -99,12 +99,10 @@ class QueueViewHolder extends DragDropSwipeAdapter.ViewHolder {
     public void bind(Song song) {
         Context context = B.parent.getContext();
 
-        String id = song.getId();
         String title = song.getTitle();
         String artiste = song.getArtiste();
         String cover = song.getCover();
 
-        B.idText.setText(id);
         B.titleText.setText(title);
         B.descriptionText.setText(artiste);
         Glide

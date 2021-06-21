@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/parent"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="65dp"
     android:background="?android:attr/selectableItemBackground">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/cover_image"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="10dp"
         android:contentDescription="@string/song_list_item_cover"
         android:src="@drawable/playing_cover_default"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -38,7 +38,7 @@
             android:maxLines="1"
             android:text="@string/Nil"
             android:textColor="@color/white"
-            android:textSize="18sp"
+            android:textSize="17sp"
             app:layout_constraintTop_toTopOf="parent"
             tools:layout_editor_absoluteX="106dp" />
 
@@ -57,11 +57,11 @@
 
     <ImageView
         android:id="@+id/menu_image"
-        android:layout_width="50dp"
+        android:layout_width="30dp"
         android:layout_height="match_parent"
         android:contentDescription="@string/menu"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp"
+        android:paddingTop="18dp"
+        android:paddingBottom="18dp"
         android:src="@drawable/ic_menu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

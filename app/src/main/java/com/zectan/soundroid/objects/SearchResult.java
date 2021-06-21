@@ -31,7 +31,7 @@ public class SearchResult {
             String cover = object.getString("cover");
             String colorHex = object.getString("colorHex");
 
-            mInfo = new Info(id, name, cover, new ArrayList<>());
+            mInfo = new Info(id, name, cover, colorHex, new ArrayList<>());
         } else {
             throw new RuntimeException(String.format("Undefined data type: %s", type));
         }

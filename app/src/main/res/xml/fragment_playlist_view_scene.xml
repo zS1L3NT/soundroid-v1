@@ -40,7 +40,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginTop="15dp"
-                android:layout_marginEnd="25dp"
+                android:layout_marginEnd="5dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </Constraint>
@@ -48,7 +48,7 @@
             <Layout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginStart="25dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginTop="15dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -60,6 +60,14 @@
                 android:layout_marginTop="15dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/name_text" />
+        </Constraint>
+        <Constraint android:id="@+id/background">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+            <PropertySet
+                android:alpha="0"
+                android:elevation="-1dp" />
         </Constraint>
     </ConstraintSet>
 
