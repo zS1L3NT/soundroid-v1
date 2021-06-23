@@ -1,5 +1,7 @@
 package com.zectan.soundroid.objects;
 
+import com.zectan.soundroid.anonymous.ListArrayHandler;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -12,7 +14,7 @@ public class Playlist {
 
     public Playlist(Info info, List<Song> songs) {
         this.info = info;
-        this.songs = Anonymous.sortSongs(songs, info.getOrder());
+        this.songs = ListArrayHandler.sortSongs(songs, info.getOrder());
     }
 
     /**

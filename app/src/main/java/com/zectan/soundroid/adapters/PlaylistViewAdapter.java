@@ -12,8 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
+import com.zectan.soundroid.anonymous.ListArrayHandler;
+import com.zectan.soundroid.anonymous.MenuItemsBuilder;
 import com.zectan.soundroid.databinding.SongListItemBinding;
-import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.objects.Song;
 
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +44,7 @@ public class PlaylistViewAdapter extends RecyclerView.Adapter<PlaylistViewViewHo
 
     public void updateSongs(List<Song> songs, List<String> order) {
         mSongs.clear();
-        mSongs.addAll(Anonymous.sortSongs(songs, order));
+        mSongs.addAll(ListArrayHandler.sortSongs(songs, order));
         notifyDataSetChanged();
     }
 
@@ -57,10 +58,8 @@ public class PlaylistViewAdapter extends RecyclerView.Adapter<PlaylistViewViewHo
         return mSongs.size();
     }
 
-    public interface Callback {
+    public interface Callback extends MenuItemsBuilder.MenuItemCallback<Song> {
         void onSongClicked(ImageView cover, String transitionName, String songId);
-
-        void onMenuClicked(Song song);
     }
 }
 
@@ -87,7 +86,6 @@ class PlaylistViewViewHolder extends RecyclerView.ViewHolder {
         B.coverImage.setTransitionName(transitionName);
         B.titleText.setText(title);
         B.descriptionText.setText(artiste);
-        B.menuImage.setOnClickListener(__ -> mCallback.onMenuClicked(song));
         Glide
             .with(context)
             .load(cover)
@@ -96,6 +94,7 @@ class PlaylistViewViewHolder extends RecyclerView.ViewHolder {
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
-        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, id));
+        B.songClickable.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, id));
+        B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.song_menu_playlist, song, mCallback));
     }
 }

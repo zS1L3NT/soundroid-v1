@@ -2,15 +2,22 @@
 <MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ConstraintSet android:id="@+id/start" />
+    <ConstraintSet android:id="@+id/start">
+        <Constraint
+            android:id="@+id/swipe_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_editor_absoluteX="116dp"
+            app:layout_editor_absoluteY="196dp" />
+    </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
         <Constraint android:id="@+id/app_icon">
             <Layout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginStart="14dp"
+                app:layout_constraintBottom_toBottomOf="@id/background"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </Constraint>
@@ -18,24 +25,29 @@
             <Layout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="50dp"
-                app:layout_constraintBottom_toBottomOf="@+id/app_icon"
+                android:layout_marginStart="45dp"
+                app:layout_constraintBottom_toBottomOf="@id/background"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/app_icon" />
+                app:layout_constraintTop_toTopOf="@id/background" />
             <Transform
                 android:scaleX="0.7"
                 android:scaleY="0.7" />
         </Constraint>
+        <Constraint android:id="@+id/background">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="54dp" />
+        </Constraint>
         <Constraint android:id="@+id/searchbar">
             <Layout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintEnd_toStartOf="@+id/settings_image"
-                app:layout_constraintStart_toEndOf="@+id/app_icon"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintBottom_toTopOf="@id/background"
+                app:layout_constraintEnd_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/background" />
             <PropertySet android:alpha="0" />
         </Constraint>
         <Constraint android:id="@+id/download_text">
@@ -43,17 +55,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="25dp"
-                android:layout_marginTop="75dp"
+                app:layout_constraintBottom_toBottomOf="@id/background"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+            <PropertySet android:alpha="0" />
         </Constraint>
         <Constraint android:id="@+id/recycler_view">
             <Layout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/download_text" />
+                app:layout_constraintTop_toBottomOf="@id/background" />
         </Constraint>
     </ConstraintSet>
 
@@ -61,5 +73,17 @@
         app:constraintSetEnd="@id/end"
         app:constraintSetStart="@+id/start">
         <OnSwipe app:touchAnchorId="@+id/recycler_view" />
+        <KeyFrameSet>
+            <KeyPosition
+                app:framePosition="50"
+                app:motionTarget="@id/app_icon"
+                app:percentX="0"
+                app:percentY="0.75" />
+            <KeyPosition
+                app:framePosition="50"
+                app:motionTarget="@id/app_name"
+                app:percentX="1.25"
+                app:percentY="0.5" />
+        </KeyFrameSet>
     </Transition>
 </MotionScene>

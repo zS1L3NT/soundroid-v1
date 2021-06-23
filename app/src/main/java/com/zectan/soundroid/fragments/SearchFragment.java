@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -35,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 public class SearchFragment extends Fragment<FragmentSearchBinding> {
     private static final String TAG = "(SounDroid) SearchFragment";
     private final SearchAdapter.Callback callback = new SearchAdapter.Callback() {
+
         @Override
         public void onSongClicked(Song song) {
             Info info = new Info(song.getId(), "Search Result", Collections.singletonList(song.getId()));
@@ -54,6 +56,11 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
             NavDirections action = SearchFragmentDirections.openPlaylistView();
             navController.navigate(action);
             playlistViewVM.firebase = false;
+        }
+
+        @Override
+        public boolean onMenuItemClicked(SearchResult result, MenuItem item) {
+            return false;
         }
     };
     private SearchAdapter searchAdapter;

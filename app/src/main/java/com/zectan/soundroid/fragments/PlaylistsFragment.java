@@ -2,6 +2,7 @@ package com.zectan.soundroid.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -24,6 +25,22 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
     private static final String TAG = "(SounDroid) PlayingFragment";
     private static final String USER_ID = "admin";
 
+    private final PlaylistsAdapter.Callback callback = new PlaylistsAdapter.Callback() {
+        @Override
+        public void onPlaylistClicked(Info info) {
+            NavDirections action = PlaylistsFragmentDirections.openPlaylistView();
+            NavHostFragment.findNavController(PlaylistsFragment.this).navigate(action);
+            playlistViewVM.info.setValue(info);
+            playlistViewVM.songs.setValue(new ArrayList<>());
+            playlistViewVM.firebase = true;
+        }
+
+        @Override
+        public boolean onMenuItemClicked(Info info, MenuItem item) {
+            return false;
+        }
+    };
+
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         B = FragmentPlaylistsBinding.inflate(inflater, container, false);
@@ -31,7 +48,7 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
 
         // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
-        PlaylistsAdapter playlistsAdapter = new PlaylistsAdapter(this::onPlaylistSelected);
+        PlaylistsAdapter playlistsAdapter = new PlaylistsAdapter(callback);
         B.recyclerView.setAdapter(playlistsAdapter);
         B.recyclerView.setLayoutManager(layoutManager);
         B.recyclerView.setHasFixedSize(true);
@@ -44,14 +61,6 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
         activity.showNavigator();
 
         return B.getRoot();
-    }
-
-    private void onPlaylistSelected(Info info) {
-        NavDirections action = PlaylistsFragmentDirections.openPlaylistView();
-        NavHostFragment.findNavController(this).navigate(action);
-        playlistViewVM.info.setValue(info);
-        playlistViewVM.songs.setValue(new ArrayList<>());
-        playlistViewVM.firebase = true;
     }
 
     private void loadFromFirebase() {

@@ -23,9 +23,9 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.QueueAdapter;
+import com.zectan.soundroid.anonymous.Animations;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlayingBinding;
-import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.Song;
 
@@ -92,20 +92,20 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         playingVM.isPlaying.observe(activity, this::onIsPlayingChange);
         playingVM.isShuffling.observe(activity, this::onIsShufflingChange);
         playingVM.isLooping.observe(activity, this::onIsLoopingChange);
-        B.parent.addTransitionListener(activity.getTransitionListener());
+//        B.parent.addTransitionListener(activity.getTransitionListener());
 
         B.playPauseImage.setOnClickListener(this::playPauseSong);
-        B.playPauseImage.setOnTouchListener(Anonymous::animationSmallSqueeze);
+        B.playPauseImage.setOnTouchListener(Animations::animationSmallSqueeze);
         B.playPauseMiniImage.setOnClickListener(this::playPauseSong);
-        B.playPauseMiniImage.setOnTouchListener(Anonymous::animationMediumSqueeze);
+        B.playPauseMiniImage.setOnTouchListener(Animations::animationMediumSqueeze);
         B.shuffleImage.setOnClickListener(__ -> playingVM.toggleShuffle(mQueueAdapter));
-        B.shuffleImage.setOnTouchListener(Anonymous::animationMediumSqueeze);
+        B.shuffleImage.setOnTouchListener(Animations::animationMediumSqueeze);
         B.backImage.setOnClickListener(__ -> playingVM.playPreviousSong());
-        B.backImage.setOnTouchListener(Anonymous::animationMediumSqueeze);
+        B.backImage.setOnTouchListener(Animations::animationMediumSqueeze);
         B.nextImage.setOnClickListener(__ -> playingVM.playNextSong());
-        B.nextImage.setOnTouchListener(Anonymous::animationMediumSqueeze);
+        B.nextImage.setOnTouchListener(Animations::animationMediumSqueeze);
         B.loopImage.setOnClickListener(__ -> playingVM.toggleLoop(mQueueAdapter));
-        B.loopImage.setOnTouchListener(Anonymous::animationMediumSqueeze);
+        B.loopImage.setOnTouchListener(Animations::animationMediumSqueeze);
 
         B.playingSeekbar.setPlayer(playingVM.getPlayer());
 
@@ -152,7 +152,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         }
 
         Drawable oldGD = B.parent.getBackground();
-        int[] colors = {Color.parseColor(colorHex), activity.getColor(R.color.theme_playing_bottom)};
+        int[] colors = {Color.parseColor(colorHex), activity.getAttributeResource(R.attr.colorSecondary)};
         GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
 
         Drawable[] layers = {oldGD, newGD};

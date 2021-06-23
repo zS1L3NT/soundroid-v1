@@ -2,7 +2,13 @@
 <MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ConstraintSet android:id="@+id/start" />
+    <ConstraintSet android:id="@+id/start">
+        <Constraint android:id="@+id/name_text">
+            <CustomAttribute
+                app:attributeName="textColor"
+                app:customColorValue="?attr/colorOnBackground" />
+        </Constraint>
+    </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
         <Constraint android:id="@+id/cover_image">
@@ -18,40 +24,22 @@
         </Constraint>
         <Constraint android:id="@+id/name_text">
             <Layout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/more_image"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/more_image" />
-            <Transform
-                android:scaleX="0.8"
-                android:scaleY="0.8" />
+                android:layout_marginStart="15dp"
+                app:layout_constraintBottom_toBottomOf="@+id/back_image"
+                app:layout_constraintEnd_toStartOf="@id/more_image"
+                app:layout_constraintStart_toEndOf="@id/back_image"
+                app:layout_constraintTop_toTopOf="@id/back_image" />
+            <CustomAttribute
+                app:attributeName="textColor"
+                app:customColorValue="@color/white" />
         </Constraint>
         <Constraint android:id="@+id/break_line">
             <Layout
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 app:layout_constraintBottom_toTopOf="@id/recycler_view" />
-            <PropertySet android:alpha="1" />
-        </Constraint>
-        <Constraint android:id="@+id/more_image">
-            <Layout
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginEnd="5dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </Constraint>
-        <Constraint android:id="@+id/back_image">
-            <Layout
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginTop="15dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
         </Constraint>
         <Constraint android:id="@+id/recycler_view">
             <Layout
@@ -65,9 +53,7 @@
             <Layout
                 android:layout_width="match_parent"
                 android:layout_height="1dp" />
-            <PropertySet
-                android:alpha="0"
-                android:elevation="-1dp" />
+            <PropertySet android:alpha="0" />
         </Constraint>
     </ConstraintSet>
 
@@ -75,5 +61,20 @@
         app:constraintSetEnd="@id/end"
         app:constraintSetStart="@+id/start">
         <OnSwipe app:touchAnchorId="@+id/recycler_view" />
+        <KeyFrameSet>
+            <KeyPosition
+                app:framePosition="50"
+                app:motionTarget="@id/name_text"
+                app:percentX="0"
+                app:percentY="0.75" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="75"
+                app:motionTarget="@id/break_line" />
+            <KeyPosition
+                app:framePosition="75"
+                app:motionTarget="@id/cover_image"
+                app:sizePercent="1" />
+        </KeyFrameSet>
     </Transition>
 </MotionScene>

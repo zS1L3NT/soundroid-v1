@@ -4,8 +4,8 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.RelativeLayout;
@@ -15,13 +15,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.zectan.soundroid.anonymous.MarginProxy;
 import com.zectan.soundroid.databinding.ActivityMainBinding;
-import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.viewmodels.MainViewModel;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 
@@ -32,12 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding B;
     private InputMethodManager imm;
     private FirebaseRepository repository;
-    private Anonymous.MarginProxy mp;
-
-    private MainViewModel mainVM;
-    private PlayingViewModel playingVM;
-
-    private NavController navController;
+    private MarginProxy mp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,56 +42,23 @@ public class MainActivity extends AppCompatActivity {
         repository = new FirebaseRepository();
 
         // View Model
-        mainVM = new ViewModelProvider(this).get(MainViewModel.class);
-        playingVM = new ViewModelProvider(this).get(PlayingViewModel.class);
+        MainViewModel mainVM = new ViewModelProvider(this).get(MainViewModel.class);
+        PlayingViewModel playingVM = new ViewModelProvider(this).get(PlayingViewModel.class);
 
-        B.bottomNavigator.setOnNavigationItemSelectedListener(this::onNavigationItem);
-        B.bottomNavigator.setOnNavigationItemReselectedListener(this::onNavigationItem);
+        // Live Observers
         mainVM.error.observe(this, this::handleError);
 
         NavHostFragment navHostFragment =
             (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
         assert navHostFragment != null;
-        navController = navHostFragment.getNavController();
+        NavController navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(B.bottomNavigator, navController);
-        mp = new Anonymous.MarginProxy(B.bottomNavigator);
+        mp = new MarginProxy(B.bottomNavigator);
 
         SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
         player.setShuffleModeEnabled(true);
         playingVM.setPlayer(player);
-    }
-
-    private boolean onNavigationItem(MenuItem item) {
-        String name = item.getTitle().toString();
-
-        NavOptions options = new NavOptions
-            .Builder()
-            .setEnterAnim(android.R.anim.fade_in)
-            .setExitAnim(R.anim.fade_out)
-            .setPopEnterAnim(R.anim.fade_in)
-            .setPopExitAnim(R.anim.fade_out)
-            .build();
-
-        switch (name) {
-            case "Home":
-                if (B.bottomNavigator.getSelectedItemId() == item.getItemId()) break;
-                navController.navigate(R.id.fragment_home, null, options);
-                break;
-            case "Playing":
-                if (B.bottomNavigator.getSelectedItemId() == item.getItemId()) break;
-                navController.navigate(R.id.fragment_playing, null, options);
-                break;
-            case "Playlist":
-                if (B.bottomNavigator.getSelectedItemId() == item.getItemId()) break;
-                navController.navigate(R.id.fragment_playlists, null, options);
-                break;
-            default:
-                Log.e(TAG, "Unknown navigation name: " + name);
-                break;
-        }
-
-        return true;
     }
 
     public FirebaseRepository getRepository() {
@@ -127,6 +88,12 @@ public class MainActivity extends AppCompatActivity {
     public void handleError(Exception e) {
         Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
         Log.e(TAG, e.getMessage());
+    }
+
+    public int getAttributeResource(int id) {
+        TypedValue value = new TypedValue();
+        getTheme().resolveAttribute(id, value, true);
+        return value.data;
     }
 
     public MotionLayout.TransitionListener getTransitionListener() {

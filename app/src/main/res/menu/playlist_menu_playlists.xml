@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/download"
+        android:icon="@drawable/ic_download"
+        android:title="@string/download" />
+
+    <item
+        android:id="@+id/edit_playlist"
+        android:icon="@drawable/ic_edit"
+        android:title="@string/edit_playlist" />
+
+    <item
+        android:id="@+id/delete_playlist"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/delete_playlist" />
+
+</menu>

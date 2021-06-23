@@ -1,17 +1,20 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="Theme.SounDroid" parent="Theme.MaterialComponents.NoActionBar">
+    <style name="Theme.SounDroid" parent="AppTheme">
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowActivityTransitions">true</item>
         <!-- Status bar color. -->
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="colorPrimary">@color/theme_2</item>
-        <!-- Customize your theme here. -->
-        <item name="android:windowSharedElementEnterTransition">
-            @transition/shared_image
-        </item>
-        <item name="android:windowSharedElementExitTransition">
-            @transition/shared_image
-        </item>
+
+        <!-- Colors -->
+        <item name="colorPrimary">#546E7A</item>
+        <item name="colorSecondary">#36393F</item>
+        <item name="backgroundColor">#EEEEEE</item>
+        <item name="colorOnBackground">#737373</item>
+        <item name="cardBackgroundColor">#FAFAFA</item>
+        <item name="colorControlHighlight">#DEE8ED</item>
+        <item name="colorControlActivated">#C1CCDD</item>
+        <item name="colorControlNormal">#DFDFE5</item>
+        <item name="navigationIconTint">#737373</item>
     </style>
 </resources>

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
+import com.zectan.soundroid.anonymous.MenuItemsBuilder;
 import com.zectan.soundroid.databinding.SongListItemBinding;
 import com.zectan.soundroid.objects.Info;
 import com.zectan.soundroid.objects.SearchResult;
@@ -111,7 +112,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
         return super.getItemViewType(position);
     }
 
-    public interface Callback {
+    public interface Callback extends MenuItemsBuilder.MenuItemCallback<SearchResult> {
         void onSongClicked(Song song);
 
         void onPlaylistClicked(Info info);
@@ -150,8 +151,6 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             B.titleText.setText(title);
             B.descriptionText.setText(String.format("%s • Song • %s", result.getLocation(), artiste));
             B.coverImage.setTransitionName(transitionName);
-            B.parent.setOnClickListener(__ -> mCallback.onSongClicked(song));
-
             Glide
                 .with(context)
                 .load(cover)
@@ -160,6 +159,13 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
                 .transition(new DrawableTransitionOptions().crossFade())
                 .centerCrop()
                 .into(B.coverImage);
+            B.songClickable.setOnClickListener(__ -> mCallback.onSongClicked(song));
+            B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(
+                v,
+                R.menu.song_menu_search,
+                result,
+                mCallback
+            ));
         } else if (result.getPlaylistInfo() != null) {
             Info info = result.getPlaylistInfo();
             String id = info.getId();
@@ -171,14 +177,19 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             B.titleText.setText(name);
             B.descriptionText.setText(String.format("%s • Playlist", result.getLocation()));
             B.coverImage.setTransitionName(transitionName);
-            B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
-
             Glide
                 .with(context)
                 .load(cover)
                 .error(R.drawable.playing_cover_default)
                 .centerCrop()
                 .into(B.coverImage);
+            B.songClickable.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
+            B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(
+                v,
+                R.menu.playlist_menu_search,
+                result,
+                mCallback
+            ));
         }
     }
 }

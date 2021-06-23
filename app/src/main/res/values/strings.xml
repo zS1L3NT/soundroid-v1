@@ -27,7 +27,7 @@
     <string name="TRANSITION_song_cover">TRANSITION song cover</string>
     <string name="playlist_cover">Playlist Cover</string>
     <string name="playlists">Playlists</string>
-    <string name="add_playlist">Add playlist</string>
+    <string name="create_playlist">Create playlist</string>
     <string name="more_playlist_options">More playlist options</string>
     <string name="back">Back</string>
     <string name="more">More</string>
@@ -45,4 +45,12 @@
     <string name="search">Search</string>
     <string name="search_for_some_songs">Search for some songs</string>
     <string name="no_song_match_found">No song match found</string>
+    <string name="add_to_queue">Add To Queue</string>
+    <string name="add_to_playlist">Add To Playlist</string>
+    <string name="download">Download</string>
+    <string name="menu_special_string">⋮</string>
+    <string name="edit_playlist">Edit Playlist</string>
+    <string name="delete_playlist">Delete Playlist</string>
+    <string name="remove_from_playlist">Remove from Playlist</string>
+    <string name="add_to_playlists">Add to Playlists</string>
 </resources>

@@ -11,8 +11,9 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.zectan.soundroid.adapters.QueueAdapter;
+import com.zectan.soundroid.anonymous.CustomPlaybackOrder;
+import com.zectan.soundroid.anonymous.ListArrayHandler;
 import com.zectan.soundroid.classes.StrictLiveData;
-import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.Song;
 
@@ -48,7 +49,7 @@ public class PlayingViewModel extends ViewModel {
     public final StrictLiveData<Boolean> isLooping = new StrictLiveData<>(true);
     public final StrictLiveData<Integer> currentTime = new StrictLiveData<>(0);
     public final MutableLiveData<String> error = new MutableLiveData<>();
-    private Anonymous.CustomPlaybackOrder mOrder;
+    private CustomPlaybackOrder mOrder;
     private SimpleExoPlayer mPlayer;
 
     public PlayingViewModel() {
@@ -67,9 +68,9 @@ public class PlayingViewModel extends ViewModel {
         selectSong(playlist, songId);
 
         if (isShuffling.getValue())
-            mOrder = Anonymous.CustomPlaybackOrder.createShuffled(playlist.size());
+            mOrder = CustomPlaybackOrder.createShuffled(playlist.size());
         else
-            mOrder = Anonymous.CustomPlaybackOrder.createOrdered(playlist.size());
+            mOrder = CustomPlaybackOrder.createOrdered(playlist.size());
         mPlayer.setShuffleOrder(mOrder);
     }
 
@@ -88,7 +89,7 @@ public class PlayingViewModel extends ViewModel {
         mPlayer.stop();
         mPlayer.clearMediaItems();
 
-        List<Integer> sequence = Anonymous.createOrder(playlist.size(), playlist.getIndexOfSong(songId));
+        List<Integer> sequence = ListArrayHandler.createOrder(playlist.size(), playlist.getIndexOfSong(songId));
         for (int i = 0; i < playlist.size(); i++) {
             Song song = playlist.getSong(sequence.get(i));
             mPlayer.addMediaItem(i, song.getMediaItem());
@@ -105,7 +106,7 @@ public class PlayingViewModel extends ViewModel {
      */
     public List<Song> getItemsInQueue() {
         if (mPlayer.getCurrentMediaItem() == null) return new ArrayList<>();
-        return Anonymous.formatQueue(
+        return ListArrayHandler.formatQueue(
             queue.getValue().getSongs(),
             mOrder.getOrder(),
             queue.getValue().getIndexOfSong(mPlayer.getCurrentMediaItem().mediaId),
@@ -137,9 +138,9 @@ public class PlayingViewModel extends ViewModel {
     public void toggleShuffle(QueueAdapter queueAdapter) {
         isShuffling.setValue(!isShuffling.getValue());
         if (isShuffling.getValue())
-            mOrder = Anonymous.CustomPlaybackOrder.createShuffled(queue.getValue().size());
+            mOrder = CustomPlaybackOrder.createShuffled(queue.getValue().size());
         else
-            mOrder = Anonymous.CustomPlaybackOrder.createOrdered(queue.getValue().size());
+            mOrder = CustomPlaybackOrder.createOrdered(queue.getValue().size());
         queueAdapter.updateQueue(getItemsInQueue());
         mPlayer.setShuffleOrder(mOrder);
     }

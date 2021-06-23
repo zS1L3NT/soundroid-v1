@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
+import com.zectan.soundroid.anonymous.MenuItemsBuilder;
 import com.zectan.soundroid.databinding.SongListItemBinding;
 import com.zectan.soundroid.objects.Info;
 import com.zectan.soundroid.objects.Playlist;
@@ -57,10 +58,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
         return mPlaylist.size();
     }
 
-    public interface Callback {
+    public interface Callback extends MenuItemsBuilder.MenuItemCallback<Song> {
         void onSongClicked(ImageView cover, String transitionName, Playlist playlist, String songId);
-
-        void onMenuClicked(Song song);
     }
 }
 
@@ -74,6 +73,7 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
         mCallback = callback;
     }
 
+    @SuppressLint("RestrictedApi")
     public void bind(Playlist playlist, int position) {
         Song song = playlist.getSong(position);
         Context context = B.parent.getContext();
@@ -87,7 +87,6 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
         B.coverImage.setTransitionName(transitionName);
         B.titleText.setText(title);
         B.descriptionText.setText(artiste);
-        B.menuImage.setOnClickListener(__ -> mCallback.onMenuClicked(song));
         Glide
             .with(context)
             .load(cover)
@@ -96,6 +95,7 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
-        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, playlist, id));
+        B.songClickable.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, playlist, id));
+        B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.song_menu_home, song, mCallback));
     }
 }

@@ -6,6 +6,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -20,9 +21,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.PlaylistViewAdapter;
+import com.zectan.soundroid.anonymous.Anonymous;
+import com.zectan.soundroid.anonymous.MenuItemsBuilder;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlaylistViewBinding;
-import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.objects.Info;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.Song;
@@ -34,6 +36,7 @@ import java.util.List;
 
 public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> {
     private final PlaylistViewAdapter.Callback callback = new PlaylistViewAdapter.Callback() {
+
         @Override
         public void onSongClicked(ImageView cover, String transitionName, String songId) {
             FragmentNavigator.Extras extras = Anonymous.makeExtras(cover, transitionName);
@@ -45,8 +48,8 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         }
 
         @Override
-        public void onMenuClicked(Song song) {
-
+        public boolean onMenuItemClicked(Song song, MenuItem item) {
+            return true;
         }
     };
     private PlaylistViewAdapter playlistViewAdapter;
@@ -66,8 +69,14 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         // Live Observers
         playlistViewVM.info.observe(activity, this::onInfoChange);
         playlistViewVM.songs.observe(activity, this::onSongsChange);
-        B.parent.addTransitionListener(activity.getTransitionListener());
         B.backImage.setOnClickListener(__ -> activity.onBackPressed());
+        B.moreImage.setOnClickListener(v -> MenuItemsBuilder.createMenu(
+            v,
+            R.menu.playlist_menu_playlists,
+            playlistViewVM.info.getValue(),
+            (info, item) -> true
+        ));
+//        B.parent.addTransitionListener(activity.getTransitionListener());
 
         B.swipeRefresh.setOnRefreshListener(this::loadPlaylistData);
         loadPlaylistData();
@@ -90,7 +99,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             .into(B.coverImage);
 
         Drawable oldGD = B.background.getBackground();
-        int[] colors = {Color.parseColor(info.getColorHex()), activity.getColor(R.color.theme_playing_bottom)};
+        int[] colors = {Color.parseColor(info.getColorHex()), activity.getAttributeResource(R.attr.backgroundColor)};
         GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
 
         Drawable[] layers = {oldGD, newGD};

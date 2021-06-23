@@ -2,6 +2,7 @@ package com.zectan.soundroid.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,11 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.HomeAdapter;
+import com.zectan.soundroid.anonymous.Anonymous;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentHomeBinding;
-import com.zectan.soundroid.objects.Anonymous;
 import com.zectan.soundroid.objects.Info;
-import com.zectan.soundroid.objects.Option;
 import com.zectan.soundroid.objects.Playlist;
 import com.zectan.soundroid.objects.Song;
 
@@ -46,20 +46,8 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
         }
 
         @Override
-        public void onMenuClicked(Song song) {
-            NavDirections action = HomeFragmentDirections.openOptionsMenu();
-            NavHostFragment.findNavController(HomeFragment.this).navigate(action);
-
-            optionsMenuVM.url.setValue(song.getCover());
-            optionsMenuVM.title.setValue(song.getTitle());
-            optionsMenuVM.colorHex.setValue(song.getColorHex());
-            optionsMenuVM.description.setValue(song.getArtiste());
-
-            List<Option> options = new ArrayList<>();
-            options.add(Option.addToQueue());
-            options.add(Option.addToPlaylist());
-            options.add(Option.download(song));
-            optionsMenuVM.options.setValue(options);
+        public boolean onMenuItemClicked(Song song, MenuItem item) {
+            return true;
         }
     };
 
@@ -76,7 +64,6 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
 
         // Live Observers
         homeVM.playlist.observe(activity, homeAdapter::updatePlaylist);
-        B.parent.addTransitionListener(activity.getTransitionListener());
 
         B.swipeRefresh.setOnRefreshListener(this::loadSongsData);
         B.searchbar.setOnClickListener(this::onSearchbarClicked);

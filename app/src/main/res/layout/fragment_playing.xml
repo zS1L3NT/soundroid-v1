@@ -45,7 +45,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/playlist_name_text"
-        app:shapeAppearanceOverlay="@style/RoundImage5dp" />
+        app:shapeAppearanceOverlay="@style/shapeableImageViewStyle" />
 
     <TextView
         android:id="@+id/error_text"
@@ -58,8 +58,8 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/cover_image"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/cover_image"
+        app:layout_constraintStart_toStartOf="@+id/cover_image"
         app:layout_constraintTop_toTopOf="@+id/cover_image" />
 
     <TextView
@@ -78,6 +78,7 @@
         android:id="@+id/title_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:elevation="6dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="@string/Nil"
@@ -94,6 +95,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginBottom="8dp"
         android:alpha="0.6"
+        android:elevation="6dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="@string/Nil"
@@ -103,24 +105,25 @@
         app:layout_constraintEnd_toStartOf="@id/loading_circle"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <com.google.android.exoplayer2.ui.PlayerControlView
-        android:id="@+id/playing_seekbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="140dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:controller_layout_id="@layout/controls_time_bar" />
-
     <ProgressBar
         android:id="@+id/loading_circle"
         style="?android:attr/progressBarStyle"
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_marginEnd="32dp"
+        android:alpha="0"
         android:indeterminateTint="@color/white"
         app:layout_constraintBottom_toBottomOf="@+id/title_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/title_text" />
+
+    <com.google.android.exoplayer2.ui.PlayerControlView
+        android:id="@+id/playing_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="140dp"
+        app:controller_layout_id="@layout/controls_time_bar"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <ImageView
         android:id="@+id/shuffle_image"
@@ -220,14 +223,12 @@
         android:layout_height="0dp"
         android:background="@drawable/playing_queue_background"
         android:elevation="10dp"
-        android:layoutAnimation="@anim/songs_recycler_animation"
         android:paddingTop="20dp"
         app:behind_swiped_item_bg_color="#E53935"
         app:behind_swiped_item_icon="@drawable/queue_delete"
         app:behind_swiped_item_icon_margin="16dp"
         app:item_layout="@layout/queue_list_item"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/recycler_view_helper"
-        tools:listitem="@layout/queue_list_item" />
+        app:layout_constraintTop_toBottomOf="@id/recycler_view_helper" />
 
 </com.zectan.soundroid.classes.SavingMotionLayout>

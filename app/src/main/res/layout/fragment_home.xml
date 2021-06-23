@@ -5,6 +5,7 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/backgroundColor"
     android:fitsSystemWindows="true"
     app:layoutDescription="@xml/fragment_home_scene"
     tools:context=".fragments.HomeFragment">
@@ -12,7 +13,9 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="116dp"
+        tools:layout_editor_absoluteY="196dp">
 
         <View
             android:layout_width="match_parent"
@@ -21,12 +24,13 @@
 
     <ImageView
         android:id="@+id/settings_image"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="20dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/settings"
+        android:elevation="2dp"
         android:src="@drawable/ic_settings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -38,44 +42,58 @@
         android:layout_height="160dp"
         android:layout_marginTop="15dp"
         android:contentDescription="@string/app_icon"
-        android:elevation="-1dp"
-        android:src="@mipmap/ic_launcher_round"
+        android:elevation="2dp"
+        android:src="@drawable/ic_launcher"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settings_image" />
 
     <TextView
         android:id="@+id/app_name"
+        style="@style/textViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:elevation="2dp"
         android:fontFamily="@font/carme"
         android:text="@string/app_name"
-        android:textSize="32sp"
+        android:textColor="@color/white"
+        android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/app_icon" />
+
+    <View
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="325dp"
+        android:background="?attr/colorPrimary"
+        android:elevation="1dp" />
 
     <EditText
         android:id="@+id/searchbar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:autofillHints="@string/searchbar_placeholder"
         android:background="@drawable/searchbar_background"
+        android:elevation="2dp"
         android:focusableInTouchMode="false"
         android:hint="@string/searchbar_placeholder"
         android:inputType="text"
-        android:paddingStart="10dp"
+        android:paddingStart="14dp"
         android:paddingEnd="10dp"
+        android:textColorHint="?attr/colorOnBackground"
+        android:textSize="14sp"
         android:transitionName="@string/TRANSITION_searchbar"
-        app:layout_constraintTop_toBottomOf="@id/app_name" />
+        app:layout_constraintBottom_toBottomOf="@id/background"
+        app:layout_constraintTop_toBottomOf="@id/background" />
 
     <TextView
         android:id="@+id/download_text"
+        style="@style/textViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="25dp"

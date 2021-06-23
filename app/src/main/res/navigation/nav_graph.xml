@@ -107,16 +107,11 @@
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
         <action
-            android:id="@+id/openPlaylistSong"
+            android:id="@+id/open_playlist_song"
             app:destination="@id/fragment_playing"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/fade_out" />
     </fragment>
-    <fragment
-        android:id="@+id/parent"
-        android:name="com.zectan.soundroid.fragments.OptionsMenuFragment"
-        android:label="fragment_options_menu"
-        tools:layout="@layout/fragment_options_menu" />
 </navigation>

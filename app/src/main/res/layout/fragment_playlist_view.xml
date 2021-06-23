@@ -21,44 +21,57 @@
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <View
+        android:id="@+id/toolbar_background"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:background="?attr/colorPrimary"
+        android:elevation="-2dp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
         android:id="@+id/background"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/black"
-        android:elevation="-1dp" />
+        android:layout_height="0dp"
+        android:background="?attr/backgroundColor"
+        android:elevation="-1dp"
+        app:layout_constraintBottom_toTopOf="@id/break_line"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/back_image"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="25dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="12dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/back"
         android:elevation="1dp"
+        android:padding="5dp"
         android:src="@drawable/ic_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/white" />
 
-    <ImageView
+    <TextView
         android:id="@+id/more_image"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="25dp"
-        android:contentDescription="@string/more"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="11dp"
+        android:layout_marginEnd="10dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:elevation="1dp"
-        android:src="@drawable/ic_menu"
+        android:gravity="center"
+        android:text="@string/menu_special_string"
+        android:textColor="@color/white"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/cover_image"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="10dp"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_marginTop="40dp"
         android:contentDescription="@string/playlist_cover"
         android:src="@drawable/playing_cover_default"
         app:layout_constraintEnd_toEndOf="parent"
@@ -71,10 +84,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:elevation="1dp"
+        android:ellipsize="end"
         android:fontFamily="@font/carme"
+        android:maxLines="1"
         android:text="@string/Nil"
-        android:textAlignment="center"
-        android:textSize="28sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/recycler_view"
         app:layout_constraintEnd_toEndOf="parent"
@@ -94,8 +108,8 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="20dp"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="10dp"
         android:elevation="1dp"
         android:layoutAnimation="@anim/songs_recycler_animation"

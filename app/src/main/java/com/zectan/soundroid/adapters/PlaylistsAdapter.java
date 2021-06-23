@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
+import com.zectan.soundroid.anonymous.MenuItemsBuilder;
 import com.zectan.soundroid.databinding.PlaylistListItemBinding;
 import com.zectan.soundroid.objects.Info;
 
@@ -54,8 +55,8 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistViewHolder> {
         return mInfos.size();
     }
 
-    public interface Callback {
-        void run(Info info);
+    public interface Callback extends MenuItemsBuilder.MenuItemCallback<Info> {
+        void onPlaylistClicked(Info info);
     }
 
 }
@@ -79,7 +80,6 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
 
         B.titleText.setText(name);
         B.descriptionText.setText(songCount);
-        B.parent.setOnClickListener(__ -> mCallback.run(info));
         Glide
             .with(context)
             .load(cover)
@@ -88,6 +88,8 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
+        B.playlistClickable.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
+        B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.playlist_menu_playlists, info, mCallback));
     }
 
 }

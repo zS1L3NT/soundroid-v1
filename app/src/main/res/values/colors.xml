@@ -2,6 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="red">#E4485B</color>
+    <color name="orange">#FE6346</color>
+    <color name="green">#7CB343</color>
+    <color name="blue">#4987C7</color>
+    <color name="yellow">#FFD56D</color>
+    <color name="gold">#F9BD5E</color>
 
     <!-- Theme -->
     <color name="theme_1">#A9A9A9</color>
@@ -12,9 +18,5 @@
     <color name="theme_button_off">#595959</color>
     <color name="theme_button_on">@color/white</color>
 
-    <color name="theme_default_gradient">#7b828b</color>
-    <color name="theme_navigator">#202020</color>
-    <color name="theme_playing_bottom">#0C0C0C</color>
-
-    <color name="theme_background">#0C0C0C</color>
+    <color name="default_cover_color">#7b828b</color>
 </resources>
