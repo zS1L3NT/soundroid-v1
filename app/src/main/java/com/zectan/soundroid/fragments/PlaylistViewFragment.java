@@ -76,7 +76,6 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             playlistViewVM.info.getValue(),
             (info, item) -> true
         ));
-//        B.parent.addTransitionListener(activity.getTransitionListener());
 
         B.swipeRefresh.setOnRefreshListener(this::loadPlaylistData);
         loadPlaylistData();

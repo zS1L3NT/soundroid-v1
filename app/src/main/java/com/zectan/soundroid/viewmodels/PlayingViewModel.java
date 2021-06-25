@@ -47,7 +47,6 @@ public class PlayingViewModel extends ViewModel {
     public final StrictLiveData<Boolean> isPlaying = new StrictLiveData<>(false);
     public final StrictLiveData<Boolean> isShuffling = new StrictLiveData<>(false);
     public final StrictLiveData<Boolean> isLooping = new StrictLiveData<>(true);
-    public final StrictLiveData<Integer> currentTime = new StrictLiveData<>(0);
     public final MutableLiveData<String> error = new MutableLiveData<>();
     private CustomPlaybackOrder mOrder;
     private SimpleExoPlayer mPlayer;

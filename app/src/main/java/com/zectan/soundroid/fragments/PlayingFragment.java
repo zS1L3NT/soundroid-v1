@@ -92,7 +92,6 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         playingVM.isPlaying.observe(activity, this::onIsPlayingChange);
         playingVM.isShuffling.observe(activity, this::onIsShufflingChange);
         playingVM.isLooping.observe(activity, this::onIsLoopingChange);
-//        B.parent.addTransitionListener(activity.getTransitionListener());
 
         B.playPauseImage.setOnClickListener(this::playPauseSong);
         B.playPauseImage.setOnTouchListener(Animations::animationSmallSqueeze);

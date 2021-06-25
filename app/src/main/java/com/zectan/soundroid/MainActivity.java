@@ -12,12 +12,12 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.zectan.soundroid.anonymous.MarginProxy;
 import com.zectan.soundroid.databinding.ActivityMainBinding;
@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
         player.setShuffleModeEnabled(true);
+        player.setRepeatMode(Player.REPEAT_MODE_ALL);
         playingVM.setPlayer(player);
     }
 
@@ -94,35 +95,6 @@ public class MainActivity extends AppCompatActivity {
         TypedValue value = new TypedValue();
         getTheme().resolveAttribute(id, value, true);
         return value.data;
-    }
-
-    public MotionLayout.TransitionListener getTransitionListener() {
-        return new MotionLayout.TransitionListener() {
-            @Override
-            public void onTransitionStarted(MotionLayout motionLayout, int i, int i1) {
-                if (i == motionLayout.getStartState()) {
-                    mp.setBottomMargin(0);
-                }
-            }
-
-            @Override
-            public void onTransitionChange(MotionLayout motionLayout, int i, int i1, float v) {
-                mp.setBottomMargin((int) (v * -B.bottomNavigator.getHeight()));
-            }
-
-            @Override
-            public void onTransitionCompleted(MotionLayout motionLayout, int i) {
-                if (i == motionLayout.getEndState()) {
-                    mp.setBottomMargin(-B.bottomNavigator.getHeight());
-                } else {
-                    mp.setBottomMargin(0);
-                }
-            }
-
-            @Override
-            public void onTransitionTrigger(MotionLayout motionLayout, int i, boolean b, float v) {
-            }
-        };
     }
 
     public RelativeLayout getView() {
