@@ -122,6 +122,8 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
     }
 
     private void onLoadingChange(Boolean loading) {
+        List<SearchResult> results = searchVM.results.getValue();
+        updateVisuals(results, loading);
         B.headerLoadingCircle.setVisibility(loading ? View.VISIBLE : View.INVISIBLE);
     }
 

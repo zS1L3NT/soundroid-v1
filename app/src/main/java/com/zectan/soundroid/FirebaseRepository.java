@@ -12,7 +12,7 @@ public class FirebaseRepository {
     }
 
     public Query playlists(String userId) {
-        return db.collection("playlists").whereArrayContains("owners", userId);
+        return db.collection("playlists").whereEqualTo(String.format("owners.%s", userId), true);
     }
 
     public DocumentReference playlist(String playlistId) {
@@ -24,29 +24,23 @@ public class FirebaseRepository {
     }
 
     public Query searchPlaylist(String userId, String query) {
-        // ! REALLY NEEDS DATABASE REWORK
         return db.collection("playlists")
-            .whereArrayContains("owners", userId)
-            .whereEqualTo("name", query);
+            .whereEqualTo(String.format("owners.%s", userId), true)
+            .whereArrayContains("queries", query.toLowerCase());
     }
 
     public Query userSongs(String userId) {
-        return db.collection("songs").whereArrayContains("owners", userId);
+        return db.collection("songs").whereEqualTo(String.format("owners.%s", userId), true);
     }
 
     public Query searchSong(String userId, String query) {
-        // ! REALLY NEEDS DATABASE REWORK
         return db.collection("songs")
-            .whereArrayContains("owners", userId)
-            .whereEqualTo("title", query);
+            .whereEqualTo(String.format("owners.%s", userId), true)
+            .whereArrayContains("queries", query.toLowerCase());
     }
 
     public DocumentReference song(String songId) {
         return db.collection("songs").document(songId);
-    }
-
-    public DocumentReference user(String userId) {
-        return db.collection("owners").document(userId);
     }
 
 }

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class Song {
@@ -20,7 +21,8 @@ public class Song {
     private String colorHex;
     private File directory;
     private List<String> playlists;
-    private List<String> owners;
+    private Map<String, Boolean> owners;
+    private List<String> queries;
 
     public Song() {
 
@@ -32,6 +34,21 @@ public class Song {
         this.artiste = artiste;
         this.cover = cover;
         this.colorHex = colorHex;
+    }
+
+    /**
+     * Creates an empty placeholder Song
+     *
+     * @return Song
+     */
+    public static Song getEmpty() {
+        return new Song(
+            "",
+            "-",
+            "-",
+            "-",
+            "#7b828b"
+        );
     }
 
     public String getId() {
@@ -54,21 +71,6 @@ public class Song {
         return colorHex;
     }
 
-    /**
-     * Creates an empty placeholder Song
-     *
-     * @return Song
-     */
-    public static Song getEmpty() {
-        return new Song(
-            "",
-            "-",
-            "-",
-            "-",
-            "#7b828b"
-        );
-    }
-
     public String getUrl() {
         return String.format("%s/%s.mp3", SongsURL, id);
     }
@@ -81,12 +83,12 @@ public class Song {
         return playlists;
     }
 
-    public void setColorHex(String colorHex) {
-        this.colorHex = colorHex;
+    public Map<String, Boolean> getOwners() {
+        return owners;
     }
 
-    public List<String> getOwners() {
-        return owners;
+    public List<String> getQueries() {
+        return queries;
     }
 
     public MediaItem getMediaItem() {

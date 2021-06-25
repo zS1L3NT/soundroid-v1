@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class Info {
@@ -12,7 +13,7 @@ public class Info {
     private String cover;
     private String colorHex;
     private List<String> order;
-    private List<String> owners;
+    private Map<String, Boolean> owners;
 
     public Info() {
     }
@@ -29,6 +30,10 @@ public class Info {
         this.cover = cover;
         this.colorHex = colorHex;
         this.order = order;
+    }
+
+    public static Info getEmpty() {
+        return new Info("", "", new ArrayList<>());
     }
 
     public String getId() {
@@ -51,12 +56,12 @@ public class Info {
         return cover;
     }
 
-    public String getColorHex() {
-        return colorHex;
-    }
-
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public String getColorHex() {
+        return colorHex;
     }
 
     public List<String> getOrder() {
@@ -67,11 +72,7 @@ public class Info {
         this.order = order;
     }
 
-    public static Info getEmpty() {
-        return new Info("", "", new ArrayList<>());
-    }
-
-    public List<String> getOwners() {
+    public Map<String, Boolean> getOwners() {
         return owners;
     }
 

@@ -23,6 +23,7 @@ import com.zectan.soundroid.anonymous.MarginProxy;
 import com.zectan.soundroid.databinding.ActivityMainBinding;
 import com.zectan.soundroid.viewmodels.MainViewModel;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
+import com.zectan.soundroid.viewmodels.SearchViewModel;
 
 // https://www.glyric.com/2018/merlin/aagaya-nilave
 
@@ -44,9 +45,11 @@ public class MainActivity extends AppCompatActivity {
         // View Model
         MainViewModel mainVM = new ViewModelProvider(this).get(MainViewModel.class);
         PlayingViewModel playingVM = new ViewModelProvider(this).get(PlayingViewModel.class);
+        SearchViewModel searchVM = new ViewModelProvider(this).get(SearchViewModel.class);
 
         // Live Observers
         mainVM.error.observe(this, this::handleError);
+        searchVM.watchResults(this);
 
         NavHostFragment navHostFragment =
             (NavHostFragment) getSupportFragmentManager()
