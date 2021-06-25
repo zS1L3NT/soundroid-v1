@@ -2,6 +2,7 @@ package com.zectan.soundroid.fragments;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -30,8 +31,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-// TODO Animate search results
 
 public class SearchFragment extends Fragment<FragmentSearchBinding> {
     private static final String TAG = "(SounDroid) SearchFragment";
@@ -116,15 +115,14 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
 
     private void onResultsChange(List<SearchResult> results) {
         boolean loading = searchVM.loading.getValue();
-        searchAdapter.updateResults(results, loading);
+        searchAdapter.updateResults(results);
         updateVisuals(results, loading);
+        // Delayed so items can reorder first
+        new Handler().postDelayed(() -> B.recyclerView.smoothScrollToPosition(0), 600);
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
     private void onLoadingChange(Boolean loading) {
-        List<SearchResult> results = searchVM.results.getValue();
-        searchAdapter.updateLoading(loading);
-        updateVisuals(results, loading);
+        B.headerLoadingCircle.setVisibility(loading ? View.VISIBLE : View.INVISIBLE);
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")

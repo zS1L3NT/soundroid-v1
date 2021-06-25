@@ -6,8 +6,12 @@ import android.util.Log;
 import com.zectan.soundroid.classes.Socket;
 import com.zectan.soundroid.objects.SearchResult;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SearchSocket extends Socket {
     private static final String TAG = "(SounDroid) SearchSocket";
@@ -40,14 +44,31 @@ public class SearchSocket extends Socket {
         }
     }
 
-    private void onDone(Object... objects) {
+    private void onDone(Object... args) {
+        if (callback.isInactive()) {
+            closeSocket();
+            Log.i(TAG, "(SOCKET) <close>");
+            return;
+        }
+
+        try {
+            List<SearchResult> results = new ArrayList<>();
+            JSONArray objects = new JSONArray(args[0].toString());
+            for (int i = 0; i < objects.length(); i++) {
+                JSONObject object = objects.getJSONObject(i);
+                results.add(new SearchResult(object, context));
+            }
+            callback.onDone(results);
+        } catch (JSONException e) {
+            callback.onError("Could not parse server response");
+            e.printStackTrace();
+        }
         closeSocket();
-        callback.onDone();
     }
 
     public interface Callback extends Socket.Callback {
         void onResult(SearchResult results);
 
-        void onDone();
+        void onDone(List<SearchResult> sortedResults);
     }
 }

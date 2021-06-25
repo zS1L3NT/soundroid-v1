@@ -1,12 +1,12 @@
 package com.zectan.soundroid.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -25,7 +25,7 @@ import java.util.List;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     private static final String TAG = "(SounDroid) SearchAdapter";
-    private static final int FOOTER_VIEW = 1;
+    //    private static final int FOOTER_VIEW = 1;
     private final Callback mCallback;
     private final List<SearchResult> mResults;
 
@@ -38,60 +38,26 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     @NotNull
     @Override
     public SearchViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        if (viewType == FOOTER_VIEW) {
-            View itemView = LayoutInflater
-                .from(parent.getContext())
-                .inflate(R.layout.footer_search, parent, false);
+//        if (viewType == FOOTER_VIEW) {
+//            View itemView = LayoutInflater
+//                .from(parent.getContext())
+//                .inflate(R.layout.footer_search, parent, false);
+//
+//            return new SearchViewHolder(itemView);
+//        } else {
+        View itemView = LayoutInflater
+            .from(parent.getContext())
+            .inflate(R.layout.song_list_item, parent, false);
 
-            return new SearchViewHolder(itemView);
-        } else {
-            View itemView = LayoutInflater
-                .from(parent.getContext())
-                .inflate(R.layout.song_list_item, parent, false);
-
-            return new SearchViewHolder(itemView, mCallback);
-        }
-
+        return new SearchViewHolder(itemView, mCallback);
+//        }
     }
 
-    public void updateResults(List<SearchResult> results, boolean loading) {
-        int oldSize = mResults.size();
-        int newSize = results.size();
-        Log.d(TAG, String.format("START %s %s %s", oldSize, newSize, loading));
-        if (newSize < oldSize) {
-            mResults.clear();
-            mResults.addAll(results);
-            if (loading) mResults.add(null);
-            notifyItemRangeRemoved(newSize, oldSize - newSize);
-        } else if (newSize > oldSize) {
-            mResults.clear();
-            mResults.addAll(results);
-            if (loading) mResults.add(null);
-            notifyItemRangeInserted(oldSize, newSize - oldSize);
-        } else {
-            mResults.clear();
-            mResults.addAll(results);
-            if (loading) mResults.add(null);
-            notifyItemRangeChanged(0, oldSize);
-        }
-        Log.d(TAG, String.format("END %s %s %s", oldSize, newSize, loading));
-    }
-
-    public void updateLoading(boolean loading) {
-        if (loading) {
-            if (mResults.size() == 0) {
-                mResults.add(null);
-                notifyItemInserted(0);
-            } else if (mResults.get(mResults.size() - 1) != null) {
-                mResults.add(null);
-                notifyItemInserted(mResults.size() - 1);
-            }
-        } else {
-            if (mResults.size() > 0 && mResults.get(mResults.size() - 1) == null) {
-                mResults.remove(mResults.size() - 1);
-                notifyItemRemoved(mResults.size());
-            }
-        }
+    public void updateResults(List<SearchResult> results) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(mResults, results));
+        diffResult.dispatchUpdatesTo(this);
+        mResults.clear();
+        mResults.addAll(results);
     }
 
     @Override
@@ -104,13 +70,13 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
         return mResults.size();
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        if (mResults.get(position) == null) {
-            return FOOTER_VIEW;
-        }
-        return super.getItemViewType(position);
-    }
+//    @Override
+//    public int getItemViewType(int position) {
+//        if (mResults.get(position).getId().equals("")) {
+//            return FOOTER_VIEW;
+//        }
+//        return super.getItemViewType(position);
+//    }
 
     public interface Callback extends MenuItemsBuilder.MenuItemCallback<SearchResult> {
         void onSongClicked(Song song);
@@ -191,5 +157,39 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
                 mCallback
             ));
         }
+    }
+}
+
+class DiffCallback extends DiffUtil.Callback {
+
+    private final List<SearchResult> oldResults, newResults;
+
+    public DiffCallback(List<SearchResult> oldResults, List<SearchResult> newResults) {
+        this.oldResults = oldResults;
+        this.newResults = newResults;
+    }
+
+    @Override
+    public int getOldListSize() {
+        return oldResults.size();
+    }
+
+    @Override
+    public int getNewListSize() {
+        return newResults.size();
+    }
+
+    @Override
+    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+        SearchResult oldResult = oldResults.get(oldItemPosition);
+        SearchResult newResult = newResults.get(newItemPosition);
+        return oldResult.getId().equals(newResult.getId());
+    }
+
+    @Override
+    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+        SearchResult oldResult = oldResults.get(oldItemPosition);
+        SearchResult newResult = newResults.get(newItemPosition);
+        return oldResult.equals(newResult);
     }
 }

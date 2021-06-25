@@ -17,7 +17,7 @@
         android:background="?attr/colorPrimary"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="8dp"
@@ -29,7 +29,6 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginStart="6dp"
-                android:layout_marginTop="10dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/searchbar_back_icon"
                 android:padding="5dp"
@@ -41,10 +40,9 @@
 
             <EditText
                 android:id="@+id/header_text_editor"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
                 android:autofillHints="@string/searchbar_placeholder"
                 android:background="@drawable/searchbar_background"
                 android:hint="@string/searchbar_placeholder"
@@ -53,13 +51,23 @@
                 android:paddingRight="10dp"
                 android:textSize="14sp"
                 android:transitionName="@string/TRANSITION_searchbar"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/header_loading_circle"
                 app:layout_constraintStart_toEndOf="@+id/header_back_image">
 
                 <requestFocus />
             </EditText>
 
-        </LinearLayout>
+            <ProgressBar
+                android:id="@+id/header_loading_circle"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="12dp"
+                android:indeterminateTint="?attr/colorControlActivated"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </RelativeLayout>
 

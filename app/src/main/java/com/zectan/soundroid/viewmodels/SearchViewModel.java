@@ -15,6 +15,7 @@ import com.zectan.soundroid.sockets.SearchSocket;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SearchViewModel extends ViewModel {
@@ -47,23 +48,31 @@ public class SearchViewModel extends ViewModel {
      */
     public void search(String query, Context context) {
         int search_id = ++search_count;
-        this.results.postValue(new ArrayList<>());
         if (query.isEmpty()) {
             loading.postValue(false);
+            this.results.postValue(new ArrayList<>());
             return;
         }
 
         loading.postValue(true);
         AtomicInteger responses = new AtomicInteger(0);
+        AtomicBoolean first = new AtomicBoolean(true);
         new SearchSocket(query, context, new SearchSocket.Callback() {
             @Override
             public void onResult(SearchResult result) {
+                if (first.compareAndSet(true, false)) {
+                    SearchViewModel.this.results.postValue(new ArrayList<>());
+                }
                 pushToResults(result);
                 error.postValue(null);
             }
 
             @Override
-            public void onDone() {
+            public void onDone(List<SearchResult> sortedResults) {
+                if (first.compareAndSet(true, false)) {
+                    SearchViewModel.this.results.postValue(new ArrayList<>());
+                }
+                SearchViewModel.this.results.postValue(sortedResults);
                 if (responses.incrementAndGet() == LOCATIONS) {
                     loading.postValue(false);
                 }
@@ -71,6 +80,9 @@ public class SearchViewModel extends ViewModel {
 
             @Override
             public void onError(String message) {
+                if (first.compareAndSet(true, false)) {
+                    SearchViewModel.this.results.postValue(new ArrayList<>());
+                }
                 error.postValue(message);
                 if (responses.incrementAndGet() == LOCATIONS) {
                     loading.postValue(false);
@@ -85,6 +97,9 @@ public class SearchViewModel extends ViewModel {
 
         repository.searchSong(USER_ID, query).get()
             .addOnSuccessListener(snaps -> {
+                if (snaps.size() > 0 && first.compareAndSet(true, false)) {
+                    results.postValue(new ArrayList<>());
+                }
                 for (int i = 0; i < snaps.size(); i++) {
                     DocumentSnapshot snap = snaps.getDocuments().get(i);
                     Song song = snap.toObject(Song.class);
@@ -96,6 +111,9 @@ public class SearchViewModel extends ViewModel {
                 }
             })
             .addOnFailureListener(err -> {
+                if (first.compareAndSet(true, false)) {
+                    results.postValue(new ArrayList<>());
+                }
                 error.postValue(err.getMessage());
                 if (responses.incrementAndGet() == LOCATIONS) {
                     loading.postValue(false);
@@ -104,6 +122,9 @@ public class SearchViewModel extends ViewModel {
 
         repository.searchPlaylist(USER_ID, query).get()
             .addOnSuccessListener(snaps -> {
+                if (snaps.size() > 0 && first.compareAndSet(true, false)) {
+                    results.postValue(new ArrayList<>());
+                }
                 for (int i = 0; i < snaps.size(); i++) {
                     DocumentSnapshot snap = snaps.getDocuments().get(i);
                     Info info = snap.toObject(Info.class);
@@ -115,6 +136,9 @@ public class SearchViewModel extends ViewModel {
                 }
             })
             .addOnFailureListener(err -> {
+                if (first.compareAndSet(true, false)) {
+                    results.postValue(new ArrayList<>());
+                }
                 error.postValue(err.getMessage());
                 if (responses.incrementAndGet() == LOCATIONS) {
                     loading.postValue(false);

@@ -59,6 +59,12 @@ public class SearchResult {
         return mLocation;
     }
 
+    public String getId() {
+        if (mSong != null) return mSong.getId();
+        if (mInfo != null) return mInfo.getId();
+        throw new RuntimeException("Undefined data type");
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
