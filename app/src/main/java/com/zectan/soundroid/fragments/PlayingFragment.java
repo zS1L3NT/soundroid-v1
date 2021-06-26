@@ -1,11 +1,14 @@
 package com.zectan.soundroid.fragments;
 
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,6 +95,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         playingVM.isPlaying.observe(activity, this::onIsPlayingChange);
         playingVM.isShuffling.observe(activity, this::onIsShufflingChange);
         playingVM.isLooping.observe(activity, this::onIsLoopingChange);
+        playingVM.error.observe(activity, this::onErrorChange);
 
         B.playPauseImage.setOnClickListener(this::playPauseSong);
         B.playPauseImage.setOnTouchListener(Animations::animationSmallSqueeze);
@@ -185,4 +189,30 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
                 isLooping ? R.color.white : R.color.playing_inactive),
             android.graphics.PorterDuff.Mode.MULTIPLY);
     }
+
+    private void onErrorChange(String error) {
+        if (error != null) {
+            B.errorText.setText(error);
+            ValueAnimator darkenAnimation = ValueAnimator
+                .ofArgb(activity.getColor(R.color.white), activity.getColor(R.color.playing_inactive))
+                .setDuration(1000);
+            darkenAnimation.addUpdateListener(animation -> B.coverImage.setColorFilter(
+                (int) animation.getAnimatedValue(),
+                PorterDuff.Mode.MULTIPLY));
+            darkenAnimation.start();
+            B.errorText.animate().alpha(1).setDuration(500).setStartDelay(500).start();
+            B.retryText.animate().alpha(1).setDuration(500).setStartDelay(500).start();
+            new Handler().postDelayed(() -> B.coverImage.setOnClickListener(__ -> {
+                playingVM.retry();
+                playingVM.error.setValue(null);
+            }), 1000);
+        } else {
+            B.coverImage.setOnClickListener(__ -> {
+            });
+            B.coverImage.clearColorFilter();
+            B.errorText.setAlpha(0f);
+            B.retryText.setAlpha(0f);
+        }
+    }
+
 }

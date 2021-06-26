@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Queue Number:
@@ -98,6 +99,11 @@ public class PlayingViewModel extends ViewModel {
         mPlayer.play();
     }
 
+    public void retry() {
+        mPlayer.prepare();
+        mPlayer.play();
+    }
+
     /**
      * Formats the display queue
      *
@@ -118,6 +124,7 @@ public class PlayingViewModel extends ViewModel {
      * Play the previous song in the queue or reset the song progress
      */
     public void playPreviousSong() {
+        error.postValue(null);
         if (mPlayer.getContentPosition() <= 2000) {
             mPlayer.prepare();
             mPlayer.previous();
@@ -130,6 +137,7 @@ public class PlayingViewModel extends ViewModel {
      * Play the next song in the queue
      */
     public void playNextSong() {
+        error.postValue(null);
         mPlayer.prepare();
         mPlayer.next();
     }
@@ -193,7 +201,11 @@ public class PlayingViewModel extends ViewModel {
 
             @Override
             public void onPlayerError(@NotNull ExoPlaybackException error) {
-                PlayingViewModel.this.error.postValue(error.getMessage());
+                if (Objects.equals(error.getMessage(), "Source error")) {
+                    PlayingViewModel.this.error.postValue("Could not fetch song from server");
+                } else {
+                    PlayingViewModel.this.error.postValue(error.getMessage());
+                }
             }
         });
     }

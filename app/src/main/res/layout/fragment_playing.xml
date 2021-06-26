@@ -29,6 +29,7 @@
         android:layout_height="wrap_content"
         android:alpha="0.7"
         android:text="@string/Nil"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="@+id/playing_from_text"
         app:layout_constraintStart_toStartOf="@+id/playing_from_text"
         app:layout_constraintTop_toBottomOf="@+id/playing_from_text" />
@@ -69,6 +70,7 @@
         android:alpha="0"
         android:elevation="6dp"
         android:text="@string/playing_click_to_retry"
+        android:textColor="@color/white"
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
