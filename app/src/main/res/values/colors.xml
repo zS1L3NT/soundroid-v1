@@ -10,13 +10,8 @@
     <color name="gold">#F9BD5E</color>
 
     <!-- Theme -->
-    <color name="theme_1">#A9A9A9</color>
-    <color name="theme_2">#8B8B8B</color>
-    <color name="theme_3">#595959</color>
-    <color name="theme_4">#363636</color>
-
-    <color name="theme_button_off">#595959</color>
-    <color name="theme_button_on">@color/white</color>
+    <color name="playing_inactive">#6B6B6B</color>
+    <color name="playing_buffered">#A9A9A9</color>
 
     <color name="default_cover_color">#7b828b</color>
 </resources>

@@ -175,14 +175,14 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     private void onIsShufflingChange(boolean isShuffling) {
         B.shuffleImage.setColorFilter(
             ContextCompat.getColor(activity,
-                isShuffling ? R.color.theme_button_on : R.color.theme_button_off),
+                isShuffling ? R.color.white : R.color.playing_inactive),
             android.graphics.PorterDuff.Mode.MULTIPLY);
     }
 
     private void onIsLoopingChange(boolean isLooping) {
         B.loopImage.setColorFilter(
             ContextCompat.getColor(activity,
-                isLooping ? R.color.theme_button_on : R.color.theme_button_off),
+                isLooping ? R.color.white : R.color.playing_inactive),
             android.graphics.PorterDuff.Mode.MULTIPLY);
     }
 }

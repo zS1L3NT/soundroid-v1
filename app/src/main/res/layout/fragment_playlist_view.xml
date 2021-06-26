@@ -100,7 +100,6 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:alpha="0"
-        android:background="@color/theme_4"
         android:elevation="1dp"
         app:layout_constraintBottom_toTopOf="@id/recycler_view" />
 

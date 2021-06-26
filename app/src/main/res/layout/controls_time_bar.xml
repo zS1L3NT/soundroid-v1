@@ -10,14 +10,14 @@
         android:layout_height="10dp"
         android:layout_marginStart="28dp"
         android:layout_marginEnd="28dp"
-        app:buffered_color="@color/theme_2"
+        app:buffered_color="@color/playing_buffered"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:played_color="@color/white"
         app:scrubber_color="@color/white"
         app:scrubber_drawable="@drawable/controls_time_indicator"
-        app:unplayed_color="@color/theme_3" />
+        app:unplayed_color="@color/playing_inactive" />
 
     <TextView
         android:id="@+id/exo_position"
