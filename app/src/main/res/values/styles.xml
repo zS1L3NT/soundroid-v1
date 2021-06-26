@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="AppTheme" parent="Theme.SounDroid">
         <item name="android:popupMenuStyle">@style/popupMenuStyle</item>
+        <item name="android:statusBarColor">?attr/statusBarBackground</item>
+    </style>
+
+    <style name="SplashScreenTheme" parent="Theme.SounDroid">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+        <item name="android:statusBarColor">?attr/statusBarBackground</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <style name="shapeableImageViewStyle" parent="">

@@ -1,12 +1,8 @@
 <resources>
-    <!-- Base application theme. -->
-    <style name="Theme.SounDroid" parent="AppTheme">
+    <style name="Theme.SounDroid" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowContentTransitions">true</item>
         <item name="android:windowActivityTransitions">true</item>
-        <!-- Status bar color. -->
-        <item name="android:windowTranslucentStatus">true</item>
 
-        <!-- Colors -->
         <item name="colorPrimary">#546E7A</item>
         <item name="colorSecondary">#36393F</item>
         <item name="backgroundColor">#EEEEEE</item>
@@ -16,5 +12,6 @@
         <item name="colorControlActivated">#C1CCDD</item>
         <item name="colorControlNormal">#DFDFE5</item>
         <item name="navigationIconTint">#737373</item>
+        <item name="statusBarBackground">#485963</item>
     </style>
 </resources>

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -57,6 +58,7 @@ public class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragm
         playlistsVM = new ViewModelProvider(activity).get(PlaylistsViewModel.class);
         playlistViewVM = new ViewModelProvider(activity).get(PlaylistViewViewModel.class);
         searchVM = new ViewModelProvider(activity).get(SearchViewModel.class);
+        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
         return B.getRoot();
     }
