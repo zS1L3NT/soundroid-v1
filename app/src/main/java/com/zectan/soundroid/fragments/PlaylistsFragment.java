@@ -58,7 +58,6 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
 
         B.swipeRefresh.setOnRefreshListener(this::loadFromFirebase);
         if (playlistsVM.infos.getValue() == null) loadFromFirebase();
-        activity.showNavigator();
 
         return B.getRoot();
     }

@@ -1,6 +1,5 @@
 package com.zectan.soundroid;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,7 +7,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,7 +17,6 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.zectan.soundroid.anonymous.MarginProxy;
 import com.zectan.soundroid.databinding.ActivityMainBinding;
 import com.zectan.soundroid.viewmodels.MainViewModel;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
@@ -29,15 +26,13 @@ import com.zectan.soundroid.viewmodels.SearchViewModel;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "(SounDroid) MainActivity";
-    private ActivityMainBinding B;
     private InputMethodManager imm;
     private FirebaseRepository repository;
-    private MarginProxy mp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        B = ActivityMainBinding.inflate(LayoutInflater.from(this));
+        ActivityMainBinding B = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(B.getRoot());
         imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         repository = new FirebaseRepository();
@@ -57,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         assert navHostFragment != null;
         NavController navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(B.bottomNavigator, navController);
-        mp = new MarginProxy(B.bottomNavigator);
 
         SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
         player.setShuffleModeEnabled(true);
@@ -67,18 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
     public FirebaseRepository getRepository() {
         return repository;
-    }
-
-    public void hideNavigator() {
-        ValueAnimator va = ValueAnimator.ofInt(mp.getBottomMargin(), -B.bottomNavigator.getHeight()).setDuration(250);
-        va.addUpdateListener(animation -> mp.setBottomMargin((int) animation.getAnimatedValue()));
-        va.start();
-    }
-
-    public void showNavigator() {
-        ValueAnimator va = ValueAnimator.ofInt(mp.getBottomMargin(), 0).setDuration(250);
-        va.addUpdateListener(animation -> mp.setBottomMargin((int) animation.getAnimatedValue()));
-        va.start();
     }
 
     public void showKeyboard() {
@@ -98,9 +80,5 @@ public class MainActivity extends AppCompatActivity {
         TypedValue value = new TypedValue();
         getTheme().resolveAttribute(id, value, true);
         return value.data;
-    }
-
-    public RelativeLayout getView() {
-        return findViewById(R.id.parent);
     }
 }

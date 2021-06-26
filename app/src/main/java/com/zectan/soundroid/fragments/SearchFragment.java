@@ -94,7 +94,6 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
             .debounce(250, TimeUnit.MILLISECONDS)
             .map(CharSequence::toString)
             .subscribe(this::afterSearchDebounce);
-        activity.hideNavigator();
         activity.showKeyboard();
 
         return B.getRoot();
