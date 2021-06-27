@@ -51,6 +51,7 @@ public class PlayingViewModel extends ViewModel {
     public final MutableLiveData<String> error = new MutableLiveData<>();
     private CustomPlaybackOrder mOrder;
     private SimpleExoPlayer mPlayer;
+    private boolean initialised = false;
 
     public PlayingViewModel() {
         // Required empty public constructor
@@ -178,6 +179,8 @@ public class PlayingViewModel extends ViewModel {
      * @param player Instance of the player. Should only be created once
      */
     public void setPlayer(SimpleExoPlayer player) {
+        if (initialised) return;
+        initialised = true;
         mPlayer = player;
         mPlayer.addListener(new Player.Listener() {
             @Override
