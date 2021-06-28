@@ -1,4 +1,4 @@
-package com.zectan.soundroid.anonymous;
+package com.zectan.soundroid.utils;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.source.ShuffleOrder;

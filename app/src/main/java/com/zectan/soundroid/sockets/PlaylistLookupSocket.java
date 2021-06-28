@@ -4,9 +4,9 @@ import android.content.Context;
 import android.util.Log;
 
 import com.zectan.soundroid.classes.Socket;
-import com.zectan.soundroid.objects.Info;
-import com.zectan.soundroid.objects.Playlist;
-import com.zectan.soundroid.objects.Song;
+import com.zectan.soundroid.models.Info;
+import com.zectan.soundroid.models.Playlist;
+import com.zectan.soundroid.models.Song;
 
 import org.json.JSONArray;
 import org.json.JSONException;

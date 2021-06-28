@@ -8,14 +8,13 @@ import androidx.lifecycle.ViewModel;
 import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.classes.StrictLiveData;
-import com.zectan.soundroid.objects.Info;
-import com.zectan.soundroid.objects.SearchResult;
-import com.zectan.soundroid.objects.Song;
+import com.zectan.soundroid.models.Info;
+import com.zectan.soundroid.models.SearchResult;
+import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.sockets.SearchSocket;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -26,13 +25,11 @@ public class SearchViewModel extends ViewModel {
     private final FirebaseRepository repository = new FirebaseRepository();
     private final StrictLiveData<List<SearchResult>> serverResults = new StrictLiveData<>(new ArrayList<>());
     private final StrictLiveData<List<SearchResult>> databaseResults = new StrictLiveData<>(new ArrayList<>());
-    public MutableLiveData<String> error = new MutableLiveData<>();
-    public StrictLiveData<List<SearchResult>> results = new StrictLiveData<>(new ArrayList<>());
-    public StrictLiveData<String> query = new StrictLiveData<>("");
-    public StrictLiveData<Boolean> loading = new StrictLiveData<>(false);
-
-    private int search_count = 0;
-    private AtomicBoolean first;
+    private final List<Boolean> search_count = new ArrayList<>();
+    public final StrictLiveData<List<SearchResult>> results = new StrictLiveData<>(new ArrayList<>());
+    public final StrictLiveData<String> query = new StrictLiveData<>("");
+    public final StrictLiveData<Boolean> loading = new StrictLiveData<>(false);
+    public final MutableLiveData<String> error = new MutableLiveData<>();
 
     public SearchViewModel() {
         // Required empty public constructor
@@ -62,8 +59,17 @@ public class SearchViewModel extends ViewModel {
         });
     }
 
-    public boolean postClearOnFirstSearch() {
-        if (first.compareAndSet(true, false)) {
+    /**
+     * Clears the current search results if the search_id is current and the results haven't been cleared <br>
+     * This method returns a boolean since StrictLiveData.postValue() doesn't change the value immediately <br>
+     * This way, the methods calling this function will know whether to use the current value of a new list <br>
+     *
+     * @param search_id Search ID passed in
+     * @return If the results were cleared
+     */
+    public boolean postClearOnFirstSearch(int search_id) {
+        if ((search_count.size() - 1) == search_id && search_count.get(search_id)) {
+            search_count.set(search_id, false);
             results.postValue(new ArrayList<>());
             serverResults.postValue(new ArrayList<>());
             databaseResults.postValue(new ArrayList<>());
@@ -79,8 +85,7 @@ public class SearchViewModel extends ViewModel {
      * @param context Context for the song object
      */
     public void search(String query, Context context) {
-        int search_id = ++search_count;
-        first = new AtomicBoolean(true);
+        int search_id = search_count.size();
         if (query.isEmpty()) {
             loading.postValue(false);
             this.results.postValue(new ArrayList<>());
@@ -88,20 +93,22 @@ public class SearchViewModel extends ViewModel {
         }
 
         loading.postValue(true);
+        search_count.add(true);
         AtomicInteger responses = new AtomicInteger(0);
         new SearchSocket(query, context, new SearchSocket.Callback() {
             @Override
             public void onResult(SearchResult result) {
-                postClearOnFirstSearch();
-                List<SearchResult> results = SearchViewModel.this.serverResults.getValue();
-                results.add(result);
-                SearchViewModel.this.serverResults.postValue(results);
+                List<SearchResult> serverResults = postClearOnFirstSearch(search_id)
+                    ? new ArrayList<>()
+                    : SearchViewModel.this.serverResults.getValue();
+                serverResults.add(result);
+                SearchViewModel.this.serverResults.postValue(serverResults);
                 error.postValue(null);
             }
 
             @Override
             public void onDone(List<SearchResult> sortedResults) {
-                postClearOnFirstSearch();
+                postClearOnFirstSearch(search_id);
                 SearchViewModel.this.serverResults.postValue(sortedResults);
                 if (responses.incrementAndGet() == LOCATIONS) {
                     loading.postValue(false);
@@ -110,7 +117,7 @@ public class SearchViewModel extends ViewModel {
 
             @Override
             public void onError(String message) {
-                postClearOnFirstSearch();
+                postClearOnFirstSearch(search_id);
                 error.postValue(message);
                 if (responses.incrementAndGet() == LOCATIONS) {
                     loading.postValue(false);
@@ -119,14 +126,14 @@ public class SearchViewModel extends ViewModel {
 
             @Override
             public boolean isInactive() {
-                return search_id != search_count;
+                return search_id != search_count.size() - 1;
             }
         });
 
         repository.searchSong(USER_ID, query).get()
             .addOnSuccessListener(snaps -> {
                 if (snaps.size() > 0) {
-                    List<SearchResult> databaseResults = postClearOnFirstSearch()
+                    List<SearchResult> databaseResults = postClearOnFirstSearch(search_id)
                         ? new ArrayList<>()
                         : this.databaseResults.getValue();
                     databaseResults.addAll(
@@ -144,7 +151,7 @@ public class SearchViewModel extends ViewModel {
                 }
             })
             .addOnFailureListener(err -> {
-                postClearOnFirstSearch();
+                postClearOnFirstSearch(search_id);
                 error.postValue(err.getMessage());
                 if (responses.incrementAndGet() == LOCATIONS) {
                     loading.postValue(false);
@@ -154,7 +161,7 @@ public class SearchViewModel extends ViewModel {
         repository.searchPlaylist(USER_ID, query).get()
             .addOnSuccessListener(snaps -> {
                 if (snaps.size() > 0) {
-                    List<SearchResult> databaseResults = postClearOnFirstSearch()
+                    List<SearchResult> databaseResults = postClearOnFirstSearch(search_id)
                         ? new ArrayList<>()
                         : this.databaseResults.getValue();
                     databaseResults.addAll(
@@ -171,7 +178,7 @@ public class SearchViewModel extends ViewModel {
                 }
             })
             .addOnFailureListener(err -> {
-                postClearOnFirstSearch();
+                postClearOnFirstSearch(search_id);
                 error.postValue(err.getMessage());
                 if (responses.incrementAndGet() == LOCATIONS) {
                     loading.postValue(false);

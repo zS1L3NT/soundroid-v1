@@ -2,7 +2,7 @@ package com.zectan.soundroid.sockets;
 
 import android.util.Log;
 
-import com.zectan.soundroid.objects.Song;
+import com.zectan.soundroid.models.Song;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;

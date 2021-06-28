@@ -27,11 +27,11 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.QueueAdapter;
-import com.zectan.soundroid.anonymous.Animations;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlayingBinding;
-import com.zectan.soundroid.objects.Playlist;
-import com.zectan.soundroid.objects.Song;
+import com.zectan.soundroid.models.Playlist;
+import com.zectan.soundroid.models.Song;
+import com.zectan.soundroid.utils.Animations;
 
 import org.jetbrains.annotations.NotNull;
 

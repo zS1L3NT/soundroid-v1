@@ -1,4 +1,4 @@
-package com.zectan.soundroid.anonymous;
+package com.zectan.soundroid.utils;
 
 import android.view.View;
 import android.view.ViewGroup;

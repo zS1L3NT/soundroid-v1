@@ -15,12 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.HomeAdapter;
-import com.zectan.soundroid.anonymous.Anonymous;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentHomeBinding;
-import com.zectan.soundroid.objects.Info;
-import com.zectan.soundroid.objects.Playlist;
-import com.zectan.soundroid.objects.Song;
+import com.zectan.soundroid.models.Info;
+import com.zectan.soundroid.models.Playlist;
+import com.zectan.soundroid.models.Song;
+import com.zectan.soundroid.utils.Anonymous;
 
 import org.jetbrains.annotations.NotNull;
 

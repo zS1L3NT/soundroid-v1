@@ -1,6 +1,6 @@
-package com.zectan.soundroid.anonymous;
+package com.zectan.soundroid.utils;
 
-import com.zectan.soundroid.objects.Song;
+import com.zectan.soundroid.models.Song;
 
 import java.util.ArrayList;
 import java.util.List;

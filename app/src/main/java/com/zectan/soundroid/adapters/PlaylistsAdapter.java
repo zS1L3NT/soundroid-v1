@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
-import com.zectan.soundroid.anonymous.MenuItemsBuilder;
 import com.zectan.soundroid.databinding.PlaylistListItemBinding;
-import com.zectan.soundroid.objects.Info;
+import com.zectan.soundroid.models.Info;
+import com.zectan.soundroid.utils.MenuItemsBuilder;
 
 import org.jetbrains.annotations.NotNull;
 

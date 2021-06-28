@@ -17,7 +17,6 @@ import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.viewmodels.HomeViewModel;
 import com.zectan.soundroid.viewmodels.MainViewModel;
-import com.zectan.soundroid.viewmodels.OptionsMenuViewModel;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistsViewModel;
@@ -33,7 +32,6 @@ public class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragm
 
     protected MainViewModel mainVM;
     protected HomeViewModel homeVM;
-    protected OptionsMenuViewModel optionsMenuVM;
     protected PlayingViewModel playingVM;
     protected PlaylistsViewModel playlistsVM;
     protected PlaylistViewViewModel playlistViewVM;
@@ -53,7 +51,6 @@ public class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragm
 
         mainVM = new ViewModelProvider(activity).get(MainViewModel.class);
         homeVM = new ViewModelProvider(activity).get(HomeViewModel.class);
-        optionsMenuVM = new ViewModelProvider(activity).get(OptionsMenuViewModel.class);
         playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
         playlistsVM = new ViewModelProvider(activity).get(PlaylistsViewModel.class);
         playlistViewVM = new ViewModelProvider(activity).get(PlaylistViewViewModel.class);

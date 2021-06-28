@@ -1,4 +1,4 @@
-package com.zectan.soundroid.objects;
+package com.zectan.soundroid.models;
 
 import org.jetbrains.annotations.NotNull;
 

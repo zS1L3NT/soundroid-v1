@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.zectan.soundroid.classes.Socket;
-import com.zectan.soundroid.objects.SearchResult;
+import com.zectan.soundroid.models.SearchResult;
 
 import org.json.JSONArray;
 import org.json.JSONException;

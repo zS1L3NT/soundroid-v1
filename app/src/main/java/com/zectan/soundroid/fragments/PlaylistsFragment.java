@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.zectan.soundroid.adapters.PlaylistsAdapter;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlaylistsBinding;
-import com.zectan.soundroid.objects.Info;
+import com.zectan.soundroid.models.Info;
 
 import org.jetbrains.annotations.NotNull;
 

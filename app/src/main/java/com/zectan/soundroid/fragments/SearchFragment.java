@@ -19,10 +19,10 @@ import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.SearchAdapter;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentSearchBinding;
-import com.zectan.soundroid.objects.Info;
-import com.zectan.soundroid.objects.Playlist;
-import com.zectan.soundroid.objects.SearchResult;
-import com.zectan.soundroid.objects.Song;
+import com.zectan.soundroid.models.Info;
+import com.zectan.soundroid.models.Playlist;
+import com.zectan.soundroid.models.SearchResult;
+import com.zectan.soundroid.models.Song;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

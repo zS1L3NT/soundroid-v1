@@ -11,11 +11,11 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.zectan.soundroid.adapters.QueueAdapter;
-import com.zectan.soundroid.anonymous.CustomPlaybackOrder;
-import com.zectan.soundroid.anonymous.ListArrayHandler;
 import com.zectan.soundroid.classes.StrictLiveData;
-import com.zectan.soundroid.objects.Playlist;
-import com.zectan.soundroid.objects.Song;
+import com.zectan.soundroid.models.Playlist;
+import com.zectan.soundroid.models.Song;
+import com.zectan.soundroid.utils.CustomPlaybackOrder;
+import com.zectan.soundroid.utils.ListArrayHandler;
 
 import org.jetbrains.annotations.NotNull;
 

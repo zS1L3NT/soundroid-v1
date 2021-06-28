@@ -11,7 +11,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.QueueListItemBinding;
-import com.zectan.soundroid.objects.Song;
+import com.zectan.soundroid.models.Song;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

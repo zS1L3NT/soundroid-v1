@@ -1,6 +1,6 @@
-package com.zectan.soundroid.objects;
+package com.zectan.soundroid.models;
 
-import com.zectan.soundroid.anonymous.ListArrayHandler;
+import com.zectan.soundroid.utils.ListArrayHandler;
 
 import org.jetbrains.annotations.NotNull;
 
