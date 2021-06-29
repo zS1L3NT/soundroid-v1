@@ -65,7 +65,7 @@ public class QueueAdapter extends DragDropSwipeAdapter<Song, QueueViewHolder> {
     @Override
     protected void onSwipeStarted(Song song, @NotNull QueueViewHolder holder) {
         super.onSwipeStarted(song, holder);
-        startSwipeId = song.getId();
+        startSwipeId = song.getSongId();
         startSwipeDataSetSize = getItemCount();
     }
 

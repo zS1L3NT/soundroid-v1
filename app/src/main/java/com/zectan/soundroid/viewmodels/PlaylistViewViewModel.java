@@ -1,8 +1,15 @@
 package com.zectan.soundroid.viewmodels;
 
+import android.content.Context;
+
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.zectan.soundroid.FirebaseRepository;
+import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.classes.StrictLiveData;
+import com.zectan.soundroid.connection.PlaylistSongsRequest;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Song;
 
@@ -10,11 +17,54 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistViewViewModel extends ViewModel {
-    public final StrictLiveData<Info> info = new StrictLiveData<>(Info.getEmpty());
+    private final FirebaseRepository repository = new FirebaseRepository();
+    public final MutableLiveData<Info> info = new MutableLiveData<>();
     public final StrictLiveData<List<Song>> songs = new StrictLiveData<>(new ArrayList<>());
-    public boolean loading = false, firebase = true;
+    public final StrictLiveData<Boolean> loading = new StrictLiveData<>(false);
+    private boolean watching = false;
 
     public PlaylistViewViewModel() {
         // Required empty public constructor
+    }
+
+    public void watch(MainActivity activity) {
+        if (watching) return;
+        watching = true;
+        info.observe(activity, __ -> reload(activity::handleError, activity));
+    }
+
+    public void reload(OnFailureListener onFailureListener, Context context) {
+        if (loading.getValue()) return;
+        loading.postValue(true);
+        Info info = this.info.getValue();
+        if (info == null) return;
+        repository
+            .playlistSongs(info.getId())
+            .get()
+            .addOnSuccessListener(snaps -> {
+                if (!snaps.isEmpty()) {
+                    songs.postValue(snaps.toObjects(Song.class));
+                    loading.postValue(false);
+                } else {
+                    fetchServer(onFailureListener, info, context);
+                }
+            })
+            .addOnFailureListener(__ -> fetchServer(onFailureListener, info, context));
+    }
+
+    private void fetchServer(OnFailureListener onFailureListener, Info info, Context context) {
+        new PlaylistSongsRequest(info.getId(), new PlaylistSongsRequest.Callback() {
+            @Override
+            public void onComplete(List<Song> songs) {
+                loading.postValue(false);
+                PlaylistViewViewModel.this.songs.postValue(songs);
+            }
+
+            @Override
+            public void onError(String message) {
+                onFailureListener.onFailure(new Exception(message));
+                loading.postValue(false);
+            }
+        });
     }
 }

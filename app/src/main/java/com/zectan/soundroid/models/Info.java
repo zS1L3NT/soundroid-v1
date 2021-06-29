@@ -1,10 +1,12 @@
 package com.zectan.soundroid.models;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class Info {
@@ -12,8 +14,9 @@ public class Info {
     private String name;
     private String cover;
     private String colorHex;
+    private String userId;
     private List<String> order;
-    private Map<String, Boolean> owners;
+    private List<String> queries;
 
     public Info() {
     }
@@ -24,56 +27,63 @@ public class Info {
         this.order = order;
     }
 
-    public Info(String id, String name, String cover, String colorHex, List<String> order) {
+    public Info(String id, String name, String cover, String colorHex, String userId, List<String> order, List<String> queries) {
         this.id = id;
         this.name = name;
         this.cover = cover;
         this.colorHex = colorHex;
+        this.userId = userId;
         this.order = order;
-    }
-
-    public static Info getEmpty() {
-        return new Info("", "", new ArrayList<>());
+        this.queries = queries;
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getCover() {
         return cover;
     }
 
-    public void setCover(String cover) {
-        this.cover = cover;
-    }
-
     public String getColorHex() {
         return colorHex;
+    }
+
+    public static Info getEmpty() {
+        return new Info("", "", new ArrayList<>());
     }
 
     public List<String> getOrder() {
         return order;
     }
 
-    public void setOrder(List<String> order) {
-        this.order = order;
+    public static Info fromJSON(JSONObject object) throws JSONException {
+        String id = object.getString("id");
+        String name = object.getString("name");
+        String cover = object.getString("cover");
+        String colorHex = object.getString("colorHex");
+        String userId = object.getString("userId");
+        JSONArray orderArray = object.getJSONArray("order");
+        JSONArray queriesArray = object.getJSONArray("queries");
+        List<String> order = new ArrayList<>();
+        List<String> queries = new ArrayList<>();
+        for (int i = 0; i < orderArray.length(); i++)
+            order.add(orderArray.getString(i));
+        for (int i = 0; i < queriesArray.length(); i++)
+            queries.add(queriesArray.getString(i));
+        return new Info(id, name, cover, colorHex, userId, order, queries);
     }
 
-    public Map<String, Boolean> getOwners() {
-        return owners;
+    public String getUserId() {
+        return userId;
+    }
+
+    public List<String> getQueries() {
+        return queries;
     }
 
     @Override

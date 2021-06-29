@@ -5,7 +5,6 @@ import android.content.Context;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class SearchResult {
@@ -18,20 +17,9 @@ public class SearchResult {
         mLocation = "Server";
 
         if (type.equals("Song")) {
-            String id = object.getString("id");
-            String title = object.getString("title");
-            String artiste = object.getString("artiste");
-            String cover = object.getString("cover");
-            String colorHex = object.getString("colorHex");
-
-            mSong = new Song(id, title, artiste, cover, colorHex).setDirectoryWith(context);
+            mSong = Song.fromJSON(object);
         } else if (type.equals("Playlist")) {
-            String id = object.getString("id");
-            String name = object.getString("name");
-            String cover = object.getString("cover");
-            String colorHex = object.getString("colorHex");
-
-            mInfo = new Info(id, name, cover, colorHex, new ArrayList<>());
+            mInfo = Info.fromJSON(object);
         } else {
             throw new RuntimeException(String.format("Undefined data type: %s", type));
         }
@@ -39,7 +27,7 @@ public class SearchResult {
 
     public SearchResult(Song song, Context context) {
         mLocation = "Local";
-        mSong = song.setDirectoryWith(context);
+        mSong = song;
     }
 
     public SearchResult(Info info) {
@@ -60,7 +48,7 @@ public class SearchResult {
     }
 
     public String getId() {
-        if (mSong != null) return mSong.getId();
+        if (mSong != null) return mSong.getSongId();
         if (mInfo != null) return mInfo.getId();
         throw new RuntimeException("Undefined data type");
     }

@@ -38,12 +38,12 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
 
         @Override
         public void onSongClicked(Song song) {
-            Info info = new Info(song.getId(), "Search Result", Collections.singletonList(song.getId()));
+            Info info = new Info(song.getSongId(), "Search Result", Collections.singletonList(song.getSongId()));
             Playlist playlist = new Playlist(info, Collections.singletonList(song));
 
             NavDirections action = SearchFragmentDirections.openSearchSong();
             navController.navigate(action);
-            playingVM.startPlaylist(playlist, song.getId());
+            playingVM.startPlaylist(playlist, song.getSongId());
             activity.hideKeyboard(SearchFragment.this.requireView());
         }
 
@@ -54,12 +54,11 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
 
             NavDirections action = SearchFragmentDirections.openPlaylistView();
             navController.navigate(action);
-            playlistViewVM.firebase = false;
         }
 
         @Override
         public boolean onMenuItemClicked(SearchResult result, MenuItem item) {
-            return false;
+            return activity.handleMenuItemClick(result.getPlaylistInfo(), result.getSong(), item);
         }
     };
     private SearchAdapter searchAdapter;

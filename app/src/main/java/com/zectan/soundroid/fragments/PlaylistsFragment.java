@@ -19,25 +19,22 @@ import com.zectan.soundroid.models.Info;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
     private static final String TAG = "(SounDroid) PlayingFragment";
-    private static final String USER_ID = "admin";
 
     private final PlaylistsAdapter.Callback callback = new PlaylistsAdapter.Callback() {
         @Override
         public void onPlaylistClicked(Info info) {
-            NavDirections action = PlaylistsFragmentDirections.openPlaylistView();
-            NavHostFragment.findNavController(PlaylistsFragment.this).navigate(action);
             playlistViewVM.info.setValue(info);
             playlistViewVM.songs.setValue(new ArrayList<>());
-            playlistViewVM.firebase = true;
+            NavDirections action = PlaylistsFragmentDirections.openPlaylistView();
+            NavHostFragment.findNavController(PlaylistsFragment.this).navigate(action);
         }
 
         @Override
         public boolean onMenuItemClicked(Info info, MenuItem item) {
-            return false;
+            return activity.handleMenuItemClick(info, null, item);
         }
     };
 
@@ -51,31 +48,18 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
         PlaylistsAdapter playlistsAdapter = new PlaylistsAdapter(callback);
         B.recyclerView.setAdapter(playlistsAdapter);
         B.recyclerView.setLayoutManager(layoutManager);
-        B.recyclerView.setHasFixedSize(true);
 
         // Observers
         playlistsVM.infos.observe(activity, playlistsAdapter::updateInfos);
+        playlistsVM.loading.observe(activity, B.swipeRefresh::setRefreshing);
 
-        B.swipeRefresh.setOnRefreshListener(this::loadFromFirebase);
-        if (playlistsVM.infos.getValue() == null) loadFromFirebase();
+        B.headerAddImage.setOnClickListener(this::createPlaylist);
+        B.swipeRefresh.setOnRefreshListener(() -> playlistsVM.reload(activity::handleError));
 
         return B.getRoot();
     }
 
-    private void loadFromFirebase() {
-        if (playlistsVM.requested) return;
-        B.swipeRefresh.setRefreshing(true);
-        playlistsVM.requested = true;
-
-        repository
-            .playlists(USER_ID)
-            .get()
-            .addOnSuccessListener(snaps -> {
-                List<Info> infos = snaps.toObjects(Info.class);
-                playlistsVM.infos.setValue(infos);
-                B.swipeRefresh.setRefreshing(false);
-                playlistsVM.requested = false;
-            })
-            .addOnFailureListener(mainVM.error::postValue);
+    private void createPlaylist(View view) {
+        // TODO Implement method
     }
 }

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -14,7 +15,6 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.SongListItemBinding;
 import com.zectan.soundroid.models.Song;
-import com.zectan.soundroid.utils.ListArrayHandler;
 import com.zectan.soundroid.utils.MenuItemsBuilder;
 
 import org.jetbrains.annotations.NotNull;
@@ -42,10 +42,11 @@ public class PlaylistViewAdapter extends RecyclerView.Adapter<PlaylistViewViewHo
         return new PlaylistViewViewHolder(itemView, mCallback);
     }
 
-    public void updateSongs(List<Song> songs, List<String> order) {
+    public void updateSongs(List<Song> songs) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new PlaylistViewDiffCallback(mSongs, songs));
+        diffResult.dispatchUpdatesTo(this);
         mSongs.clear();
-        mSongs.addAll(ListArrayHandler.sortSongs(songs, order));
-        notifyDataSetChanged();
+        mSongs.addAll(songs);
     }
 
     @Override
@@ -77,7 +78,7 @@ class PlaylistViewViewHolder extends RecyclerView.ViewHolder {
         Song song = songs.get(position);
         Context context = B.parent.getContext();
 
-        String id = song.getId();
+        String id = song.getSongId();
         String title = song.getTitle();
         String artiste = song.getArtiste();
         String cover = song.getCover();
@@ -94,7 +95,42 @@ class PlaylistViewViewHolder extends RecyclerView.ViewHolder {
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
-        B.songClickable.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, id));
+        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, id));
         B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.song_menu_playlist, song, mCallback));
     }
+}
+
+class PlaylistViewDiffCallback extends DiffUtil.Callback {
+
+    private final List<Song> oldSongs, newSongs;
+
+    public PlaylistViewDiffCallback(List<Song> oldSongs, List<Song> newSongs) {
+        this.oldSongs = oldSongs;
+        this.newSongs = newSongs;
+    }
+
+    @Override
+    public int getOldListSize() {
+        return oldSongs.size();
+    }
+
+    @Override
+    public int getNewListSize() {
+        return newSongs.size();
+    }
+
+    @Override
+    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+        Song oldSong = oldSongs.get(oldItemPosition);
+        Song newSong = newSongs.get(newItemPosition);
+        return oldSong.getSongId().equals(newSong.getSongId());
+    }
+
+    @Override
+    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+        Song oldSong = oldSongs.get(oldItemPosition);
+        Song newSong = newSongs.get(newItemPosition);
+        return oldSong.equals(newSong);
+    }
+
 }

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -22,6 +23,7 @@ import com.zectan.soundroid.utils.MenuItemsBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @SuppressLint("UseCompatLoadingForDrawables")
 public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
@@ -45,8 +47,9 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
     }
 
     public void updatePlaylist(Playlist playlist) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new HomeDiffCallback(mPlaylist, playlist));
+        diffResult.dispatchUpdatesTo(this);
         mPlaylist = playlist;
-        notifyDataSetChanged();
     }
 
     public void onBindViewHolder(@NonNull HomeViewHolder holder, int position) {
@@ -78,7 +81,7 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
         Song song = playlist.getSong(position);
         Context context = B.parent.getContext();
 
-        String id = song.getId();
+        String id = song.getSongId();
         String title = song.getTitle();
         String artiste = song.getArtiste();
         String cover = song.getCover();
@@ -95,7 +98,41 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
-        B.songClickable.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, playlist, id));
+        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, playlist, id));
         B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.song_menu_home, song, mCallback));
+    }
+}
+
+class HomeDiffCallback extends DiffUtil.Callback {
+
+    private final List<Song> oldSongs, newSongs;
+
+    public HomeDiffCallback(Playlist oldPlaylist, Playlist newPlaylist) {
+        this.oldSongs = oldPlaylist.getSongs();
+        this.newSongs = newPlaylist.getSongs();
+    }
+
+    @Override
+    public int getOldListSize() {
+        return oldSongs.size();
+    }
+
+    @Override
+    public int getNewListSize() {
+        return newSongs.size();
+    }
+
+    @Override
+    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+        Song oldSong = oldSongs.get(oldItemPosition);
+        Song newSong = newSongs.get(newItemPosition);
+        return oldSong.getSongId().equals(newSong.getSongId());
+    }
+
+    @Override
+    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+        Song oldSong = oldSongs.get(oldItemPosition);
+        Song newSong = newSongs.get(newItemPosition);
+        return oldSong.equals(newSong);
     }
 }

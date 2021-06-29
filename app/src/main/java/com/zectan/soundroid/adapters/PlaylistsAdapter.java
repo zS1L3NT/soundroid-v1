@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -40,9 +41,10 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistViewHolder> {
     }
 
     public void updateInfos(List<Info> infos) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new PlaylistsDiffCallback(mInfos, infos));
+        diffResult.dispatchUpdatesTo(this);
         mInfos.clear();
         mInfos.addAll(infos);
-        notifyDataSetChanged();
     }
 
     @Override
@@ -88,8 +90,42 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
-        B.playlistClickable.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
+        B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
         B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.playlist_menu_playlists, info, mCallback));
     }
 
+}
+
+class PlaylistsDiffCallback extends DiffUtil.Callback {
+
+    private final List<Info> oldInfos, newInfos;
+
+    public PlaylistsDiffCallback(List<Info> oldInfos, List<Info> newInfos) {
+        this.oldInfos = oldInfos;
+        this.newInfos = newInfos;
+    }
+
+    @Override
+    public int getOldListSize() {
+        return oldInfos.size();
+    }
+
+    @Override
+    public int getNewListSize() {
+        return newInfos.size();
+    }
+
+    @Override
+    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+        Info oldInfo = oldInfos.get(oldItemPosition);
+        Info newInfo = newInfos.get(newItemPosition);
+        return oldInfo.getId().equals(newInfo.getId());
+    }
+
+    @Override
+    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+        Info oldInfo = oldInfos.get(oldItemPosition);
+        Info newInfo = newInfos.get(newItemPosition);
+        return oldInfo.equals(newInfo);
+    }
 }

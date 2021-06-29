@@ -75,6 +75,10 @@
                 app:framePosition="75"
                 app:motionTarget="@id/cover_image"
                 app:sizePercent="1" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="50"
+                app:motionTarget="@id/cover_image" />
         </KeyFrameSet>
     </Transition>
 </MotionScene>

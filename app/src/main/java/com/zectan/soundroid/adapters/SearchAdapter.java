@@ -38,23 +38,15 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     @NotNull
     @Override
     public SearchViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-//        if (viewType == FOOTER_VIEW) {
-//            View itemView = LayoutInflater
-//                .from(parent.getContext())
-//                .inflate(R.layout.footer_search, parent, false);
-//
-//            return new SearchViewHolder(itemView);
-//        } else {
         View itemView = LayoutInflater
             .from(parent.getContext())
             .inflate(R.layout.song_list_item, parent, false);
 
         return new SearchViewHolder(itemView, mCallback);
-//        }
     }
 
     public void updateResults(List<SearchResult> results) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(mResults, results));
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SearchDiffCallback(mResults, results));
         diffResult.dispatchUpdatesTo(this);
         mResults.clear();
         mResults.addAll(results);
@@ -70,14 +62,6 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
         return mResults.size();
     }
 
-//    @Override
-//    public int getItemViewType(int position) {
-//        if (mResults.get(position).getId().equals("")) {
-//            return FOOTER_VIEW;
-//        }
-//        return super.getItemViewType(position);
-//    }
-
     public interface Callback extends MenuItemsBuilder.MenuItemCallback<SearchResult> {
         void onSongClicked(Song song);
 
@@ -87,17 +71,13 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
 }
 
 class SearchViewHolder extends RecyclerView.ViewHolder {
-    private SongListItemBinding B;
-    private SearchAdapter.Callback mCallback;
+    private final SongListItemBinding B;
+    private final SearchAdapter.Callback mCallback;
 
     public SearchViewHolder(@NonNull @NotNull View itemView, SearchAdapter.Callback callback) {
         super(itemView);
         B = SongListItemBinding.bind(itemView);
         mCallback = callback;
-    }
-
-    public SearchViewHolder(@NonNull @NotNull View itemView) {
-        super(itemView);
     }
 
     public void bind(List<SearchResult> results, int position) {
@@ -108,7 +88,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
 
         if (result.getSong() != null) {
             Song song = result.getSong();
-            String id = song.getId();
+            String id = song.getSongId();
             String title = song.getTitle();
             String artiste = song.getArtiste();
             String cover = song.getCover();
@@ -125,7 +105,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
                 .transition(new DrawableTransitionOptions().crossFade())
                 .centerCrop()
                 .into(B.coverImage);
-            B.songClickable.setOnClickListener(__ -> mCallback.onSongClicked(song));
+            B.parent.setOnClickListener(__ -> mCallback.onSongClicked(song));
             B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(
                 v,
                 R.menu.song_menu_search,
@@ -149,7 +129,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
                 .error(R.drawable.playing_cover_default)
                 .centerCrop()
                 .into(B.coverImage);
-            B.songClickable.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
+            B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
             B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(
                 v,
                 R.menu.playlist_menu_search,
@@ -160,11 +140,11 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
     }
 }
 
-class DiffCallback extends DiffUtil.Callback {
+class SearchDiffCallback extends DiffUtil.Callback {
 
     private final List<SearchResult> oldResults, newResults;
 
-    public DiffCallback(List<SearchResult> oldResults, List<SearchResult> newResults) {
+    public SearchDiffCallback(List<SearchResult> oldResults, List<SearchResult> newResults) {
         this.oldResults = oldResults;
         this.newResults = newResults;
     }

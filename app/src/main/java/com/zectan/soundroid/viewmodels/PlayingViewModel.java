@@ -15,7 +15,7 @@ import com.zectan.soundroid.classes.StrictLiveData;
 import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.utils.CustomPlaybackOrder;
-import com.zectan.soundroid.utils.ListArrayHandler;
+import com.zectan.soundroid.utils.ListArrayUtils;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -90,7 +90,7 @@ public class PlayingViewModel extends ViewModel {
         mPlayer.stop();
         mPlayer.clearMediaItems();
 
-        List<Integer> sequence = ListArrayHandler.createOrder(playlist.size(), playlist.getIndexOfSong(songId));
+        List<Integer> sequence = ListArrayUtils.createOrder(playlist.size(), playlist.getIndexOfSong(songId));
         for (int i = 0; i < playlist.size(); i++) {
             Song song = playlist.getSong(sequence.get(i));
             mPlayer.addMediaItem(i, song.getMediaItem());
@@ -112,7 +112,7 @@ public class PlayingViewModel extends ViewModel {
      */
     public List<Song> getItemsInQueue() {
         if (mPlayer.getCurrentMediaItem() == null) return new ArrayList<>();
-        return ListArrayHandler.formatQueue(
+        return ListArrayUtils.formatQueue(
             queue.getValue().getSongs(),
             mOrder.getOrder(),
             queue.getValue().getIndexOfSong(mPlayer.getCurrentMediaItem().mediaId),
@@ -229,6 +229,10 @@ public class PlayingViewModel extends ViewModel {
         mPlayer.removeMediaItem(position);
         mOrder = mOrder.cloneAndRemove(position, position + 1);
         mPlayer.setShuffleOrder(mOrder);
+    }
+
+    public void addToQueue(Song song) {
+
     }
 
 }

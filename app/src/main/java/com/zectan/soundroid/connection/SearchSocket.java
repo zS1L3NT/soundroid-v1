@@ -1,4 +1,4 @@
-package com.zectan.soundroid.sockets;
+package com.zectan.soundroid.connection;
 
 import android.content.Context;
 import android.util.Log;

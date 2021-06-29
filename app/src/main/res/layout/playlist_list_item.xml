@@ -4,17 +4,12 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="90dp"
-    android:layout_marginStart="5dp"
-    android:layout_marginTop="5dp"
-    android:layout_marginEnd="5dp"
-    android:background="@drawable/playlist_background"
+    android:background="?android:attr/selectableItemBackground"
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/playlist_clickable"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:background="?attr/selectableItemBackground"
         app:layout_constraintEnd_toStartOf="@+id/menu_clickable"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -72,6 +67,7 @@
         android:layout_width="32dp"
         android:layout_height="match_parent"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:elevation="1dp"
         android:gravity="center"
         android:text="@string/menu_special_string"
         android:textSize="20sp"

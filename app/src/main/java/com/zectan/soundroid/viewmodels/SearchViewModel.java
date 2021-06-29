@@ -8,10 +8,10 @@ import androidx.lifecycle.ViewModel;
 import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.classes.StrictLiveData;
+import com.zectan.soundroid.connection.SearchSocket;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.SearchResult;
 import com.zectan.soundroid.models.Song;
-import com.zectan.soundroid.sockets.SearchSocket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 public class SearchViewModel extends ViewModel {
     private static final String TAG = "(SounDroid) SearchViewModel";
-    private static final String USER_ID = "admin";
     private static final int LOCATIONS = 3;
     private final FirebaseRepository repository = new FirebaseRepository();
     private final StrictLiveData<List<SearchResult>> serverResults = new StrictLiveData<>(new ArrayList<>());
@@ -41,7 +40,7 @@ public class SearchViewModel extends ViewModel {
      *
      * @param activity MainActivity
      */
-    public void watchResults(MainActivity activity) {
+    public void watch(MainActivity activity) {
         serverResults.observe(activity, serverResults -> {
             List<SearchResult> databaseResults = this.databaseResults.getValue();
             List<SearchResult> results = new ArrayList<>();
@@ -130,7 +129,8 @@ public class SearchViewModel extends ViewModel {
             }
         });
 
-        repository.searchSong(USER_ID, query).get()
+        repository
+            .searchSong(FirebaseRepository.USER_ID, query).get()
             .addOnSuccessListener(snaps -> {
                 if (snaps.size() > 0) {
                     List<SearchResult> databaseResults = postClearOnFirstSearch(search_id)
@@ -140,7 +140,6 @@ public class SearchViewModel extends ViewModel {
                         snaps
                             .toObjects(Song.class)
                             .stream()
-                            .map(song -> song.setDirectoryWith(context))
                             .map(song -> new SearchResult(song, context))
                             .collect(Collectors.toList())
                     );
@@ -158,7 +157,7 @@ public class SearchViewModel extends ViewModel {
                 }
             });
 
-        repository.searchPlaylist(USER_ID, query).get()
+        repository.searchPlaylist(FirebaseRepository.USER_ID, query).get()
             .addOnSuccessListener(snaps -> {
                 if (snaps.size() > 0) {
                     List<SearchResult> databaseResults = postClearOnFirstSearch(search_id)

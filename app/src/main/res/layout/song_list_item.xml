@@ -3,13 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/parent"
     android:layout_width="match_parent"
-    android:layout_height="65dp">
+    android:layout_height="65dp"
+    android:background="?android:attr/selectableItemBackground">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/song_clickable"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:background="?android:attr/selectableItemBackground"
         android:orientation="horizontal"
         app:layout_constraintEnd_toStartOf="@id/menu_clickable"
         app:layout_constraintStart_toStartOf="parent">
@@ -66,6 +65,7 @@
         android:layout_width="28dp"
         android:layout_height="0dp"
         android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:elevation="1dp"
         android:gravity="center"
         android:text="@string/menu_special_string"
         android:textSize="20sp"

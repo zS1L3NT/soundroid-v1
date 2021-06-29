@@ -2,11 +2,13 @@ package com.zectan.soundroid.utils;
 
 import com.zectan.soundroid.models.Song;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ListArrayHandler {
+public class ListArrayUtils {
     /**
      * Creates a list order starting
      *
@@ -47,7 +49,7 @@ public class ListArrayHandler {
     public static List<Song> sortSongs(List<Song> songs, List<String> order) {
         return songs
             .stream()
-            .sorted((song1, song2) -> order.indexOf(song1.getId()) - order.indexOf(song2.getId()))
+            .sorted((song1, song2) -> order.indexOf(song1.getSongId()) - order.indexOf(song2.getSongId()))
             .collect(Collectors.toList());
     }
 
@@ -104,5 +106,10 @@ public class ListArrayHandler {
             array[i] = list.get(i);
         }
         return array;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T[] toArray(Class<T> c, Collection<T> collection) {
+        return collection.toArray((T[]) Array.newInstance(c, collection.size()));
     }
 }

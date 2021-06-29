@@ -26,8 +26,8 @@ import com.zectan.soundroid.databinding.FragmentPlaylistViewBinding;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.models.Song;
-import com.zectan.soundroid.sockets.PlaylistLookupSocket;
 import com.zectan.soundroid.utils.Anonymous;
+import com.zectan.soundroid.utils.ListArrayUtils;
 import com.zectan.soundroid.utils.MenuItemsBuilder;
 
 import org.jetbrains.annotations.NotNull;
@@ -43,13 +43,15 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             NavDirections action = PlaylistViewFragmentDirections.openPlaylistSong().setTransitionName(transitionName);
             NavHostFragment.findNavController(PlaylistViewFragment.this).navigate(action, extras);
 
-            Playlist playlist = new Playlist(playlistViewVM.info.getValue(), playlistViewVM.songs.getValue());
+            Info info = playlistViewVM.info.getValue();
+            assert info != null;
+            Playlist playlist = new Playlist(info, playlistViewVM.songs.getValue());
             playingVM.startPlaylist(playlist, songId);
         }
 
         @Override
         public boolean onMenuItemClicked(Song song, MenuItem item) {
-            return true;
+            return activity.handleMenuItemClick(playlistViewVM.info.getValue(), song, item);
         }
     };
     private PlaylistViewAdapter playlistViewAdapter;
@@ -64,11 +66,11 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         playlistViewAdapter = new PlaylistViewAdapter(callback);
         B.recyclerView.setAdapter(playlistViewAdapter);
         B.recyclerView.setLayoutManager(layoutManager);
-        B.recyclerView.setHasFixedSize(true);
 
         // Live Observers
         playlistViewVM.info.observe(activity, this::onInfoChange);
         playlistViewVM.songs.observe(activity, this::onSongsChange);
+        playlistViewVM.loading.observe(activity, B.swipeRefresh::setRefreshing);
         B.backImage.setOnClickListener(__ -> activity.onBackPressed());
         B.moreImage.setOnClickListener(v -> MenuItemsBuilder.createMenu(
             v,
@@ -76,17 +78,15 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             playlistViewVM.info.getValue(),
             (info, item) -> true
         ));
-
-        B.swipeRefresh.setOnRefreshListener(this::loadPlaylistData);
-        loadPlaylistData();
+        B.swipeRefresh.setOnRefreshListener(() -> playlistViewVM.reload(activity::handleError, activity));
 
         return B.getRoot();
     }
 
     private void onSongsChange(List<Song> songs) {
         Info info = playlistViewVM.info.getValue();
-
-        playlistViewAdapter.updateSongs(songs, info.getOrder());
+        if (info == null) return;
+        playlistViewAdapter.updateSongs(ListArrayUtils.sortSongs(songs, info.getOrder()));
     }
 
     private void onInfoChange(Info info) {
@@ -94,7 +94,10 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         Glide
             .with(activity)
             .load(info.getCover())
-            .transition(DrawableTransitionOptions.withCrossFade())
+            .placeholder(R.drawable.playing_cover_default)
+            .error(R.drawable.playing_cover_default)
+            .transition(new DrawableTransitionOptions().crossFade())
+            .centerCrop()
             .into(B.coverImage);
 
         Drawable oldGD = B.background.getBackground();
@@ -105,63 +108,5 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         TransitionDrawable transition = new TransitionDrawable(layers);
         B.background.setBackground(transition);
         transition.startTransition(1000);
-    }
-
-    private void loadPlaylistData() {
-        if (playlistViewVM.loading) return;
-        B.swipeRefresh.setRefreshing(true);
-        playlistViewVM.loading = true;
-
-        Info info = playlistViewVM.info.getValue();
-
-        if (playlistViewVM.firebase) {
-            repository
-                .playlist(info.getId())
-                .get()
-                .addOnSuccessListener(snap -> {
-                    Info newInfo = snap.toObject(Info.class);
-                    assert newInfo != null;
-                    playlistViewVM.info.setValue(newInfo);
-
-                    repository
-                        .playlistSongs(info.getId())
-                        .get()
-                        .addOnSuccessListener(snaps -> {
-                            List<Song> songs = snaps.toObjects(Song.class);
-                            songs.sort((a, b) -> a.getTitle().compareTo(b.getTitle()));
-                            songs.forEach(song -> song.setDirectoryWith(activity));
-                            playlistViewVM.songs.setValue(songs);
-                            B.swipeRefresh.setRefreshing(false);
-                            playlistViewVM.loading = false;
-                        })
-                        .addOnFailureListener(mainVM.error::postValue);
-
-                })
-                .addOnFailureListener(mainVM.error::postValue);
-        } else {
-            new PlaylistLookupSocket(info, getContext(), new PlaylistLookupSocket.Callback() {
-                @Override
-                public void onFinish(Playlist playlist) {
-                    playlistViewVM.songs.postValue(playlist.getSongs());
-                    B.swipeRefresh.setRefreshing(false);
-                    playlistViewVM.loading = false;
-                }
-
-                @Override
-                public void onSong(Song song) {
-
-                }
-
-                @Override
-                public void onError(String message) {
-                    mainVM.error.postValue(new Exception(message));
-                }
-
-                @Override
-                public boolean isInactive() {
-                    return false;
-                }
-            });
-        }
     }
 }

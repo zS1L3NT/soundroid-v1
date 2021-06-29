@@ -67,7 +67,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/cover_image"
         android:layout_width="180dp"
         android:layout_height="180dp"
@@ -76,7 +76,8 @@
         android:src="@drawable/playing_cover_default"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/back_image" />
+        app:layout_constraintTop_toBottomOf="@+id/back_image"
+        app:shapeAppearanceOverlay="@style/shapeableImageViewStyle" />
 
     <TextView
         android:id="@+id/name_text"

@@ -45,7 +45,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         public void onSongSelected(Song song) {
             Playlist queue = playingVM.queue.getValue();
 
-            playingVM.selectSong(queue, song.getId());
+            playingVM.selectSong(queue, song.getSongId());
         }
 
         @Override

@@ -53,7 +53,7 @@ public class CustomPlaybackOrder implements ShuffleOrder {
     }
 
     private static int[] createUnshuffledList(int length) {
-        return ListArrayHandler.toIntArray(ListArrayHandler.createOrder(length, 0));
+        return ListArrayUtils.toIntArray(ListArrayUtils.createOrder(length, 0));
     }
 
     public int[] getOrder() {
@@ -132,10 +132,10 @@ public class CustomPlaybackOrder implements ShuffleOrder {
     }
 
     public CustomPlaybackOrder closeAndMove(int oldPosition, int newPosition) {
-        List<Integer> list = ListArrayHandler.toListInteger(order);
+        List<Integer> list = ListArrayUtils.toListInteger(order);
         int item = list.remove(oldPosition);
         list.add(newPosition, item);
-        return new CustomPlaybackOrder(ListArrayHandler.toIntArray(list), new Random(random.nextLong()));
+        return new CustomPlaybackOrder(ListArrayUtils.toIntArray(list), new Random(random.nextLong()));
     }
 
     @Override

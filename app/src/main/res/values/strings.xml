@@ -42,4 +42,5 @@
     <string name="delete_playlist">Delete Playlist</string>
     <string name="remove_from_playlist">Remove from Playlist</string>
     <string name="add_to_playlists">Add to Playlists</string>
+    <string name="done">Done</string>
 </resources>
