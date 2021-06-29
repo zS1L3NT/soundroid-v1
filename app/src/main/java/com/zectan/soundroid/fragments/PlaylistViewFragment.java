@@ -78,7 +78,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             playlistViewVM.info.getValue(),
             (info, item) -> true
         ));
-        B.swipeRefresh.setOnRefreshListener(() -> playlistViewVM.reload(activity::handleError, activity));
+        B.swipeRefresh.setOnRefreshListener(() -> playlistViewVM.reload(activity::handleError));
 
         return B.getRoot();
     }

@@ -1,7 +1,5 @@
 package com.zectan.soundroid.models;
 
-import android.content.Context;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,7 +10,7 @@ public class SearchResult {
     private Info mInfo;
     private Song mSong;
 
-    public SearchResult(JSONObject object, Context context) throws JSONException {
+    public SearchResult(JSONObject object) throws JSONException {
         String type = object.getString("type");
         mLocation = "Server";
 
@@ -25,7 +23,7 @@ public class SearchResult {
         }
     }
 
-    public SearchResult(Song song, Context context) {
+    public SearchResult(Song song) {
         mLocation = "Local";
         mSong = song;
     }

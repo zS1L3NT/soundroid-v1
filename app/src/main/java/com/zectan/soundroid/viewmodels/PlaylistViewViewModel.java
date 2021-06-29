@@ -1,7 +1,5 @@
 package com.zectan.soundroid.viewmodels;
 
-import android.content.Context;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -30,10 +28,10 @@ public class PlaylistViewViewModel extends ViewModel {
     public void watch(MainActivity activity) {
         if (watching) return;
         watching = true;
-        info.observe(activity, __ -> reload(activity::handleError, activity));
+        info.observe(activity, __ -> reload(activity::handleError));
     }
 
-    public void reload(OnFailureListener onFailureListener, Context context) {
+    public void reload(OnFailureListener onFailureListener) {
         if (loading.getValue()) return;
         loading.postValue(true);
         Info info = this.info.getValue();
@@ -46,13 +44,13 @@ public class PlaylistViewViewModel extends ViewModel {
                     songs.postValue(snaps.toObjects(Song.class));
                     loading.postValue(false);
                 } else {
-                    fetchServer(onFailureListener, info, context);
+                    fetchServer(onFailureListener, info);
                 }
             })
-            .addOnFailureListener(__ -> fetchServer(onFailureListener, info, context));
+            .addOnFailureListener(__ -> fetchServer(onFailureListener, info));
     }
 
-    private void fetchServer(OnFailureListener onFailureListener, Info info, Context context) {
+    private void fetchServer(OnFailureListener onFailureListener, Info info) {
         new PlaylistSongsRequest(info.getId(), new PlaylistSongsRequest.Callback() {
             @Override
             public void onComplete(List<Song> songs) {

@@ -137,7 +137,7 @@ public class MenuItemEvents {
         OnSuccessListener<Object> onSuccessListener = __ -> {
             if (completed.incrementAndGet() == 2) {
                 snack("Song removed");
-                mActivity.playlistViewVM.reload(mActivity::handleError, mActivity);
+                mActivity.playlistViewVM.reload(mActivity::handleError);
             }
         };
 

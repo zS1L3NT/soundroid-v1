@@ -1,7 +1,5 @@
 package com.zectan.soundroid.viewmodels;
 
-import android.content.Context;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -80,10 +78,9 @@ public class SearchViewModel extends ViewModel {
     /**
      * Search the server for results
      *
-     * @param query   Text that the user gave
-     * @param context Context for the song object
+     * @param query Text that the user gave
      */
-    public void search(String query, Context context) {
+    public void search(String query) {
         int search_id = search_count.size();
         if (query.isEmpty()) {
             loading.postValue(false);
@@ -94,7 +91,7 @@ public class SearchViewModel extends ViewModel {
         loading.postValue(true);
         search_count.add(true);
         AtomicInteger responses = new AtomicInteger(0);
-        new SearchSocket(query, context, new SearchSocket.Callback() {
+        new SearchSocket(query, new SearchSocket.Callback() {
             @Override
             public void onResult(SearchResult result) {
                 List<SearchResult> serverResults = postClearOnFirstSearch(search_id)
@@ -140,7 +137,7 @@ public class SearchViewModel extends ViewModel {
                         snaps
                             .toObjects(Song.class)
                             .stream()
-                            .map(song -> new SearchResult(song, context))
+                            .map(SearchResult::new)
                             .collect(Collectors.toList())
                     );
                     this.databaseResults.postValue(databaseResults);

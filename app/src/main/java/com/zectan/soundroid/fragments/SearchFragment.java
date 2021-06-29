@@ -107,7 +107,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         String search = searchVM.query.getValue();
         if (!search.equals(text)) {
             searchVM.query.postValue(text);
-            searchVM.search(text, getContext());
+            searchVM.search(text);
         }
     }
 
