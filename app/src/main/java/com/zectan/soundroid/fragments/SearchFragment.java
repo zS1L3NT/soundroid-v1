@@ -83,9 +83,9 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         B.recyclerView.setHasFixedSize(true);
 
         // Observers
-        searchVM.results.observe(activity, this::onResultsChange);
-        searchVM.loading.observe(activity, this::onLoadingChange);
-        searchVM.error.observe(activity, this::onErrorChange);
+        searchVM.results.observe(this, this::onResultsChange);
+        searchVM.loading.observe(this, this::onLoadingChange);
+        searchVM.error.observe(this, this::onErrorChange);
         B.headerBackImage.setOnClickListener(this::onBackPressed);
 
         RxTextView
@@ -148,7 +148,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
     }
 
     private void onErrorChange(String error) {
-        if (error != null) {
+        if (!error.equals("")) {
             Log.e(TAG, error);
             B.connectToTheInternetText.setText(R.string.connect_to_the_internet);
         } else {

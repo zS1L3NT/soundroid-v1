@@ -92,12 +92,12 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         B.recyclerView.setReduceItemAlphaOnSwiping(true);
 
         // Live Observers
-        playingVM.currentSong.observe(activity, this::onCurrentSongChange);
-        playingVM.isBuffering.observe(activity, this::onIsBufferingChange);
-        playingVM.isPlaying.observe(activity, this::onIsPlayingChange);
-        playingVM.isShuffling.observe(activity, this::onIsShufflingChange);
-        playingVM.isLooping.observe(activity, this::onIsLoopingChange);
-        playingVM.error.observe(activity, this::onErrorChange);
+        playingVM.currentSong.observe(this, this::onCurrentSongChange);
+        playingVM.isBuffering.observe(this, this::onIsBufferingChange);
+        playingVM.isPlaying.observe(this, this::onIsPlayingChange);
+        playingVM.isShuffling.observe(this, this::onIsShufflingChange);
+        playingVM.isLooping.observe(this, this::onIsLoopingChange);
+        playingVM.error.observe(this, this::onErrorChange);
 
         B.playPauseImage.setOnClickListener(this::playPauseSong);
         B.playPauseImage.setOnTouchListener(Animations::animationSmallSqueeze);
@@ -193,7 +193,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     }
 
     private void onErrorChange(String error) {
-        if (error != null) {
+        if (!error.equals("")) {
             B.errorText.setText(error);
             ValueAnimator darkenAnimation = ValueAnimator
                 .ofArgb(activity.getColor(R.color.white), activity.getColor(R.color.playing_inactive))
@@ -206,7 +206,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             B.retryText.animate().alpha(1).setDuration(500).setStartDelay(500).start();
             new Handler().postDelayed(() -> B.coverImage.setOnClickListener(__ -> {
                 playingVM.retry();
-                playingVM.error.setValue(null);
+                playingVM.error.setValue("");
             }), 1000);
         } else {
             B.coverImage.setOnClickListener(__ -> {

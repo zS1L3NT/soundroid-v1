@@ -43,9 +43,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             NavDirections action = PlaylistViewFragmentDirections.openPlaylistSong().setTransitionName(transitionName);
             NavHostFragment.findNavController(PlaylistViewFragment.this).navigate(action, extras);
 
-            Info info = playlistViewVM.info.getValue();
-            assert info != null;
-            Playlist playlist = new Playlist(info, playlistViewVM.songs.getValue());
+            Playlist playlist = new Playlist(playlistViewVM.info.getValue(), playlistViewVM.songs.getValue());
             playingVM.startPlaylist(playlist, songId);
         }
 
@@ -71,9 +69,9 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         B.recyclerView.setLayoutManager(layoutManager);
 
         // Live Observers
-        playlistViewVM.info.observe(activity, this::onInfoChange);
-        playlistViewVM.songs.observe(activity, this::onSongsChange);
-        playlistViewVM.loading.observe(activity, B.swipeRefresh::setRefreshing);
+        playlistViewVM.info.observe(this, this::onInfoChange);
+        playlistViewVM.songs.observe(this, this::onSongsChange);
+        playlistViewVM.loading.observe(this, B.swipeRefresh::setRefreshing);
         B.backImage.setOnClickListener(__ -> activity.onBackPressed());
         B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.swipeRefresh.setOnRefreshListener(() -> playlistViewVM.reload(activity::handleError));
@@ -94,9 +92,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
     }
 
     private void onSongsChange(List<Song> songs) {
-        Info info = playlistViewVM.info.getValue();
-        if (info == null) return;
-        playlistViewAdapter.updateSongs(ListArrayUtils.sortSongs(songs, info.getOrder()));
+        playlistViewAdapter.updateSongs(ListArrayUtils.sortSongs(songs, playlistViewVM.info.getValue().getOrder()));
     }
 
     private void onInfoChange(Info info) {

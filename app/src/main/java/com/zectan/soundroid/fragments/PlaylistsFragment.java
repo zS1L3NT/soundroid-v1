@@ -53,8 +53,8 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
         B.recyclerView.setLayoutManager(layoutManager);
 
         // Observers
-        playlistsVM.infos.observe(activity, playlistsAdapter::updateInfos);
-        playlistsVM.loading.observe(activity, B.swipeRefresh::setRefreshing);
+        playlistsVM.infos.observe(this, playlistsAdapter::updateInfos);
+        playlistsVM.loading.observe(this, B.swipeRefresh::setRefreshing);
 
         B.headerAddImage.setOnClickListener(this::createPlaylist);
         B.swipeRefresh.setOnRefreshListener(() -> playlistsVM.reload(activity::handleError));

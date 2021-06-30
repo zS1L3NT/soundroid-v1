@@ -59,8 +59,8 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
         B.recyclerView.setAdapter(homeAdapter);
 
         // Live Observers
-        homeVM.playlist.observe(activity, homeAdapter::updatePlaylist);
-        homeVM.loading.observe(activity, B.swipeRefresh::setRefreshing);
+        homeVM.playlist.observe(this, homeAdapter::updatePlaylist);
+        homeVM.loading.observe(this, B.swipeRefresh::setRefreshing);
 
         B.swipeRefresh.setOnRefreshListener(() -> homeVM.reload(activity::handleError));
         B.searchbar.setOnClickListener(this::onSearchbarClicked);

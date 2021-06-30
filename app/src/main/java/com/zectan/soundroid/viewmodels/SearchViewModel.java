@@ -1,6 +1,5 @@
 package com.zectan.soundroid.viewmodels;
 
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.zectan.soundroid.FirebaseRepository;
@@ -13,6 +12,7 @@ import com.zectan.soundroid.models.Song;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -26,7 +26,7 @@ public class SearchViewModel extends ViewModel {
     public final StrictLiveData<List<SearchResult>> results = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<String> query = new StrictLiveData<>("");
     public final StrictLiveData<Boolean> loading = new StrictLiveData<>(false);
-    public final MutableLiveData<String> error = new MutableLiveData<>();
+    public final StrictLiveData<String> error = new StrictLiveData<>("");
 
     public SearchViewModel() {
         // Required empty public constructor
@@ -99,7 +99,7 @@ public class SearchViewModel extends ViewModel {
                     : SearchViewModel.this.serverResults.getValue();
                 serverResults.add(result);
                 SearchViewModel.this.serverResults.postValue(serverResults);
-                error.postValue(null);
+                error.postValue("");
             }
 
             @Override
@@ -148,7 +148,7 @@ public class SearchViewModel extends ViewModel {
             })
             .addOnFailureListener(err -> {
                 postClearOnFirstSearch(search_id);
-                error.postValue(err.getMessage());
+                error.postValue(Objects.requireNonNull(err.getMessage()));
                 if (responses.incrementAndGet() == LOCATIONS) {
                     loading.postValue(false);
                 }
@@ -175,7 +175,7 @@ public class SearchViewModel extends ViewModel {
             })
             .addOnFailureListener(err -> {
                 postClearOnFirstSearch(search_id);
-                error.postValue(err.getMessage());
+                this.error.postValue(Objects.requireNonNull(err.getMessage()));
                 if (responses.incrementAndGet() == LOCATIONS) {
                     loading.postValue(false);
                 }

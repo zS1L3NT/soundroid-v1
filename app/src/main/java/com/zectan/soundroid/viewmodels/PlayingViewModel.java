@@ -3,7 +3,6 @@ package com.zectan.soundroid.viewmodels;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -48,7 +47,7 @@ public class PlayingViewModel extends ViewModel {
     public final StrictLiveData<Boolean> isPlaying = new StrictLiveData<>(false);
     public final StrictLiveData<Boolean> isShuffling = new StrictLiveData<>(false);
     public final StrictLiveData<Boolean> isLooping = new StrictLiveData<>(true);
-    public final MutableLiveData<String> error = new MutableLiveData<>();
+    public final StrictLiveData<String> error = new StrictLiveData<>("");
     private CustomPlaybackOrder mOrder;
     private SimpleExoPlayer mPlayer;
     private boolean initialised = false;
@@ -125,7 +124,7 @@ public class PlayingViewModel extends ViewModel {
      * Play the previous song in the queue or reset the song progress
      */
     public void playPreviousSong() {
-        error.postValue(null);
+        error.postValue("");
         if (mPlayer.getContentPosition() <= 2000) {
             mPlayer.prepare();
             mPlayer.previous();
@@ -138,7 +137,7 @@ public class PlayingViewModel extends ViewModel {
      * Play the next song in the queue
      */
     public void playNextSong() {
-        error.postValue(null);
+        error.postValue("");
         mPlayer.prepare();
         mPlayer.next();
     }
@@ -203,11 +202,11 @@ public class PlayingViewModel extends ViewModel {
             }
 
             @Override
-            public void onPlayerError(@NotNull ExoPlaybackException error) {
-                if (Objects.equals(error.getMessage(), "Source error")) {
+            public void onPlayerError(@NotNull ExoPlaybackException err) {
+                if (Objects.equals(err.getMessage(), "Source error")) {
                     PlayingViewModel.this.error.postValue("Could not fetch song from server");
                 } else {
-                    PlayingViewModel.this.error.postValue(error.getMessage());
+                    PlayingViewModel.this.error.postValue(Objects.requireNonNull(err.getMessage()));
                 }
             }
         });

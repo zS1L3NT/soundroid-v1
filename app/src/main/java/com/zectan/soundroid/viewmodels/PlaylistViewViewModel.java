@@ -1,6 +1,5 @@
 package com.zectan.soundroid.viewmodels;
 
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -16,7 +15,7 @@ import java.util.List;
 
 public class PlaylistViewViewModel extends ViewModel {
     private final FirebaseRepository repository = new FirebaseRepository();
-    public final MutableLiveData<Info> info = new MutableLiveData<>();
+    public final StrictLiveData<Info> info = new StrictLiveData<>(Info.getEmpty());
     public final StrictLiveData<List<Song>> songs = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<Boolean> loading = new StrictLiveData<>(false);
     private boolean watching = false;
@@ -35,7 +34,12 @@ public class PlaylistViewViewModel extends ViewModel {
         if (loading.getValue()) return;
         loading.postValue(true);
         Info info = this.info.getValue();
-        if (info == null) return;
+
+        if (info.getId().equals("")) {
+            loading.postValue(false);
+            return;
+        }
+
         repository
             .playlist(info.getId())
             .get()
