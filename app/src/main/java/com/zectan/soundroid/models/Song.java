@@ -106,8 +106,16 @@ public class Song {
         return this.playlistId;
     }
 
-    public String getOwner() {
+    public void setPlaylistId(String playlistId) {
+        this.playlistId = playlistId;
+    }
+
+    public String getUserId() {
         return this.userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public List<String> getQueries() {

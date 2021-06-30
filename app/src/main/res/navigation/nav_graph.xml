@@ -53,6 +53,14 @@
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/fade_out"
             app:popUpTo="@id/fragment_playlists" />
+        <action
+            android:id="@+id/open_edit_playlist"
+            app:destination="@id/fragment_playlist_edit"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out"
+            app:popUpTo="@id/fragment_playlists" />
     </fragment>
     <fragment
         android:id="@+id/fragment_playing"
@@ -93,14 +101,18 @@
         android:id="@+id/fragment_playlist_edit"
         android:name="com.zectan.soundroid.fragments.PlaylistEditFragment"
         android:label="fragment_playlist_edit"
-        tools:layout="@layout/fragment_playlist_edit" />
+        tools:layout="@layout/fragment_playlist_edit">
+        <action
+            android:id="@+id/back_to_playlist_view"
+            app:destination="@id/fragment_playlist_view" />
+    </fragment>
     <fragment
         android:id="@+id/fragment_playlist_view"
         android:name="com.zectan.soundroid.fragments.PlaylistViewFragment"
         android:label="fragment_playlist_view"
         tools:layout="@layout/fragment_playlist_view">
         <action
-            android:id="@+id/edit_playlist"
+            android:id="@+id/open_edit_playlist"
             app:destination="@id/fragment_playlist_edit"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"

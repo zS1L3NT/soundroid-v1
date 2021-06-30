@@ -38,9 +38,10 @@
     <string name="add_to_playlist">Add To Playlist</string>
     <string name="download">Download</string>
     <string name="menu_special_string">⋮</string>
-    <string name="edit_playlist">Edit Playlist</string>
     <string name="delete_playlist">Delete Playlist</string>
     <string name="remove_from_playlist">Remove from Playlist</string>
     <string name="add_to_playlists">Add to Playlists</string>
     <string name="done">Done</string>
+    <string name="edit_playlist">Edit Playlist</string>
+    <string name="enter_playlist_name">Enter Playlist Name</string>
 </resources>

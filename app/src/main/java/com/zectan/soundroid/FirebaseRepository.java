@@ -6,8 +6,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 public class FirebaseRepository {
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
     public static final String USER_ID = "admin";
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public FirebaseRepository() {
 
@@ -39,5 +39,9 @@ public class FirebaseRepository {
 
     public CollectionReference songsCollection() {
         return db.collection("songs");
+    }
+
+    public CollectionReference playlistsCollection() {
+        return db.collection("playlists");
     }
 }

@@ -34,7 +34,10 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
 
         @Override
         public boolean onMenuItemClicked(Info info, MenuItem item) {
-            return activity.handleMenuItemClick(info, null, item);
+            return activity.handleMenuItemClick(info, null, item, () -> {
+                NavDirections action = PlaylistsFragmentDirections.openEditPlaylist();
+                NavHostFragment.findNavController(PlaylistsFragment.this).navigate(action);
+            });
         }
     };
 
@@ -60,6 +63,9 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
     }
 
     private void createPlaylist(View view) {
-        // TODO Implement method
+        playlistsVM.createPlaylist()
+            .addOnSuccessListener(__ -> activity.snack("Created Playlist"))
+            .addOnFailureListener(activity::handleError);
     }
+
 }

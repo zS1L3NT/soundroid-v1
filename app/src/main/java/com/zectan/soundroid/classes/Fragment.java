@@ -18,6 +18,7 @@ import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.viewmodels.HomeViewModel;
 import com.zectan.soundroid.viewmodels.MainViewModel;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
+import com.zectan.soundroid.viewmodels.PlaylistEditViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistsViewModel;
 import com.zectan.soundroid.viewmodels.SearchViewModel;
@@ -33,6 +34,7 @@ public class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragm
     protected MainViewModel mainVM;
     protected HomeViewModel homeVM;
     protected PlayingViewModel playingVM;
+    protected PlaylistEditViewModel playlistEditVM;
     protected PlaylistsViewModel playlistsVM;
     protected PlaylistViewViewModel playlistViewVM;
     protected SearchViewModel searchVM;
@@ -52,6 +54,7 @@ public class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragm
         mainVM = new ViewModelProvider(activity).get(MainViewModel.class);
         homeVM = new ViewModelProvider(activity).get(HomeViewModel.class);
         playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
+        playlistEditVM = new ViewModelProvider(activity).get(PlaylistEditViewModel.class);
         playlistsVM = new ViewModelProvider(activity).get(PlaylistsViewModel.class);
         playlistViewVM = new ViewModelProvider(activity).get(PlaylistViewViewModel.class);
         searchVM = new ViewModelProvider(activity).get(SearchViewModel.class);

@@ -6,7 +6,6 @@ import android.view.MenuItem;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.zectan.soundroid.FirebaseRepository;
@@ -28,6 +27,7 @@ public class MenuItemEvents {
     private final Info mInfo;
     private final Song mSong;
     private final MenuItem mItem;
+    private Runnable mOpenEditPlaylist;
 
     public MenuItemEvents(MainActivity activity, Info info, Song song, MenuItem item) {
         mActivity = activity;
@@ -37,12 +37,13 @@ public class MenuItemEvents {
         repository = activity.getRepository();
     }
 
-    public void snack(String message) {
-        Snackbar
-            .make(mActivity.B.navHostFragment, message, Snackbar.LENGTH_SHORT)
-            .setAction(R.string.done, __ -> {
-            })
-            .show();
+    public MenuItemEvents(MainActivity activity, Info info, Song song, MenuItem item, Runnable openEditPlaylist) {
+        mActivity = activity;
+        mInfo = info;
+        mSong = song;
+        mItem = item;
+        repository = activity.getRepository();
+        mOpenEditPlaylist = openEditPlaylist;
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -85,7 +86,7 @@ public class MenuItemEvents {
             AtomicInteger completed = new AtomicInteger(0);
             OnSuccessListener<Object> onSuccessListener = __ -> {
                 if (completed.incrementAndGet() == 2) {
-                    snack("Song added");
+                    mActivity.snack("Song added");
                 }
             };
 
@@ -98,10 +99,12 @@ public class MenuItemEvents {
             repository
                 .songsCollection()
                 .whereEqualTo("songId", mSong.getSongId())
-                .whereEqualTo("playlistId", mSong.getPlaylistId())
+                .whereEqualTo("playlistId", info.getId())
                 .get()
                 .addOnSuccessListener(snaps -> {
                     if (snaps.size() == 0) {
+                        mSong.setPlaylistId(info.getId());
+                        mSong.setUserId(FirebaseRepository.USER_ID);
                         repository
                             .songsCollection()
                             .add(mSong.toMap())
@@ -129,14 +132,14 @@ public class MenuItemEvents {
 
     private void addToQueue() {
         mActivity.playingVM.addToQueue(mSong);
-        snack("Song added to queue");
+        mActivity.snack("Song added to queue");
     }
 
     private void removeFromPlaylist() {
         AtomicInteger completed = new AtomicInteger(0);
         OnSuccessListener<Object> onSuccessListener = __ -> {
             if (completed.incrementAndGet() == 2) {
-                snack("Song removed");
+                mActivity.snack("Song removed");
                 mActivity.playlistViewVM.reload(mActivity::handleError);
             }
         };
@@ -171,7 +174,7 @@ public class MenuItemEvents {
         new SavePlaylistRequest(mInfo, FirebaseRepository.USER_ID, new SavePlaylistRequest.Callback() {
             @Override
             public void onComplete() {
-                snack("Saved playlist");
+                mActivity.snack("Saved playlist");
             }
 
             @Override
@@ -186,14 +189,15 @@ public class MenuItemEvents {
     }
 
     private void editPlaylist() {
-        // TODO Finish this callback
+        mActivity.playlistEditVM.info.setValue(mInfo);
+        mOpenEditPlaylist.run();
     }
 
     private void deletePlaylist() {
         new DeletePlaylistRequest(mInfo.getId(), new DeletePlaylistRequest.Callback() {
             @Override
             public void onComplete() {
-                snack("Playlist deleted");
+                mActivity.snack("Playlist deleted");
             }
 
             @Override

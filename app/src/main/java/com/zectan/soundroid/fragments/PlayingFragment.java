@@ -42,7 +42,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     private static final String TAG = "(SounDroid) PlayingFragment";
     private final QueueAdapter.Callback callback = new QueueAdapter.Callback() {
         @Override
-        public void onSongSelected(Song song) {
+        public void onSongClicked(Song song) {
             Playlist queue = playingVM.queue.getValue();
 
             playingVM.selectSong(queue, song.getSongId());

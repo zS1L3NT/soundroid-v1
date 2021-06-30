@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeAdapter;
 import com.zectan.soundroid.R;
-import com.zectan.soundroid.databinding.QueueListItemBinding;
+import com.zectan.soundroid.databinding.SongReorderListItemBinding;
 import com.zectan.soundroid.models.Song;
 
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +47,7 @@ public class QueueAdapter extends DragDropSwipeAdapter<Song, QueueViewHolder> {
 
     @Override
     protected void onBindViewHolder(Song song, @NotNull QueueViewHolder holder, int position) {
-        holder.bind(getDataSet().get(position));
+        holder.bind(song);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class QueueAdapter extends DragDropSwipeAdapter<Song, QueueViewHolder> {
     }
 
     public interface Callback {
-        void onSongSelected(Song song);
+        void onSongClicked(Song song);
 
         void onMove(int oldPosition, int newPosition);
 
@@ -87,12 +87,12 @@ public class QueueAdapter extends DragDropSwipeAdapter<Song, QueueViewHolder> {
 }
 
 class QueueViewHolder extends DragDropSwipeAdapter.ViewHolder {
-    public final QueueListItemBinding B;
+    public final SongReorderListItemBinding B;
     private final QueueAdapter.Callback mCallback;
 
     public QueueViewHolder(@NonNull @NotNull View itemView, QueueAdapter.Callback callback) {
         super(itemView);
-        B = QueueListItemBinding.bind(itemView);
+        B = SongReorderListItemBinding.bind(itemView);
         mCallback = callback;
     }
 
@@ -113,7 +113,7 @@ class QueueViewHolder extends DragDropSwipeAdapter.ViewHolder {
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
-        B.parent.setOnClickListener(__ -> mCallback.onSongSelected(song));
+        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(song));
     }
 
     public ImageView getDragImage() {

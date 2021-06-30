@@ -3,7 +3,6 @@ package com.zectan.soundroid;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -25,6 +24,7 @@ import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.utils.MenuItemEvents;
 import com.zectan.soundroid.viewmodels.MainViewModel;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
+import com.zectan.soundroid.viewmodels.PlaylistEditViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistsViewModel;
 import com.zectan.soundroid.viewmodels.SearchViewModel;
@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     public PlayingViewModel playingVM;
     public PlaylistViewViewModel playlistViewVM;
+    public PlaylistEditViewModel playlistEditVM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +55,14 @@ public class MainActivity extends AppCompatActivity {
         SearchViewModel searchVM = new ViewModelProvider(this).get(SearchViewModel.class);
         PlaylistsViewModel playlistsVM = new ViewModelProvider(this).get(PlaylistsViewModel.class);
         playlistViewVM = new ViewModelProvider(this).get(PlaylistViewViewModel.class);
+        playlistEditVM = new ViewModelProvider(this).get(PlaylistEditViewModel.class);
 
         // Live Observers
         mainVM.error.observe(this, this::handleError);
         searchVM.watch(this);
         playlistsVM.watch(this);
         playlistViewVM.watch(this);
+        playlistEditVM.watch(this);
 
         NavHostFragment navHostFragment =
             (NavHostFragment) getSupportFragmentManager()
@@ -88,12 +91,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void handleError(Exception e) {
         String message = e.getMessage() != null ? e.getMessage() : "Unknown error occurred";
-        Snackbar
-            .make(B.navHostFragment, message, Snackbar.LENGTH_SHORT)
-            .setAction(R.string.done, __ -> {
-            })
-            .show();
-        Log.e(TAG, e.getMessage());
+        snack(message);
+        e.printStackTrace();
     }
 
     public int getAttributeResource(int id) {
@@ -106,4 +105,18 @@ public class MainActivity extends AppCompatActivity {
     public boolean handleMenuItemClick(Info info, Song song, MenuItem item) {
         return new MenuItemEvents(this, info, song, item).handle();
     }
+
+    @SuppressLint("NonConstantResourceId")
+    public boolean handleMenuItemClick(Info info, Song song, MenuItem item, Runnable openEditPlaylist) {
+        return new MenuItemEvents(this, info, song, item, openEditPlaylist).handle();
+    }
+
+    public void snack(String message) {
+        Snackbar
+            .make(B.navHostFragment, message, Snackbar.LENGTH_SHORT)
+            .setAction(R.string.done, __ -> {
+            })
+            .show();
+    }
+
 }

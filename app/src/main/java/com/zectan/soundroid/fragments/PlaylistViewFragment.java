@@ -51,7 +51,10 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
 
         @Override
         public boolean onMenuItemClicked(Song song, MenuItem item) {
-            return activity.handleMenuItemClick(playlistViewVM.info.getValue(), song, item);
+            return activity.handleMenuItemClick(playlistViewVM.info.getValue(), song, item, () -> {
+                NavDirections action = PlaylistViewFragmentDirections.openEditPlaylist();
+                NavHostFragment.findNavController(PlaylistViewFragment.this).navigate(action);
+            });
         }
     };
     private PlaylistViewAdapter playlistViewAdapter;
@@ -72,15 +75,22 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         playlistViewVM.songs.observe(activity, this::onSongsChange);
         playlistViewVM.loading.observe(activity, B.swipeRefresh::setRefreshing);
         B.backImage.setOnClickListener(__ -> activity.onBackPressed());
-        B.moreImage.setOnClickListener(v -> MenuItemsBuilder.createMenu(
-            v,
-            R.menu.playlist_menu_playlists,
-            playlistViewVM.info.getValue(),
-            (info, item) -> true
-        ));
+        B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.swipeRefresh.setOnRefreshListener(() -> playlistViewVM.reload(activity::handleError));
 
         return B.getRoot();
+    }
+
+    public void onMoreImageClicked(View view) {
+        MenuItemsBuilder.createMenu(
+            view,
+            R.menu.playlist_menu_playlists,
+            playlistViewVM.info.getValue(),
+            (info, item) -> activity.handleMenuItemClick(info, null, item, () -> {
+                NavDirections action = PlaylistViewFragmentDirections.openEditPlaylist();
+                NavHostFragment.findNavController(PlaylistViewFragment.this).navigate(action);
+            })
+        );
     }
 
     private void onSongsChange(List<Song> songs) {

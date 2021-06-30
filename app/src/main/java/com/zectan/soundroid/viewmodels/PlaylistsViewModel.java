@@ -4,11 +4,14 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.classes.StrictLiveData;
 import com.zectan.soundroid.models.Info;
+import com.zectan.soundroid.utils.Anonymous;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistsViewModel extends ViewModel {
@@ -51,6 +54,23 @@ public class PlaylistsViewModel extends ViewModel {
                 }
             })
             .addOnFailureListener(onFailureListener);
+    }
+
+    public Task<Void> createPlaylist() {
+        String id = repository.songsCollection().document().getId();
+        Info info = new Info(
+            id,
+            "New Playlist",
+            "",
+            "#7b828b",
+            FirebaseRepository.USER_ID,
+            new ArrayList<>(),
+            Anonymous.getQueries("New Playlist")
+        );
+
+        return repository
+            .playlist(id)
+            .set(info.toMap());
     }
 
 }

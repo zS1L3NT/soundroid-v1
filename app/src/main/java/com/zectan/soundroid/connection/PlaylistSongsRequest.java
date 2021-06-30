@@ -37,7 +37,7 @@ public class PlaylistSongsRequest {
                     }
                     callback.onComplete(songs);
                 } else {
-                    callback.onError(response.body().string());
+                    callback.onError("Could not retrieve songs from server");
                 }
             } catch (Exception e) {
                 callback.onError(e.getMessage());

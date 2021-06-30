@@ -37,17 +37,24 @@ public class PlaylistViewViewModel extends ViewModel {
         Info info = this.info.getValue();
         if (info == null) return;
         repository
-            .playlistSongs(info.getId())
+            .playlist(info.getId())
             .get()
-            .addOnSuccessListener(snaps -> {
-                if (!snaps.isEmpty()) {
-                    songs.postValue(snaps.toObjects(Song.class));
-                    loading.postValue(false);
+            .addOnSuccessListener(snap -> {
+                if (snap.exists()) {
+                    repository
+                        .playlistSongs(info.getId())
+                        .get()
+                        .addOnSuccessListener(snaps -> {
+                            if (!snaps.isEmpty()) {
+                                songs.postValue(snaps.toObjects(Song.class));
+                            }
+                            loading.postValue(false);
+                        })
+                        .addOnFailureListener(__ -> fetchServer(onFailureListener, info));
                 } else {
                     fetchServer(onFailureListener, info);
                 }
-            })
-            .addOnFailureListener(__ -> fetchServer(onFailureListener, info));
+            });
     }
 
     private void fetchServer(OnFailureListener onFailureListener, Info info) {
