@@ -24,15 +24,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SuppressLint("UseCompatLoadingForDrawables")
 public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
     private final Callback mCallback;
-    private Playlist mPlaylist;
+    private final List<Song> mSongs;
 
     public HomeAdapter(Callback callback) {
-        mPlaylist = new Playlist(new Info("", "All Songs", new ArrayList<>()), new ArrayList<>());
         mCallback = callback;
+        mSongs = new ArrayList<>();
     }
 
     @NonNull
@@ -46,19 +47,20 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
         return new HomeViewHolder(itemView, mCallback);
     }
 
-    public void updatePlaylist(Playlist playlist) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new HomeDiffCallback(mPlaylist, playlist));
+    public void updateSongs(List<Song> songs) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new HomeDiffCallback(mSongs, songs));
         diffResult.dispatchUpdatesTo(this);
-        mPlaylist = playlist;
+        mSongs.clear();
+        mSongs.addAll(songs);
     }
 
     public void onBindViewHolder(@NonNull HomeViewHolder holder, int position) {
-        holder.bind(mPlaylist, position);
+        holder.bind(mSongs, position);
     }
 
     @Override
     public int getItemCount() {
-        return mPlaylist.size();
+        return mSongs.size();
     }
 
     public interface Callback extends MenuItemsBuilder.MenuItemCallback<Song> {
@@ -77,8 +79,8 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
     }
 
     @SuppressLint("RestrictedApi")
-    public void bind(Playlist playlist, int position) {
-        Song song = playlist.getSong(position);
+    public void bind(List<Song> songs, int position) {
+        Song song = songs.get(position);
         Context context = B.parent.getContext();
 
         String id = song.getSongId();
@@ -98,6 +100,15 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
+
+        List<String> order = songs
+            .stream()
+            .sorted((song1, song2) -> song1.getTitle().compareTo(song2.getTitle()))
+            .map(Song::getSongId)
+            .collect(Collectors.toList());
+        Info info = new Info("", "All Songs", order);
+        Playlist playlist = new Playlist(info, songs);
+
         B.parent.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, playlist, id));
         B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.song_menu_home, song, mCallback));
     }
@@ -107,9 +118,9 @@ class HomeDiffCallback extends DiffUtil.Callback {
 
     private final List<Song> oldSongs, newSongs;
 
-    public HomeDiffCallback(Playlist oldPlaylist, Playlist newPlaylist) {
-        this.oldSongs = oldPlaylist.getSongs();
-        this.newSongs = newPlaylist.getSongs();
+    public HomeDiffCallback(List<Song> oldSongs, List<Song> newSongs) {
+        this.oldSongs = oldSongs;
+        this.newSongs = newSongs;
     }
 
     @Override

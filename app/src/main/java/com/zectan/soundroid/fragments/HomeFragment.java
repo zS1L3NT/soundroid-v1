@@ -24,6 +24,7 @@ import com.zectan.soundroid.utils.Anonymous;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment extends Fragment<FragmentHomeBinding> {
     private static final String TAG = "(SounDroid) HomeFragment";
@@ -59,13 +60,12 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
         B.recyclerView.setAdapter(homeAdapter);
 
         // Live Observers
-        homeVM.playlist.observe(this, homeAdapter::updatePlaylist);
+        homeVM.songs.observe(this, homeAdapter::updateSongs);
         homeVM.loading.observe(this, B.swipeRefresh::setRefreshing);
 
-        B.swipeRefresh.setOnRefreshListener(() -> homeVM.reload(activity::handleError));
+        mainVM.mySongs.observe(this, homeVM.songs::setValue);
         B.searchbar.setOnClickListener(this::onSearchbarClicked);
-
-        homeVM.reload(activity::handleError);
+        B.swipeRefresh.setOnRefreshListener(this::onReload);
 
         return B.getRoot();
     }
@@ -75,5 +75,12 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
         NavDirections action = HomeFragmentDirections.openSearch();
         NavHostFragment.findNavController(this).navigate(action, extras);
         searchVM.results.postValue(new ArrayList<>());
+    }
+
+    private void onReload() {
+        List<Song> songs = mainVM.mySongs.getValue();
+        homeVM.songs.postValue(songs);
+        homeVM.loading.postValue(false);
+        B.recyclerView.scrollToPosition(0);
     }
 }

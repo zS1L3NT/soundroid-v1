@@ -27,7 +27,6 @@ import com.zectan.soundroid.models.Song;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -49,8 +48,8 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
 
         @Override
         public void onPlaylistClicked(Info info) {
+            playlistViewVM.playlistId.setValue(info.getId());
             playlistViewVM.info.postValue(info);
-            playlistViewVM.songs.postValue(new ArrayList<>());
 
             NavDirections action = SearchFragmentDirections.openPlaylistView();
             navController.navigate(action);
@@ -107,7 +106,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         String search = searchVM.query.getValue();
         if (!search.equals(text)) {
             searchVM.query.postValue(text);
-            searchVM.search(text);
+            searchVM.search(text, mainVM);
         }
     }
 

@@ -2,31 +2,23 @@ package com.zectan.soundroid.viewmodels;
 
 import androidx.lifecycle.ViewModel;
 
-import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.classes.StrictLiveData;
 import com.zectan.soundroid.connection.SearchSocket;
-import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.SearchResult;
-import com.zectan.soundroid.models.Song;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class SearchViewModel extends ViewModel {
     private static final String TAG = "(SounDroid) SearchViewModel";
-    private static final int LOCATIONS = 3;
-    private final FirebaseRepository repository = new FirebaseRepository();
     private final StrictLiveData<List<SearchResult>> serverResults = new StrictLiveData<>(new ArrayList<>());
     private final StrictLiveData<List<SearchResult>> databaseResults = new StrictLiveData<>(new ArrayList<>());
-    private final List<Boolean> search_count = new ArrayList<>();
     public final StrictLiveData<List<SearchResult>> results = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<String> query = new StrictLiveData<>("");
     public final StrictLiveData<Boolean> loading = new StrictLiveData<>(false);
     public final StrictLiveData<String> error = new StrictLiveData<>("");
+    private int search_count = 0;
 
     public SearchViewModel() {
         // Required empty public constructor
@@ -57,46 +49,29 @@ public class SearchViewModel extends ViewModel {
     }
 
     /**
-     * Clears the current search results if the search_id is current and the results haven't been cleared <br>
-     * This method returns a boolean since StrictLiveData.postValue() doesn't change the value immediately <br>
-     * This way, the methods calling this function will know whether to use the current value of a new list <br>
-     *
-     * @param search_id Search ID passed in
-     * @return If the results were cleared
-     */
-    public boolean postClearOnFirstSearch(int search_id) {
-        if ((search_count.size() - 1) == search_id && search_count.get(search_id)) {
-            search_count.set(search_id, false);
-            results.postValue(new ArrayList<>());
-            serverResults.postValue(new ArrayList<>());
-            databaseResults.postValue(new ArrayList<>());
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Search the server for results
      *
      * @param query Text that the user gave
      */
-    public void search(String query) {
-        int search_id = search_count.size();
+    public void search(String query, MainViewModel mainVM) {
+        int search_id = ++search_count;
         if (query.isEmpty()) {
             loading.postValue(false);
-            this.results.postValue(new ArrayList<>());
+            results.postValue(new ArrayList<>());
+            serverResults.postValue(new ArrayList<>());
+            databaseResults.postValue(new ArrayList<>());
             return;
         }
 
         loading.postValue(true);
-        search_count.add(true);
-        AtomicInteger responses = new AtomicInteger(0);
+        results.postValue(new ArrayList<>());
+        serverResults.postValue(new ArrayList<>());
+        databaseResults.postValue(mainVM.getResultsMatchingQuery(query));
+
         new SearchSocket(query, new SearchSocket.Callback() {
             @Override
             public void onResult(SearchResult result) {
-                List<SearchResult> serverResults = postClearOnFirstSearch(search_id)
-                    ? new ArrayList<>()
-                    : SearchViewModel.this.serverResults.getValue();
+                List<SearchResult> serverResults = SearchViewModel.this.serverResults.getValue();
                 serverResults.add(result);
                 SearchViewModel.this.serverResults.postValue(serverResults);
                 error.postValue("");
@@ -104,82 +79,22 @@ public class SearchViewModel extends ViewModel {
 
             @Override
             public void onDone(List<SearchResult> sortedResults) {
-                postClearOnFirstSearch(search_id);
                 SearchViewModel.this.serverResults.postValue(sortedResults);
-                if (responses.incrementAndGet() == LOCATIONS) {
-                    loading.postValue(false);
-                }
+                loading.postValue(false);
             }
 
             @Override
             public void onError(String message) {
-                postClearOnFirstSearch(search_id);
                 error.postValue(message);
-                if (responses.incrementAndGet() == LOCATIONS) {
-                    loading.postValue(false);
-                }
+                loading.postValue(false);
             }
 
             @Override
             public boolean isInactive() {
-                return search_id != search_count.size() - 1;
+                return search_id != search_count;
             }
         });
 
-        repository
-            .searchSong(FirebaseRepository.USER_ID, query).get()
-            .addOnSuccessListener(snaps -> {
-                if (snaps.size() > 0) {
-                    List<SearchResult> databaseResults = postClearOnFirstSearch(search_id)
-                        ? new ArrayList<>()
-                        : this.databaseResults.getValue();
-                    databaseResults.addAll(
-                        snaps
-                            .toObjects(Song.class)
-                            .stream()
-                            .map(SearchResult::new)
-                            .collect(Collectors.toList())
-                    );
-                    this.databaseResults.postValue(databaseResults);
-                }
-                if (responses.incrementAndGet() == LOCATIONS) {
-                    loading.postValue(false);
-                }
-            })
-            .addOnFailureListener(err -> {
-                postClearOnFirstSearch(search_id);
-                error.postValue(Objects.requireNonNull(err.getMessage()));
-                if (responses.incrementAndGet() == LOCATIONS) {
-                    loading.postValue(false);
-                }
-            });
-
-        repository.searchPlaylist(FirebaseRepository.USER_ID, query).get()
-            .addOnSuccessListener(snaps -> {
-                if (snaps.size() > 0) {
-                    List<SearchResult> databaseResults = postClearOnFirstSearch(search_id)
-                        ? new ArrayList<>()
-                        : this.databaseResults.getValue();
-                    databaseResults.addAll(
-                        snaps
-                            .toObjects(Info.class)
-                            .stream()
-                            .map(SearchResult::new)
-                            .collect(Collectors.toList())
-                    );
-                    this.databaseResults.postValue(databaseResults);
-                }
-                if (responses.incrementAndGet() == LOCATIONS) {
-                    loading.postValue(false);
-                }
-            })
-            .addOnFailureListener(err -> {
-                postClearOnFirstSearch(search_id);
-                this.error.postValue(Objects.requireNonNull(err.getMessage()));
-                if (responses.incrementAndGet() == LOCATIONS) {
-                    loading.postValue(false);
-                }
-            });
     }
 
 }

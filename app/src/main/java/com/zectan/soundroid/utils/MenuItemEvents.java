@@ -8,7 +8,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
-import com.zectan.soundroid.FirebaseRepository;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.connection.DeletePlaylistRequest;
@@ -22,8 +22,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class MenuItemEvents {
+    private static final String USER_ID = "admin";
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final MainActivity mActivity;
-    private final FirebaseRepository repository;
     private final Info mInfo;
     private final Song mSong;
     private final MenuItem mItem;
@@ -34,7 +35,6 @@ public class MenuItemEvents {
         mInfo = info;
         mSong = song;
         mItem = item;
-        repository = activity.getRepository();
     }
 
     public MenuItemEvents(MainActivity activity, Info info, Song song, MenuItem item, Runnable openEditPlaylist) {
@@ -42,7 +42,6 @@ public class MenuItemEvents {
         mInfo = info;
         mSong = song;
         mItem = item;
-        repository = activity.getRepository();
         mOpenEditPlaylist = openEditPlaylist;
     }
 
@@ -90,44 +89,34 @@ public class MenuItemEvents {
                 }
             };
 
-            repository
-                .playlist(info.getId())
+            db.collection("playlists")
+                .document(info.getId())
                 .update("order", FieldValue.arrayUnion(mSong.getSongId()))
                 .addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener(mActivity::handleError);
 
-            repository
-                .songsCollection()
-                .whereEqualTo("songId", mSong.getSongId())
-                .whereEqualTo("playlistId", info.getId())
-                .get()
-                .addOnSuccessListener(snaps -> {
-                    if (snaps.size() == 0) {
-                        mSong.setPlaylistId(info.getId());
-                        mSong.setUserId(FirebaseRepository.USER_ID);
-                        repository
-                            .songsCollection()
-                            .add(mSong.toMap())
-                            .addOnSuccessListener(onSuccessListener)
-                            .addOnFailureListener(mActivity::handleError);
-                    } else {
-                        mActivity.handleError(new Exception("Song already in playlist!"));
-                    }
-                });
+            boolean inPlaylist = mActivity
+                .mainVM
+                .mySongs
+                .getValue()
+                .stream()
+                .anyMatch(song -> song.getSongId().equals(mSong.getSongId()));
 
-
+            if (inPlaylist) {
+                mActivity.handleError(new Exception("Song already in playlist!"));
+            } else {
+                mSong.setPlaylistId(info.getId());
+                mSong.setUserId(USER_ID);
+                db.collection("songs")
+                    .add(mSong.toMap())
+                    .addOnSuccessListener(onSuccessListener)
+                    .addOnFailureListener(mActivity::handleError);
+            }
         };
 
-        repository
-            .playlists(FirebaseRepository.USER_ID)
-            .get()
-            .addOnSuccessListener(snaps -> {
-                infos.clear();
-                infos.addAll(snaps.toObjects(Info.class));
-                dialog.setItems(ListArrayUtils.toArray(CharSequence.class, infos.stream().map(Info::getName).collect(Collectors.toList())), onClickListener);
-                dialog.show();
-            })
-            .addOnFailureListener(mActivity::handleError);
+        infos.addAll(mActivity.mainVM.myInfos.getValue());
+        dialog.setItems(ListArrayUtils.toArray(CharSequence.class, infos.stream().map(Info::getName).collect(Collectors.toList())), onClickListener);
+        dialog.show();
     }
 
     private void addToQueue() {
@@ -140,25 +129,23 @@ public class MenuItemEvents {
         OnSuccessListener<Object> onSuccessListener = __ -> {
             if (completed.incrementAndGet() == 2) {
                 mActivity.snack("Song removed");
-                mActivity.playlistViewVM.reload(mActivity::handleError);
             }
         };
 
-        repository
-            .playlist(mInfo.getId())
+        db.collection("playlists")
+            .document(mInfo.getId())
             .update("order", FieldValue.arrayRemove(mSong.getSongId()))
             .addOnSuccessListener(onSuccessListener)
             .addOnFailureListener(mActivity::handleError);
 
-        repository
-            .playlistSongs(mInfo.getId())
+        db.collection("songs")
+            .whereEqualTo("playlistId", mInfo.getId())
             .whereEqualTo("songId", mSong.getSongId())
             .get()
             .addOnSuccessListener(snaps -> {
                 if (snaps.size() > 0) {
                     DocumentSnapshot snap = snaps.getDocuments().get(0);
-                    repository
-                        .songsCollection()
+                    db.collection("songs")
                         .document(snap.getId())
                         .delete()
                         .addOnSuccessListener(onSuccessListener)
@@ -171,7 +158,7 @@ public class MenuItemEvents {
     }
 
     private void addToPlaylists() {
-        new SavePlaylistRequest(mInfo, FirebaseRepository.USER_ID, new SavePlaylistRequest.Callback() {
+        new SavePlaylistRequest(mInfo, USER_ID, new SavePlaylistRequest.Callback() {
             @Override
             public void onComplete() {
                 mActivity.snack("Saved playlist");
@@ -189,7 +176,7 @@ public class MenuItemEvents {
     }
 
     private void editPlaylist() {
-        mActivity.playlistEditVM.info.setValue(mInfo);
+        mActivity.playlistEditVM.playlistId.setValue(mInfo.getId());
         mOpenEditPlaylist.run();
     }
 

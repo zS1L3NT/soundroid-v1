@@ -22,11 +22,10 @@ import java.util.ArrayList;
 
 public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
     private static final String TAG = "(SounDroid) PlayingFragment";
-
     private final PlaylistsAdapter.Callback callback = new PlaylistsAdapter.Callback() {
         @Override
         public void onPlaylistClicked(Info info) {
-            playlistViewVM.info.setValue(info);
+            playlistViewVM.playlistId.setValue(info.getId());
             playlistViewVM.songs.setValue(new ArrayList<>());
             NavDirections action = PlaylistsFragmentDirections.openPlaylistView();
             NavHostFragment.findNavController(PlaylistsFragment.this).navigate(action);
@@ -40,6 +39,7 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
             });
         }
     };
+    private PlaylistsAdapter playlistsAdapter;
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,16 +48,16 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
 
         // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
-        PlaylistsAdapter playlistsAdapter = new PlaylistsAdapter(callback);
+        playlistsAdapter = new PlaylistsAdapter(callback);
         B.recyclerView.setAdapter(playlistsAdapter);
         B.recyclerView.setLayoutManager(layoutManager);
 
         // Observers
-        playlistsVM.infos.observe(this, playlistsAdapter::updateInfos);
         playlistsVM.loading.observe(this, B.swipeRefresh::setRefreshing);
+        mainVM.myInfos.observe(this, playlistsAdapter::updateInfos);
 
         B.headerAddImage.setOnClickListener(this::createPlaylist);
-        B.swipeRefresh.setOnRefreshListener(() -> playlistsVM.reload(activity::handleError));
+        B.swipeRefresh.setOnRefreshListener(this::onReload);
 
         return B.getRoot();
     }
@@ -66,6 +66,11 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
         playlistsVM.createPlaylist()
             .addOnSuccessListener(__ -> activity.snack("Created Playlist"))
             .addOnFailureListener(activity::handleError);
+    }
+
+    private void onReload() {
+        playlistsAdapter.updateInfos(mainVM.myInfos.getValue());
+        playlistsVM.loading.postValue(false);
     }
 
 }

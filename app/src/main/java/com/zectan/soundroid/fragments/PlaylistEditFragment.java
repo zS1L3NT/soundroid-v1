@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.navigation.NavDirections;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,7 +46,10 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         playlistEditVM.info.observe(this, this::onInfoChange);
         playlistEditVM.songs.observe(this, this::onSongsChange);
         playlistEditVM.navigateNow.observe(this, this::onNavigateNowChange);
+        playlistEditVM.saving.observe(this, this::onSavingChange);
 
+        mainVM.watchInfoFromPlaylist(this, playlistEditVM.playlistId.getValue(), playlistEditVM.info::setValue);
+        mainVM.watchSongsFromPlaylist(this, playlistEditVM.playlistId.getValue(), playlistEditVM.songs::setValue);
         B.backImage.setOnClickListener(__ -> activity.onBackPressed());
         B.saveImage.setOnClickListener(this::onSaveClicked);
 
@@ -55,6 +57,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
     }
 
     public void onSaveClicked(View view) {
+        playlistEditVM.saving.setValue(true);
         Info info = playlistEditVM.info.getValue();
         List<String> order = playlistEditAdapter
             .getDataSet()
@@ -83,11 +86,13 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
             @Override
             public void onComplete() {
                 playlistEditVM.navigateNow.postValue(1);
+                playlistEditVM.saving.postValue(false);
             }
 
             @Override
             public void onError(String message) {
                 mainVM.error.postValue(new Exception(message));
+                playlistEditVM.saving.postValue(false);
             }
         });
     }
@@ -108,10 +113,20 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
             .into(B.coverImage);
     }
 
+    private void onSavingChange(Boolean saving) {
+        B.saveImage.setEnabled(!saving);
+        if (saving) {
+            B.saveImage.setAlpha(0f);
+            B.loadingCircle.setAlpha(1f);
+        } else {
+            B.saveImage.setAlpha(1f);
+            B.loadingCircle.setAlpha(0f);
+        }
+    }
+
     private void onNavigateNowChange(Integer i) {
         if (i == 0) return;
         playlistEditVM.navigateNow.postValue(0);
-        NavDirections action = PlaylistEditFragmentDirections.backToPlaylistView();
-        navController.navigate(action);
+        activity.onBackPressed();
     }
 }

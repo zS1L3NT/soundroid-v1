@@ -13,7 +13,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.viewbinding.ViewBinding;
 
-import com.zectan.soundroid.FirebaseRepository;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.viewmodels.HomeViewModel;
 import com.zectan.soundroid.viewmodels.MainViewModel;
@@ -25,8 +24,7 @@ import com.zectan.soundroid.viewmodels.SearchViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
-public class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragment {
-    protected FirebaseRepository repository;
+public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragment {
     protected NavController navController;
     protected MainActivity activity;
     protected T B;
@@ -48,7 +46,6 @@ public class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragm
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         activity = (MainActivity) getActivity();
         assert activity != null;
-        repository = activity.getRepository();
         navController = NavHostFragment.findNavController(this);
 
         mainVM = new ViewModelProvider(activity).get(MainViewModel.class);

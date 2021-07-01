@@ -22,6 +22,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.PlaylistViewAdapter;
 import com.zectan.soundroid.classes.Fragment;
+import com.zectan.soundroid.connection.PlaylistSongsRequest;
 import com.zectan.soundroid.databinding.FragmentPlaylistViewBinding;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Playlist;
@@ -72,11 +73,47 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         playlistViewVM.info.observe(this, this::onInfoChange);
         playlistViewVM.songs.observe(this, this::onSongsChange);
         playlistViewVM.loading.observe(this, B.swipeRefresh::setRefreshing);
+
+        mainVM.watchInfoFromPlaylist(this, playlistViewVM.playlistId.getValue(), playlistViewVM.info::setValue);
+        mainVM.watchSongsFromPlaylist(this, playlistViewVM.playlistId.getValue(), playlistViewVM.songs::setValue);
         B.backImage.setOnClickListener(__ -> activity.onBackPressed());
         B.moreImage.setOnClickListener(this::onMoreImageClicked);
-        B.swipeRefresh.setOnRefreshListener(() -> playlistViewVM.reload(activity::handleError));
+        B.swipeRefresh.setOnRefreshListener(this::onReload);
+
+        onReload();
 
         return B.getRoot();
+    }
+
+    public void onReload() {
+        String playlistId = playlistViewVM.playlistId.getValue();
+        playlistViewVM.loading.setValue(true);
+
+        Info info = mainVM.getInfoFromPlaylist(playlistId);
+        if (info == null) {
+            fetchFromServer();
+        } else {
+            playlistViewVM.info.setValue(info);
+            playlistViewVM.loading.setValue(false);
+            playlistViewVM.songs.setValue(mainVM.getSongsFromPlaylist(playlistId));
+            B.recyclerView.scrollToPosition(0);
+        }
+    }
+
+    public void fetchFromServer() {
+        new PlaylistSongsRequest(playlistViewVM.playlistId.getValue(), new PlaylistSongsRequest.Callback() {
+            @Override
+            public void onComplete(List<Song> songs) {
+                playlistViewVM.loading.postValue(false);
+                playlistViewVM.songs.postValue(songs);
+            }
+
+            @Override
+            public void onError(String message) {
+                playlistViewVM.loading.postValue(false);
+                mainVM.error.postValue(new Exception(message));
+            }
+        });
     }
 
     public void onMoreImageClicked(View view) {
