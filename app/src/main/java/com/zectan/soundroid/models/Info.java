@@ -118,6 +118,10 @@ public class Info {
         return userId;
     }
 
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public List<String> getQueries() {
         return queries;
     }

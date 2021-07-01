@@ -158,7 +158,8 @@ public class MenuItemEvents {
     }
 
     private void addToPlaylists() {
-        new SavePlaylistRequest(mInfo, USER_ID, new SavePlaylistRequest.Callback() {
+        mInfo.setUserId(USER_ID);
+        new SavePlaylistRequest(mInfo, new SavePlaylistRequest.Callback() {
             @Override
             public void onComplete() {
                 mActivity.snack("Saved playlist");

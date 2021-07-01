@@ -12,7 +12,7 @@ import java.util.List;
 
 public class PlaylistSongsRequest {
     private static final String TAG = "(SounDroid) PlaylistSongsRequest";
-    private static final String URL = "http://soundroid.zectan.com/playlist/%s/songs";
+    private static final String URL = "http://soundroid.zectan.com/playlist/songs?playlistId=%s";
 
     public PlaylistSongsRequest(String playlistId, Callback callback) {
         if (playlistId.equals("")) {
