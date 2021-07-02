@@ -106,6 +106,10 @@ public class Info {
         return cover;
     }
 
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
     public String getColorHex() {
         return colorHex;
     }

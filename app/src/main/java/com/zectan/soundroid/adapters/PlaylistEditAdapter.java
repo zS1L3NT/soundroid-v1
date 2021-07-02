@@ -16,12 +16,12 @@ import com.zectan.soundroid.models.Song;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class PlaylistEditAdapter extends DragDropSwipeAdapter<Song, PlaylistEditViewHolder> {
 
-    public PlaylistEditAdapter(List<Song> songs) {
-        setDataSet(songs);
+    public PlaylistEditAdapter() {
+        setDataSet(new ArrayList<>());
     }
 
     @Override

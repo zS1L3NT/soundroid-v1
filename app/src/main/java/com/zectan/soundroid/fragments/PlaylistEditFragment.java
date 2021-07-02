@@ -1,16 +1,24 @@
 package com.zectan.soundroid.fragments;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.PlaylistEditAdapter;
 import com.zectan.soundroid.classes.Fragment;
@@ -23,11 +31,31 @@ import com.zectan.soundroid.utils.ListArrayUtils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static android.app.Activity.RESULT_OK;
+
 public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> {
+    private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private PlaylistEditAdapter playlistEditAdapter;
+    private Uri newFilePath;
+    private final ActivityResultLauncher<Intent> chooseCoverImage = registerForActivityResult(
+        new ActivityResultContracts.StartActivityForResult(),
+        result -> {
+            mainVM.watch(activity);
+            if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
+                newFilePath = result.getData().getData();
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), newFilePath);
+                    B.coverImage.setImageBitmap(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    );
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -36,7 +64,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
 
         // Recycler Views
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
-        playlistEditAdapter = new PlaylistEditAdapter(playlistViewVM.songs.getValue());
+        playlistEditAdapter = new PlaylistEditAdapter();
         B.recyclerView.setAdapter(playlistEditAdapter);
         B.recyclerView.setLayoutManager(layoutManager);
         B.recyclerView.setOrientation(DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING);
@@ -50,13 +78,21 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
 
         mainVM.watchInfoFromPlaylist(this, playlistEditVM.playlistId.getValue(), playlistEditVM.info::setValue);
         mainVM.watchSongsFromPlaylist(this, playlistEditVM.playlistId.getValue(), playlistEditVM.songs::setValue);
-        B.backImage.setOnClickListener(__ -> activity.onBackPressed());
+        B.backImage.setOnClickListener(__ -> navController.navigateUp());
         B.saveImage.setOnClickListener(this::onSaveClicked);
+        B.coverImage.setOnClickListener(this::onCoverClicked);
 
         return B.getRoot();
     }
 
-    public void onSaveClicked(View view) {
+    private void onCoverClicked(View view) {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        chooseCoverImage.launch(intent);
+    }
+
+    private void onSaveClicked(View view) {
         playlistEditVM.saving.setValue(true);
         Info info = playlistEditVM.info.getValue();
         List<String> order = playlistEditAdapter
@@ -82,7 +118,29 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
             Anonymous.getQueries(newName)
         );
 
-        new EditPlaylistRequest(newInfo, new EditPlaylistRequest.Callback() {
+        StorageReference ref = storage.getReference().child(String.format("covers/%s.png", info.getId()));
+        if (newFilePath != null) {
+            ref.putFile(newFilePath)
+                .addOnSuccessListener(snap -> ref.getDownloadUrl()
+                    .addOnSuccessListener(uri -> {
+                        newInfo.setCover(uri.toString());
+                        sendEditPlaylistRequest(newInfo);
+                    })
+                    .addOnFailureListener(error -> {
+                        playlistEditVM.saving.postValue(false);
+                        mainVM.error.postValue(error);
+                    }))
+                .addOnFailureListener(error -> {
+                    playlistEditVM.saving.postValue(false);
+                    mainVM.error.postValue(error);
+                });
+        } else {
+            sendEditPlaylistRequest(newInfo);
+        }
+    }
+
+    private void sendEditPlaylistRequest(Info info) {
+        new EditPlaylistRequest(info, new EditPlaylistRequest.Callback() {
             @Override
             public void onComplete() {
                 playlistEditVM.navigateNow.postValue(1);
@@ -103,14 +161,16 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
 
     private void onInfoChange(Info info) {
         B.nameTextInput.setText(info.getName());
-        Glide
-            .with(activity)
-            .load(info.getCover())
-            .placeholder(R.drawable.playing_cover_default)
-            .error(R.drawable.playing_cover_default)
-            .transition(new DrawableTransitionOptions().crossFade())
-            .centerCrop()
-            .into(B.coverImage);
+        if (newFilePath == null) {
+            Glide
+                .with(activity)
+                .load(info.getCover())
+                .placeholder(R.drawable.playing_cover_default)
+                .error(R.drawable.playing_cover_default)
+                .transition(new DrawableTransitionOptions().crossFade())
+                .centerCrop()
+                .into(B.coverImage);
+        }
     }
 
     private void onSavingChange(Boolean saving) {

@@ -76,7 +76,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
 
         mainVM.watchInfoFromPlaylist(this, playlistViewVM.playlistId.getValue(), playlistViewVM.info::setValue);
         mainVM.watchSongsFromPlaylist(this, playlistViewVM.playlistId.getValue(), playlistViewVM.songs::setValue);
-        B.backImage.setOnClickListener(__ -> activity.onBackPressed());
+        B.backImage.setOnClickListener(__ -> navController.navigateUp());
         B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.swipeRefresh.setOnRefreshListener(this::onReload);
 
