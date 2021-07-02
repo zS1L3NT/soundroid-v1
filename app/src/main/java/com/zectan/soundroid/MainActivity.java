@@ -15,7 +15,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.material.snackbar.Snackbar;
 import com.zectan.soundroid.databinding.ActivityMainBinding;
@@ -68,8 +67,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(B.bottomNavigator, navController);
 
         SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
-        player.setShuffleModeEnabled(true);
-        player.setRepeatMode(Player.REPEAT_MODE_ALL);
         playingVM.setPlayer(player);
     }
 

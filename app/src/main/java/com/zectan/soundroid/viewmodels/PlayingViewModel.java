@@ -9,12 +9,11 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.zectan.soundroid.adapters.QueueAdapter;
 import com.zectan.soundroid.classes.StrictLiveData;
 import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.models.Song;
-import com.zectan.soundroid.utils.CustomPlaybackOrder;
 import com.zectan.soundroid.utils.ListArrayUtils;
+import com.zectan.soundroid.utils.QueueManager;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -41,14 +40,15 @@ import java.util.Objects;
 
 public class PlayingViewModel extends ViewModel {
     private static final String TAG = "(SounDroid) PlayingViewModel";
-    public final StrictLiveData<Playlist> queue = new StrictLiveData<>(Playlist.getEmpty());
+    public final StrictLiveData<Playlist> playlist = new StrictLiveData<>(Playlist.getEmpty());
     public final StrictLiveData<Song> currentSong = new StrictLiveData<>(Song.getEmpty());
     public final StrictLiveData<Boolean> isBuffering = new StrictLiveData<>(false);
     public final StrictLiveData<Boolean> isPlaying = new StrictLiveData<>(false);
     public final StrictLiveData<Boolean> isShuffling = new StrictLiveData<>(false);
     public final StrictLiveData<Boolean> isLooping = new StrictLiveData<>(true);
     public final StrictLiveData<String> error = new StrictLiveData<>("");
-    private CustomPlaybackOrder mOrder;
+    public final StrictLiveData<List<Song>> queue = new StrictLiveData<>(new ArrayList<>());
+    private QueueManager mQueueManager;
     private SimpleExoPlayer mPlayer;
     private boolean initialised = false;
 
@@ -65,38 +65,29 @@ public class PlayingViewModel extends ViewModel {
     public void startPlaylist(Playlist playlist, String songId) {
         Log.i(TAG, String.format("Start Playlist (%s)[%s]", playlist.getInfo().getId(), songId));
 
-        selectSong(playlist, songId);
+        this.playlist.setValue(playlist);
+        mQueueManager = new QueueManager(
+            playlist.getSongs(),
+            ListArrayUtils.startOrderFromId(playlist.getInfo().getOrder(), songId),
+            isLooping,
+            isShuffling,
+            currentSong,
+            queue,
+            mPlayer
+        );
 
-        if (isShuffling.getValue())
-            mOrder = CustomPlaybackOrder.createShuffled(playlist.size());
-        else
-            mOrder = CustomPlaybackOrder.createOrdered(playlist.size());
-        mPlayer.setShuffleOrder(mOrder);
+        changeSong(songId);
     }
 
-    /**
-     * Method to play a song without shuffling the queue
-     *
-     * @param playlist New playlist for the MusicPlayer to play
-     * @param songId   Id of the starting song
-     */
-    public void selectSong(Playlist playlist, String songId) {
-        Log.i(TAG, String.format("Play from Playlist (%s)[%s]", playlist.getInfo().getId(), songId));
+    public void changeSong(String songId) {
+        Log.i(TAG, String.format("Changed Song to Song<%s>", songId));
+        Song song = mQueueManager.getSongById(songId);
 
-        // If the new clicked song is from a new playlist or has no id
-        this.queue.setValue(playlist);
-
-        mPlayer.stop();
-        mPlayer.clearMediaItems();
-
-        List<Integer> sequence = ListArrayUtils.createOrder(playlist.size(), playlist.getIndexOfSong(songId));
-        for (int i = 0; i < playlist.size(); i++) {
-            Song song = playlist.getSong(sequence.get(i));
-            mPlayer.addMediaItem(i, song.getMediaItem());
+        if (song == null) {
+            throw new RuntimeException(String.format("Song not found in playlist: %s", songId));
         }
 
-        mPlayer.prepare();
-        mPlayer.play();
+        mQueueManager.goToSong(song);
     }
 
     public void retry() {
@@ -105,29 +96,12 @@ public class PlayingViewModel extends ViewModel {
     }
 
     /**
-     * Formats the display queue
-     *
-     * @return List of songs in the queue
-     */
-    public List<Song> getItemsInQueue() {
-        if (mPlayer.getCurrentMediaItem() == null) return new ArrayList<>();
-        return ListArrayUtils.formatQueue(
-            queue.getValue().getSongs(),
-            mOrder.getOrder(),
-            queue.getValue().getIndexOfSong(mPlayer.getCurrentMediaItem().mediaId),
-            isLooping.getValue()
-        );
-    }
-
-
-    /**
      * Play the previous song in the queue or reset the song progress
      */
     public void playPreviousSong() {
         error.postValue("");
         if (mPlayer.getContentPosition() <= 2000) {
-            mPlayer.prepare();
-            mPlayer.previous();
+            mQueueManager.backSong();
         } else {
             mPlayer.seekTo(0);
         }
@@ -138,26 +112,15 @@ public class PlayingViewModel extends ViewModel {
      */
     public void playNextSong() {
         error.postValue("");
-        mPlayer.prepare();
-        mPlayer.next();
+        mQueueManager.nextSong();
     }
 
-    public void toggleShuffle(QueueAdapter queueAdapter) {
-        isShuffling.setValue(!isShuffling.getValue());
-        if (isShuffling.getValue())
-            mOrder = CustomPlaybackOrder.createShuffled(queue.getValue().size());
-        else
-            mOrder = CustomPlaybackOrder.createOrdered(queue.getValue().size());
-        queueAdapter.updateQueue(getItemsInQueue());
-        mPlayer.setShuffleOrder(mOrder);
+    public void toggleShuffle() {
+        mQueueManager.toggleShuffle();
     }
 
-    public void toggleLoop(QueueAdapter queueAdapter) {
-        int oldRepeatMode = mPlayer.getRepeatMode();
-        int newRepeatMode = oldRepeatMode == Player.REPEAT_MODE_ALL ? Player.REPEAT_MODE_OFF : Player.REPEAT_MODE_ALL;
-        mPlayer.setRepeatMode(newRepeatMode);
-        isLooping.setValue(newRepeatMode == 2);
-        queueAdapter.updateQueue(getItemsInQueue());
+    public void toggleLoop() {
+        mQueueManager.toggleLoop();
     }
 
     public void play() {
@@ -190,14 +153,15 @@ public class PlayingViewModel extends ViewModel {
             @Override
             public void onPlaybackStateChanged(int state) {
                 PlayingViewModel.this.isBuffering.postValue(state == Player.STATE_BUFFERING);
+                if (state == Player.STATE_ENDED) {
+                    mQueueManager.nextSong();
+                }
             }
 
             @Override
             public void onMediaItemTransition(@Nullable @org.jetbrains.annotations.Nullable MediaItem mediaItem, int reason) {
                 if (mediaItem != null) {
-                    Song song = queue.getValue().getSong(mediaItem.mediaId);
-                    currentSong.postValue(song);
-                    Log.i(TAG, String.format("Song changed to %s", song));
+                    Log.i(TAG, String.format("Song changed to %s", mediaItem));
                 }
             }
 
@@ -210,28 +174,22 @@ public class PlayingViewModel extends ViewModel {
                 }
             }
         });
+        mQueueManager = new QueueManager(new ArrayList<>(), new ArrayList<>(), isLooping, isShuffling, currentSong, queue, mPlayer);
     }
 
     public void onMoveSong(int oldPosition, int newPosition) {
         Log.i(TAG, String.format("Dragged song from %s to %s", oldPosition, newPosition));
-        mOrder = mOrder.closeAndMove(oldPosition, newPosition);
-        mPlayer.setShuffleOrder(mOrder);
+        mQueueManager.moveSong(oldPosition, newPosition);
     }
 
     public void onRemoveSong(String songId) {
         Log.i(TAG, String.format("Swiped song %s", songId));
-        Playlist queue = this.queue.getValue();
-        int position = mOrder.getOrder()[queue.getIndexOfSong(songId)];
-        queue.removeSong(songId);
-        this.queue.setValue(queue);
-
-        mPlayer.removeMediaItem(position);
-        mOrder = mOrder.cloneAndRemove(position, position + 1);
-        mPlayer.setShuffleOrder(mOrder);
+        mQueueManager.removeSong(songId);
     }
 
     public void addToQueue(Song song) {
-
+        Log.i(TAG, String.format("Added song %s", song));
+        mQueueManager.addSong(song);
     }
 
 }

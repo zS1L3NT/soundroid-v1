@@ -29,7 +29,6 @@ import com.zectan.soundroid.R;
 import com.zectan.soundroid.adapters.QueueAdapter;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlayingBinding;
-import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.utils.Animations;
 
@@ -43,9 +42,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     private final QueueAdapter.Callback callback = new QueueAdapter.Callback() {
         @Override
         public void onSongClicked(Song song) {
-            Playlist queue = playingVM.queue.getValue();
-
-            playingVM.selectSong(queue, song.getSongId());
+            playingVM.changeSong(song.getSongId());
         }
 
         @Override
@@ -92,6 +89,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         B.recyclerView.setReduceItemAlphaOnSwiping(true);
 
         // Live Observers
+        playingVM.queue.observe(this, mQueueAdapter::updateQueue);
         playingVM.currentSong.observe(this, this::onCurrentSongChange);
         playingVM.isBuffering.observe(this, this::onIsBufferingChange);
         playingVM.isPlaying.observe(this, this::onIsPlayingChange);
@@ -103,13 +101,13 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         B.playPauseImage.setOnTouchListener(Animations::animationSmallSqueeze);
         B.playPauseMiniImage.setOnClickListener(this::playPauseSong);
         B.playPauseMiniImage.setOnTouchListener(Animations::animationMediumSqueeze);
-        B.shuffleImage.setOnClickListener(__ -> playingVM.toggleShuffle(mQueueAdapter));
+        B.shuffleImage.setOnClickListener(__ -> playingVM.toggleShuffle());
         B.shuffleImage.setOnTouchListener(Animations::animationMediumSqueeze);
         B.backImage.setOnClickListener(__ -> playingVM.playPreviousSong());
         B.backImage.setOnTouchListener(Animations::animationMediumSqueeze);
         B.nextImage.setOnClickListener(__ -> playingVM.playNextSong());
         B.nextImage.setOnTouchListener(Animations::animationMediumSqueeze);
-        B.loopImage.setOnClickListener(__ -> playingVM.toggleLoop(mQueueAdapter));
+        B.loopImage.setOnClickListener(__ -> playingVM.toggleLoop());
         B.loopImage.setOnTouchListener(Animations::animationMediumSqueeze);
 
         B.playingSeekbar.setPlayer(playingVM.getPlayer());
@@ -137,14 +135,12 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             B.descriptionText.setText("-");
             colorHex = "#7b828b";
         } else {
-            mQueueAdapter.updateQueue(playingVM.getItemsInQueue());
-
             String title = song.getTitle();
             String artiste = song.getArtiste();
             String cover = song.getCover();
             colorHex = song.getColorHex();
 
-            B.playlistNameText.setText(playingVM.queue.getValue().getInfo().getName());
+            B.playlistNameText.setText(playingVM.playlist.getValue().getInfo().getName());
             B.titleText.setText(title);
             B.descriptionText.setText(artiste);
             Glide

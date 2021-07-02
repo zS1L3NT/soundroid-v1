@@ -5,38 +5,31 @@ import com.zectan.soundroid.models.Song;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ListArrayUtils {
-    /**
-     * Creates a list order starting
-     *
-     * @param startValue Value of the first item in the list
-     * @param length     Length of the list
-     * @return New list
-     */
-    public static List<Integer> createOrder(int length, int startValue) {
-        List<Integer> order = new ArrayList<>();
-        for (int i = startValue; i < length; i++) order.add(i);
-        for (int i = 0; i < startValue; i++) order.add(i);
-        return order;
+    public static List<String> startOrderFromId(List<String> order, String songId) {
+        List<String> filtered = order
+            .stream()
+            .filter(s -> s.equals(songId))
+            .collect(Collectors.toList());
+
+        if (filtered.size() == 0) return order;
+        int startPosition = order.indexOf(filtered.get(0));
+
+        return startListFromPosition(order, startPosition);
     }
 
-    /**
-     * Changes the order of a list but maintaining an item as the first in the list
-     *
-     * @param order         Order to rearrange
-     * @param startPosition Position to start list from
-     * @return New list
-     */
-    public static List<Integer> changeOrder(List<Integer> order, int startPosition) {
-        if (startPosition < 0) return order;
+    public static List<String> shuffleOrder(List<String> order) {
+        if (order.size() == 0) return order;
+        String itemOne = order.get(0);
+        order.remove(0);
 
-        List<Integer> newOrder = new ArrayList<>();
-        for (int i = startPosition; i < order.size(); i++) newOrder.add(order.get(i));
-        for (int i = 0; i < startPosition; i++) newOrder.add(order.get(i));
-        return newOrder;
+        Collections.shuffle(order);
+        order.add(0, itemOne);
+        return order;
     }
 
     /**
@@ -53,59 +46,11 @@ public class ListArrayUtils {
             .collect(Collectors.toList());
     }
 
-    /**
-     * Makes the order for display of the queue. All logic will be done here, just pass the values
-     *
-     * @param songs        All the songs in default order in a list
-     * @param order        Order of the song indexes in an array
-     * @param currentIndex Current index of the player
-     * @param isLooping    If the player is looping the tracks
-     * @return Formatted version of the queue
-     */
-    public static List<Song> formatQueue(List<Song> songs, int[] order, int currentIndex, boolean isLooping) {
-        List<Song> queue = new ArrayList<>();
-
-        List<Integer> listOrder = toListInteger(order);
-        int indexOfCurrent = listOrder.indexOf(currentIndex);
-        order = toIntArray(
-            isLooping
-                ? changeOrder(listOrder, indexOfCurrent)
-                : listOrder.subList(indexOfCurrent, order.length)
-        );
-
-        for (int i = 0; i < order.length; i++)
-            if (i != 0)
-                queue.add(songs.get(order[i]));
-
-        return queue;
-    }
-
-    /**
-     * Convert an array of int to a list of integer
-     *
-     * @param array The array to convert
-     * @return The list produced
-     */
-    public static List<Integer> toListInteger(int[] array) {
-        List<Integer> list = new ArrayList<>();
-        for (int item : array) {
-            list.add(item);
-        }
-        return list;
-    }
-
-    /**
-     * Convert a list of integer to an array of int
-     *
-     * @param list The list to convert
-     * @return The array produced
-     */
-    public static int[] toIntArray(List<Integer> list) {
-        int[] array = new int[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            array[i] = list.get(i);
-        }
-        return array;
+    public static <T> List<T> startListFromPosition(List<T> list, int startPosition) {
+        List<T> newList = new ArrayList<>();
+        for (int i = startPosition; i < list.size(); i++) newList.add(list.get(i));
+        for (int i = 0; i < startPosition; i++) newList.add(list.get(i));
+        return newList;
     }
 
     @SuppressWarnings("unchecked")
