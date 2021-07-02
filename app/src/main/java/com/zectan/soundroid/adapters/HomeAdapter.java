@@ -110,7 +110,7 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
         Playlist playlist = new Playlist(info, songs);
 
         B.parent.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, playlist, id));
-        B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.song_menu_home, song, mCallback));
+        B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.song_menu, song, mCallback));
     }
 }
 

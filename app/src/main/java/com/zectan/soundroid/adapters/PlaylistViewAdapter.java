@@ -96,7 +96,7 @@ class PlaylistViewViewHolder extends RecyclerView.ViewHolder {
             .centerCrop()
             .into(B.coverImage);
         B.parent.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, id));
-        B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.song_menu_playlist, song, mCallback));
+        B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.song_menu, song, mCallback));
     }
 }
 

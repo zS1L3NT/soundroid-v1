@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.viewbinding.ViewBinding;
 
 import com.zectan.soundroid.MainActivity;
@@ -46,7 +45,7 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         activity = (MainActivity) getActivity();
         assert activity != null;
-        navController = NavHostFragment.findNavController(this);
+        navController = activity.navController;
 
         mainVM = new ViewModelProvider(activity).get(MainViewModel.class);
         homeVM = new ViewModelProvider(activity).get(HomeViewModel.class);

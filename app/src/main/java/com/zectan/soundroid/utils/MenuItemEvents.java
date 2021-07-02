@@ -6,7 +6,6 @@ import android.view.MenuItem;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.MainActivity;
@@ -14,6 +13,7 @@ import com.zectan.soundroid.R;
 import com.zectan.soundroid.connection.DeletePlaylistRequest;
 import com.zectan.soundroid.connection.SavePlaylistRequest;
 import com.zectan.soundroid.models.Info;
+import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.models.Song;
 
 import java.util.ArrayList;
@@ -54,11 +54,11 @@ public class MenuItemEvents {
             case R.id.add_to_queue:
                 addToQueue();
                 break;
-            case R.id.remove_from_playlist:
-                removeFromPlaylist();
+            case R.id.play_playlist:
+                playPlaylist();
                 break;
-            case R.id.add_to_playlists:
-                addToPlaylists();
+            case R.id.save_playlist:
+                savePlaylist();
                 break;
             case R.id.download_playlist:
                 downloadPlaylist();
@@ -124,40 +124,14 @@ public class MenuItemEvents {
         mActivity.snack("Song added to queue");
     }
 
-    private void removeFromPlaylist() {
-        AtomicInteger completed = new AtomicInteger(0);
-        OnSuccessListener<Object> onSuccessListener = __ -> {
-            if (completed.incrementAndGet() == 2) {
-                mActivity.snack("Song removed");
-            }
-        };
-
-        db.collection("playlists")
-            .document(mInfo.getId())
-            .update("order", FieldValue.arrayRemove(mSong.getSongId()))
-            .addOnSuccessListener(onSuccessListener)
-            .addOnFailureListener(mActivity::handleError);
-
-        db.collection("songs")
-            .whereEqualTo("playlistId", mInfo.getId())
-            .whereEqualTo("songId", mSong.getSongId())
-            .get()
-            .addOnSuccessListener(snaps -> {
-                if (snaps.size() > 0) {
-                    DocumentSnapshot snap = snaps.getDocuments().get(0);
-                    db.collection("songs")
-                        .document(snap.getId())
-                        .delete()
-                        .addOnSuccessListener(onSuccessListener)
-                        .addOnFailureListener(mActivity::handleError);
-                } else {
-                    mActivity.handleError(new Exception("Document not found"));
-                }
-            })
-            .addOnFailureListener(mActivity::handleError);
+    private void playPlaylist() {
+        List<Song> songs = mActivity.mainVM.getSongsFromPlaylist(mInfo.getId());
+        Playlist playlist = new Playlist(mInfo, songs);
+        mActivity.playingVM.startPlaylist(playlist, songs.get(0).getSongId());
+        mActivity.navController.navigate(R.id.fragment_playing);
     }
 
-    private void addToPlaylists() {
+    private void savePlaylist() {
         mInfo.setUserId(USER_ID);
         new SavePlaylistRequest(mInfo, new SavePlaylistRequest.Callback() {
             @Override

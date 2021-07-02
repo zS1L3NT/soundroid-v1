@@ -33,6 +33,7 @@ import com.zectan.soundroid.viewmodels.SearchViewModel;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "(SounDroid) MainActivity";
     public ActivityMainBinding B;
+    public NavController navController;
     private InputMethodManager imm;
 
     public MainViewModel mainVM;
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
         assert navHostFragment != null;
-        NavController navController = navHostFragment.getNavController();
+        navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(B.bottomNavigator, navController);
 
         SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();

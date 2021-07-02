@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -108,7 +109,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             B.parent.setOnClickListener(__ -> mCallback.onSongClicked(song));
             B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(
                 v,
-                R.menu.song_menu_search,
+                R.menu.song_menu,
                 result,
                 mCallback
             ));
@@ -118,7 +119,18 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             String name = info.getName();
             String cover = info.getCover();
             String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_song_cover), id);
+            @MenuRes int menu_id;
 
+            switch (result.getLocation()) {
+                case "Local":
+                    menu_id = R.menu.playlist_menu_search_local;
+                    break;
+                case "Server":
+                    menu_id = R.menu.playlist_menu_search_server;
+                    break;
+                default:
+                    throw new RuntimeException(String.format("Unknown result location %s", result.getLocation()));
+            }
 
             B.titleText.setText(name);
             B.descriptionText.setText(String.format("%s • Playlist", result.getLocation()));
@@ -132,7 +144,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
             B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(
                 v,
-                R.menu.playlist_menu_search,
+                menu_id,
                 result,
                 mCallback
             ));
