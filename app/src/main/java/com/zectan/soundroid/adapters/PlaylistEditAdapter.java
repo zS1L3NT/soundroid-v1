@@ -19,8 +19,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 public class PlaylistEditAdapter extends DragDropSwipeAdapter<Song, PlaylistEditViewHolder> {
+    private final Callback mCallback;
+    private String startSwipeId;
+    private int startSwipeDataSetSize;
 
-    public PlaylistEditAdapter() {
+    public PlaylistEditAdapter(Callback callback) {
+        mCallback = callback;
         setDataSet(new ArrayList<>());
     }
 
@@ -37,6 +41,25 @@ public class PlaylistEditAdapter extends DragDropSwipeAdapter<Song, PlaylistEdit
     @Override
     protected void onBindViewHolder(Song song, @NotNull PlaylistEditViewHolder holder, int i) {
         holder.bind(song);
+    }
+
+    @Override
+    protected void onSwipeStarted(Song song, @NotNull PlaylistEditViewHolder holder) {
+        super.onSwipeStarted(song, holder);
+        startSwipeId = song.getSongId();
+        startSwipeDataSetSize = getItemCount();
+    }
+
+    @Override
+    protected void onSwipeAnimationFinished(@NotNull PlaylistEditViewHolder holder) {
+        super.onSwipeAnimationFinished(holder);
+        if (startSwipeDataSetSize != getItemCount()) {
+            mCallback.onRemove(startSwipeId);
+        }
+    }
+
+    public interface Callback {
+        void onRemove(String songId);
     }
 }
 

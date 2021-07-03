@@ -32,6 +32,7 @@ import com.zectan.soundroid.utils.ListArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> {
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
+    private final List<String> removed = new ArrayList<>();
     private PlaylistEditAdapter playlistEditAdapter;
     private Uri newFilePath;
     private final ActivityResultLauncher<Intent> chooseCoverImage = registerForActivityResult(
@@ -64,7 +66,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
 
         // Recycler Views
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
-        playlistEditAdapter = new PlaylistEditAdapter();
+        playlistEditAdapter = new PlaylistEditAdapter(removed::add);
         B.recyclerView.setAdapter(playlistEditAdapter);
         B.recyclerView.setLayoutManager(layoutManager);
         B.recyclerView.setOrientation(DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING);
@@ -81,6 +83,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         B.backImage.setOnClickListener(__ -> navController.navigateUp());
         B.saveImage.setOnClickListener(this::onSaveClicked);
         B.coverImage.setOnClickListener(this::onCoverClicked);
+        removed.clear();
 
         return B.getRoot();
     }
@@ -140,9 +143,15 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
     }
 
     private void sendEditPlaylistRequest(Info info) {
-        new EditPlaylistRequest(info, new EditPlaylistRequest.Callback() {
+        new EditPlaylistRequest(info, removed, new EditPlaylistRequest.Callback() {
             @Override
             public void onComplete() {
+                playlistEditVM.songs
+                    .getValue()
+                    .stream()
+                    .filter(song -> removed.contains(song.getSongId()))
+                    .forEach(song -> song.deleteLocally(activity));
+
                 playlistEditVM.navigateNow.postValue(1);
                 playlistEditVM.saving.postValue(false);
             }

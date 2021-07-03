@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         mainVM.watch(this);
         searchVM.watch(this);
 
+        // Navigation
         NavHostFragment navHostFragment =
             (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         navController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(B.bottomNavigator, navController);
 
+        // Music Player
         SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
         playingVM.setPlayer(this, player);
     }

@@ -7,16 +7,31 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.zectan.soundroid.models.Info;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.util.List;
 
 public class EditPlaylistRequest {
     private static final String URL = "http://soundroid.zectan.com/playlist/edit";
 
-    public EditPlaylistRequest(Info info, Callback callback) {
+    public EditPlaylistRequest(Info info, List<String> removed, Callback callback) {
         MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
+        JSONObject object = new JSONObject();
+        JSONArray removedArray = new JSONArray();
+        for (String songId : removed) removedArray.put(songId);
+        try {
+            object.put("removed", removedArray);
+            object.put("info", info.toJSON());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         OkHttpClient client = new OkHttpClient();
-        RequestBody body = RequestBody.create(JSON, info.toJSON().toString());
+        RequestBody body = RequestBody.create(JSON, object.toString());
 
         Request request = new Request.Builder()
             .url(URL)
