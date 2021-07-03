@@ -1,6 +1,8 @@
 package com.zectan.soundroid.viewmodels;
 
 import android.content.Context;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.util.Log;
 
 import androidx.lifecycle.ViewModel;
@@ -8,6 +10,7 @@ import androidx.lifecycle.ViewModel;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.classes.StrictLiveData;
 import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.models.Song;
@@ -50,6 +53,8 @@ public class PlayingViewModel extends ViewModel {
     private QueueManager mQueueManager;
     private SimpleExoPlayer mPlayer;
     private boolean initialised = false;
+    private AudioManager am;
+    private AudioFocusRequest afr;
 
     public PlayingViewModel() {
         // Required empty public constructor
@@ -81,10 +86,12 @@ public class PlayingViewModel extends ViewModel {
             throw new RuntimeException(String.format("Song not found in playlist: %s", songId));
         }
 
+        requestAudioFocus();
         mQueueManager.goToSong(song);
     }
 
     public void retry() {
+        requestAudioFocus();
         mPlayer.prepare();
         mPlayer.play();
     }
@@ -93,6 +100,7 @@ public class PlayingViewModel extends ViewModel {
      * Play the previous song in the queue or reset the song progress
      */
     public void playPreviousSong() {
+        requestAudioFocus();
         error.postValue("");
         if (mPlayer.getContentPosition() <= 2000) {
             mQueueManager.backSong();
@@ -105,6 +113,7 @@ public class PlayingViewModel extends ViewModel {
      * Play the next song in the queue
      */
     public void playNextSong() {
+        requestAudioFocus();
         error.postValue("");
         mQueueManager.nextSong();
     }
@@ -118,6 +127,7 @@ public class PlayingViewModel extends ViewModel {
     }
 
     public void play() {
+        requestAudioFocus();
         mPlayer.play();
     }
 
@@ -134,7 +144,7 @@ public class PlayingViewModel extends ViewModel {
      *
      * @param player Instance of the player. Should only be created once
      */
-    public void setPlayer(Context context, SimpleExoPlayer player) {
+    public void setPlayer(MainActivity activity, SimpleExoPlayer player) {
         if (initialised) return;
         initialised = true;
         mPlayer = player;
@@ -162,8 +172,16 @@ public class PlayingViewModel extends ViewModel {
             }
         });
 
+        // Audio Focus
+        am = activity.getSystemService(AudioManager.class);
+        afr = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+            .setAcceptsDelayedFocusGain(true)
+            .setWillPauseWhenDucked(true)
+            .setOnAudioFocusChangeListener(this::onAudioFocusChange)
+            .build();
+
         mQueueManager = new QueueManager(
-            context,
+            activity,
             new ArrayList<>(),
             new ArrayList<>(),
             isLooping,
@@ -187,6 +205,26 @@ public class PlayingViewModel extends ViewModel {
     public void addToQueue(Song song) {
         Log.i(TAG, String.format("Added song %s", song));
         mQueueManager.addSong(song);
+    }
+
+    private void requestAudioFocus() {
+        if (am == null || afr == null) return;
+        am.requestAudioFocus(afr);
+    }
+
+    private void onAudioFocusChange(int focusChange) {
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                pause();
+                break;
+            case AudioManager.AUDIOFOCUS_GAIN:
+                play();
+                break;
+            case AudioManager.AUDIOFOCUS_LOSS:
+                am.abandonAudioFocusRequest(afr);
+                pause();
+                break;
+        }
     }
 
 }
