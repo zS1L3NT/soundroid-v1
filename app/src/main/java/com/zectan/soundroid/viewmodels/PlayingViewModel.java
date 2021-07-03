@@ -1,12 +1,11 @@
 package com.zectan.soundroid.viewmodels;
 
+import android.content.Context;
 import android.util.Log;
 
-import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.zectan.soundroid.classes.StrictLiveData;
@@ -56,17 +55,12 @@ public class PlayingViewModel extends ViewModel {
         // Required empty public constructor
     }
 
-    /**
-     * Starts a playlist and shuffles it
-     *
-     * @param playlist New playlist for MusicPlayer to loop
-     * @param songId   Id of the song you're starting from
-     */
-    public void startPlaylist(Playlist playlist, String songId) {
+    public void startPlaylist(Context context, Playlist playlist, String songId) {
         Log.i(TAG, String.format("Start Playlist (%s)[%s]", playlist.getInfo().getId(), songId));
 
         this.playlist.setValue(playlist);
         mQueueManager = new QueueManager(
+            context,
             playlist.getSongs(),
             ListArrayUtils.startOrderFromId(playlist.getInfo().getOrder(), songId),
             isLooping,
@@ -140,7 +134,7 @@ public class PlayingViewModel extends ViewModel {
      *
      * @param player Instance of the player. Should only be created once
      */
-    public void setPlayer(SimpleExoPlayer player) {
+    public void setPlayer(Context context, SimpleExoPlayer player) {
         if (initialised) return;
         initialised = true;
         mPlayer = player;
@@ -159,13 +153,6 @@ public class PlayingViewModel extends ViewModel {
             }
 
             @Override
-            public void onMediaItemTransition(@Nullable @org.jetbrains.annotations.Nullable MediaItem mediaItem, int reason) {
-                if (mediaItem != null) {
-                    Log.i(TAG, String.format("Song changed to %s", mediaItem));
-                }
-            }
-
-            @Override
             public void onPlayerError(@NotNull ExoPlaybackException err) {
                 if (Objects.equals(err.getMessage(), "Source error")) {
                     PlayingViewModel.this.error.postValue("Could not fetch song from server");
@@ -174,7 +161,17 @@ public class PlayingViewModel extends ViewModel {
                 }
             }
         });
-        mQueueManager = new QueueManager(new ArrayList<>(), new ArrayList<>(), isLooping, isShuffling, currentSong, queue, mPlayer);
+
+        mQueueManager = new QueueManager(
+            context,
+            new ArrayList<>(),
+            new ArrayList<>(),
+            isLooping,
+            isShuffling,
+            currentSong,
+            queue,
+            mPlayer
+        );
     }
 
     public void onMoveSong(int oldPosition, int newPosition) {

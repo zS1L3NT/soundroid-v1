@@ -26,6 +26,7 @@ public class MainViewModel extends ViewModel {
     public final MutableLiveData<Exception> error = new MutableLiveData<>();
     public final StrictLiveData<List<Info>> myInfos = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<List<Song>> mySongs = new StrictLiveData<>(new ArrayList<>());
+    public final StrictLiveData<List<String>> downloading = new StrictLiveData<>(new ArrayList<>());
 
     public MainViewModel() {
 

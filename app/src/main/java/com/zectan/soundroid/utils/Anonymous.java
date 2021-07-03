@@ -29,4 +29,8 @@ public class Anonymous {
         return queries;
     }
 
+    public static int getRandomInt() {
+        return (int) (Math.random() * 1000000000);
+    }
+
 }

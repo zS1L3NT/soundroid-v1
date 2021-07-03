@@ -39,7 +39,7 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
             FragmentNavigator.Extras extras = Anonymous.makeExtras(cover, transitionName);
             NavDirections action = HomeFragmentDirections.openDownloadedSong().setTransitionName(transitionName);
             NavHostFragment.findNavController(HomeFragment.this).navigate(action, extras);
-            playingVM.startPlaylist(playlist, songId);
+            playingVM.startPlaylist(activity, playlist, songId);
         }
 
         @Override

@@ -23,11 +23,11 @@ import java.util.stream.Collectors;
 
 public class MenuItemEvents {
     private static final String USER_ID = "admin";
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final MainActivity mActivity;
     private final Info mInfo;
     private final Song mSong;
     private final MenuItem mItem;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
     private Runnable mOpenEditPlaylist;
 
     public MenuItemEvents(MainActivity activity, Info info, Song song, MenuItem item) {
@@ -62,6 +62,9 @@ public class MenuItemEvents {
                 break;
             case R.id.download_playlist:
                 downloadPlaylist();
+                break;
+            case R.id.clear_downloads:
+                deleteDownloads();
                 break;
             case R.id.edit_playlist:
                 editPlaylist();
@@ -127,7 +130,7 @@ public class MenuItemEvents {
     private void playPlaylist() {
         List<Song> songs = mActivity.mainVM.getSongsFromPlaylist(mInfo.getId());
         Playlist playlist = new Playlist(mInfo, songs);
-        mActivity.playingVM.startPlaylist(playlist, songs.get(0).getSongId());
+        mActivity.playingVM.startPlaylist(mActivity, playlist, songs.get(0).getSongId());
         mActivity.navController.navigate(R.id.fragment_playing);
     }
 
@@ -147,7 +150,17 @@ public class MenuItemEvents {
     }
 
     private void downloadPlaylist() {
-        // TODO Finish this callback
+        new DownloadPlaylist(mActivity, mInfo);
+    }
+
+    private void deleteDownloads() {
+        List<Song> songs = mActivity.mainVM.getSongsFromPlaylist(mInfo.getId());
+
+        for (Song song : songs) {
+            song.deleteLocally(mActivity);
+        }
+
+        mActivity.snack("Songs deleted");
     }
 
     private void editPlaylist() {

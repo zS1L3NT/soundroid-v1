@@ -1,7 +1,7 @@
 package com.zectan.soundroid;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+import android.app.NotificationManager;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -31,21 +31,23 @@ import com.zectan.soundroid.viewmodels.SearchViewModel;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "(SounDroid) MainActivity";
+    public static final String DOWNLOAD_CHANNEL_ID = "Downloads";
     public ActivityMainBinding B;
     public NavController navController;
-    private InputMethodManager imm;
-
+    public NotificationManager notificationManager;
     public MainViewModel mainVM;
     public PlayingViewModel playingVM;
     public PlaylistViewViewModel playlistViewVM;
     public PlaylistEditViewModel playlistEditVM;
+    private InputMethodManager imm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         B = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(B.getRoot());
-        imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm = getSystemService(InputMethodManager.class);
+        notificationManager = getSystemService(NotificationManager.class);
 
         // View Model
         mainVM = new ViewModelProvider(this).get(MainViewModel.class);
@@ -67,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(B.bottomNavigator, navController);
 
         SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
-        playingVM.setPlayer(player);
+        playingVM.setPlayer(this, player);
     }
 
     public void showKeyboard() {

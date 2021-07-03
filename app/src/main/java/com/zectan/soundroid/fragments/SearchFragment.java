@@ -42,7 +42,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
 
             NavDirections action = SearchFragmentDirections.openSearchSong();
             navController.navigate(action);
-            playingVM.startPlaylist(playlist, song.getSongId());
+            playingVM.startPlaylist(activity, playlist, song.getSongId());
             activity.hideKeyboard(SearchFragment.this.requireView());
         }
 

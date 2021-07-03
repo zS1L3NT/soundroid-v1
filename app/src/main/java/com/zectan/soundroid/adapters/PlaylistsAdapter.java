@@ -5,21 +5,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.PlaylistListItemBinding;
 import com.zectan.soundroid.models.Info;
+import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.utils.MenuItemsBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistViewHolder> {
     private final Callback mCallback;
@@ -91,7 +95,23 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
             .centerCrop()
             .into(B.coverImage);
         B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
-        B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.playlist_menu_playlists, info, mCallback));
+
+
+        B.menuClickable.setOnClickListener(v -> {
+            @MenuRes int menu_id;
+            List<Song> songs = ((MainActivity) context).mainVM.getSongsFromPlaylist(info.getId());
+            List<Boolean> downloaded = songs.stream().map(song -> song.isDownloaded(context)).collect(Collectors.toList());
+
+            if (downloaded.stream().allMatch(d -> d)) {
+                menu_id = R.menu.playlist_menu_playlists_delete;
+            } else if (downloaded.contains(true)) {
+                menu_id = R.menu.playlist_menu_playlist_both;
+            } else {
+                menu_id = R.menu.playlist_menu_playlists_download;
+            }
+
+            MenuItemsBuilder.createMenu(v, menu_id, info, mCallback);
+        });
     }
 
 }

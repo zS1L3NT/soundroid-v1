@@ -1,6 +1,7 @@
 package com.zectan.soundroid.utils;
 
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 
 public class QueueManager {
     private static final String TAG = "(SounDroid) QueueManager";
+    private final Context mContext;
     private final SimpleExoPlayer mPlayer;
     private final StrictLiveData<List<Song>> mQueue;
     private final StrictLiveData<Boolean> mIsLooping;
@@ -27,6 +29,7 @@ public class QueueManager {
     private int mPosition;
 
     public QueueManager(
+        Context context,
         List<Song> songs,
         List<String> order,
         StrictLiveData<Boolean> isLooping,
@@ -35,6 +38,7 @@ public class QueueManager {
         StrictLiveData<List<Song>> queue,
         SimpleExoPlayer player
     ) {
+        mContext = context;
         mIsLooping = isLooping;
         mIsShuffling = isShuffling;
         mSongs = new ArrayList<>(songs);
@@ -219,7 +223,7 @@ public class QueueManager {
         mCurrentSong.setValue(song);
 
         mPlayer.stop();
-        mPlayer.setMediaItem(song.getMediaItem());
+        mPlayer.setMediaItem(song.getMediaItem(mContext));
         mPlayer.prepare();
         mPlayer.play();
 

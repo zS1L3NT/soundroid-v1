@@ -1,5 +1,8 @@
 package com.zectan.soundroid.models;
 
+import android.content.Context;
+import android.net.Uri;
+
 import com.google.android.exoplayer2.MediaItem;
 
 import org.jetbrains.annotations.NotNull;
@@ -7,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -122,12 +126,29 @@ public class Song {
         return this.queries;
     }
 
-    public String getUrl() {
-        return String.format("%s/%s.mp3", SongsURL, songId);
+    public MediaItem getMediaItem(Context context) {
+        Uri uri;
+
+        if (isDownloaded(context)) {
+            uri = Uri.fromFile(getFileDir(context));
+        } else {
+            uri = Uri.parse(String.format("%s/%s.mp3", SongsURL, songId));
+        }
+
+        return new MediaItem.Builder().setUri(uri).setMediaId(songId).build();
     }
 
-    public MediaItem getMediaItem() {
-        return new MediaItem.Builder().setUri(getUrl()).setMediaId(songId).build();
+    public boolean isDownloaded(Context context) {
+        return getFileDir(context).exists();
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public void deleteLocally(Context context) {
+        getFileDir(context).delete();
+    }
+
+    private File getFileDir(Context context) {
+        return new File(context.getFilesDir(), String.format("/%s%s.mp3", playlistId, songId));
     }
 
     public Map<String, Object> toMap() {

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import androidx.annotation.MenuRes;
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.fragment.NavHostFragment;
@@ -34,6 +35,7 @@ import com.zectan.soundroid.utils.MenuItemsBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> {
     private final PlaylistViewAdapter.Callback callback = new PlaylistViewAdapter.Callback() {
@@ -45,7 +47,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             NavHostFragment.findNavController(PlaylistViewFragment.this).navigate(action, extras);
 
             Playlist playlist = new Playlist(playlistViewVM.info.getValue(), playlistViewVM.songs.getValue());
-            playingVM.startPlaylist(playlist, songId);
+            playingVM.startPlaylist(activity, playlist, songId);
         }
 
         @Override
@@ -117,9 +119,21 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
     }
 
     public void onMoreImageClicked(View view) {
+        @MenuRes int menu_id;
+        List<Song> songs = activity.mainVM.getSongsFromPlaylist(playlistViewVM.info.getValue().getId());
+        List<Boolean> downloaded = songs.stream().map(song -> song.isDownloaded(activity)).collect(Collectors.toList());
+
+        if (downloaded.stream().allMatch(d -> d)) {
+            menu_id = R.menu.playlist_menu_playlists_delete;
+        } else if (downloaded.contains(true)) {
+            menu_id = R.menu.playlist_menu_playlist_both;
+        } else {
+            menu_id = R.menu.playlist_menu_playlists_download;
+        }
+
         MenuItemsBuilder.createMenu(
             view,
-            R.menu.playlist_menu_playlists,
+            menu_id,
             playlistViewVM.info.getValue(),
             (info, item) -> activity.handleMenuItemClick(info, null, item, () -> {
                 NavDirections action = PlaylistViewFragmentDirections.openEditPlaylist();
