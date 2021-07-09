@@ -48,10 +48,18 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
     }
 
     public void updateSongs(List<Song> songs) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new HomeDiffCallback(mSongs, songs));
+        List<Song> sortedSongs = songs
+            .stream()
+            .sorted((song1, song2) -> song1.getTitle().compareTo(song2.getTitle()))
+            .collect(Collectors.toList());
+
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new HomeDiffCallback(
+            mSongs,
+            sortedSongs
+        ));
         diffResult.dispatchUpdatesTo(this);
         mSongs.clear();
-        mSongs.addAll(songs);
+        mSongs.addAll(sortedSongs);
     }
 
     public void onBindViewHolder(@NonNull HomeViewHolder holder, int position) {
@@ -103,7 +111,6 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
 
         List<String> order = songs
             .stream()
-            .sorted((song1, song2) -> song1.getTitle().compareTo(song2.getTitle()))
             .map(Song::getSongId)
             .collect(Collectors.toList());
         Info info = new Info("", "All Songs", order);
