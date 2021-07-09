@@ -46,7 +46,6 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
     private final ActivityResultLauncher<Intent> chooseCoverImage = registerForActivityResult(
         new ActivityResultContracts.StartActivityForResult(),
         result -> {
-            mainVM.watch(activity);
             if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
                 newFilePath = result.getData().getData();
                 try {

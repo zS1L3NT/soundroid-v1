@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Live Observers
         mainVM.error.observe(this, this::handleError);
-        mainVM.watch(this);
         searchVM.watch(this);
 
         // Navigation
@@ -72,6 +71,12 @@ public class MainActivity extends AppCompatActivity {
         // Music Player
         SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
         playingVM.setPlayer(this, player);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mainVM.watch(this);
     }
 
     public void showKeyboard() {
