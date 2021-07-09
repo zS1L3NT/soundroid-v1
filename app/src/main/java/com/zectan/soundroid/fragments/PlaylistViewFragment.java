@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> {
+    private Boolean isLocal;
+
     private final PlaylistViewAdapter.Callback callback = new PlaylistViewAdapter.Callback() {
 
         @Override
@@ -92,6 +94,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         playlistViewVM.loading.setValue(true);
 
         Info info = mainVM.getInfoFromPlaylist(playlistId);
+        isLocal = info != null;
         if (info == null) {
             fetchFromServer();
         } else {
@@ -119,11 +122,15 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
     }
 
     public void onMoreImageClicked(View view) {
+        if (isLocal == null) return;
+
         @MenuRes int menu_id;
         List<Song> songs = activity.mainVM.getSongsFromPlaylist(playlistViewVM.info.getValue().getId());
         List<Boolean> downloaded = songs.stream().map(song -> song.isDownloaded(activity)).collect(Collectors.toList());
 
-        if (downloaded.stream().allMatch(d -> d)) {
+        if (!isLocal) {
+            menu_id = R.menu.playlist_menu_search_server;
+        } else if (downloaded.stream().allMatch(d -> d)) {
             menu_id = R.menu.playlist_menu_playlists_delete;
         } else if (downloaded.contains(true)) {
             menu_id = R.menu.playlist_menu_playlist_both;
