@@ -72,16 +72,29 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         B.recyclerView.setReduceItemAlphaOnSwiping(true);
 
         // Live Observers
-        playlistEditVM.info.observe(this, this::onInfoChange);
-        playlistEditVM.songs.observe(this, this::onSongsChange);
         playlistEditVM.navigateNow.observe(this, this::onNavigateNowChange);
         playlistEditVM.saving.observe(this, this::onSavingChange);
 
-        mainVM.watchInfoFromPlaylist(this, playlistEditVM.playlistId.getValue(), playlistEditVM.info::setValue);
-        mainVM.watchSongsFromPlaylist(this, playlistEditVM.playlistId.getValue(), playlistEditVM.songs::setValue);
         B.backImage.setOnClickListener(__ -> navController.navigateUp());
         B.saveImage.setOnClickListener(this::onSaveClicked);
         B.coverImage.setOnClickListener(this::onCoverClicked);
+
+        Info info = mainVM.getInfoFromPlaylist(playlistEditVM.playlistId.getValue());
+        List<Song> songs = mainVM.getSongsFromPlaylist(playlistEditVM.playlistId.getValue());
+        assert info != null;
+        playlistEditVM.info.setValue(info);
+        playlistEditVM.songs.setValue(songs);
+
+        B.nameTextInput.setText(info.getName());
+        Glide
+            .with(activity)
+            .load(info.getCover())
+            .placeholder(R.drawable.playing_cover_default)
+            .error(R.drawable.playing_cover_default)
+            .transition(new DrawableTransitionOptions().crossFade())
+            .centerCrop()
+            .into(B.coverImage);
+        playlistEditAdapter.setDataSet(ListArrayUtils.sortSongs(songs, playlistEditVM.info.getValue().getOrder()));
         removed.clear();
 
         return B.getRoot();
@@ -161,24 +174,6 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
                 playlistEditVM.saving.postValue(false);
             }
         });
-    }
-
-    private void onSongsChange(List<Song> songs) {
-        playlistEditAdapter.setDataSet(ListArrayUtils.sortSongs(songs, playlistEditVM.info.getValue().getOrder()));
-    }
-
-    private void onInfoChange(Info info) {
-        B.nameTextInput.setText(info.getName());
-        if (newFilePath == null) {
-            Glide
-                .with(activity)
-                .load(info.getCover())
-                .placeholder(R.drawable.playing_cover_default)
-                .error(R.drawable.playing_cover_default)
-                .transition(new DrawableTransitionOptions().crossFade())
-                .centerCrop()
-                .into(B.coverImage);
-        }
     }
 
     private void onSavingChange(Boolean saving) {
