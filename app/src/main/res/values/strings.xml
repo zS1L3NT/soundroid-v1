@@ -46,4 +46,6 @@
     <string name="enter_playlist_name">Enter Playlist Name</string>
     <string name="play_playlist">Play Playlist</string>
     <string name="clear_downloads">Clear Downloads</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="logout">Logout</string>
 </resources>

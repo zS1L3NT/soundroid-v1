@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.navigation.NavDirections;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,14 +27,14 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
             playlistViewVM.playlistId.setValue(info.getId());
             playlistViewVM.songs.setValue(new ArrayList<>());
             NavDirections action = PlaylistsFragmentDirections.openPlaylistView();
-            NavHostFragment.findNavController(PlaylistsFragment.this).navigate(action);
+            navController.navigate(action);
         }
 
         @Override
         public boolean onMenuItemClicked(Info info, MenuItem item) {
             return activity.handleMenuItemClick(info, null, item, () -> {
                 NavDirections action = PlaylistsFragmentDirections.openEditPlaylist();
-                NavHostFragment.findNavController(PlaylistsFragment.this).navigate(action);
+                navController.navigate(action);
             });
         }
     };

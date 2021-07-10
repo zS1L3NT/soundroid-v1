@@ -44,12 +44,14 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
 
         @Override
         public void onSongClicked(ImageView cover, String transitionName, String songId) {
-            FragmentNavigator.Extras extras = Anonymous.makeExtras(cover, transitionName);
-            NavDirections action = PlaylistViewFragmentDirections.openPlaylistSong().setTransitionName(transitionName);
-            NavHostFragment.findNavController(PlaylistViewFragment.this).navigate(action, extras);
-
             Playlist playlist = new Playlist(playlistViewVM.info.getValue(), playlistViewVM.songs.getValue());
             playingVM.startPlaylist(activity, playlist, songId);
+
+            if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
+                FragmentNavigator.Extras extras = Anonymous.makeExtras(cover, transitionName);
+                NavDirections action = PlaylistViewFragmentDirections.openPlaylistSong().setTransitionName(transitionName);
+                navController.navigate(action, extras);
+            }
         }
 
         @Override

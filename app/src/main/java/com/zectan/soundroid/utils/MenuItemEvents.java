@@ -131,7 +131,10 @@ public class MenuItemEvents {
         List<Song> songs = mActivity.mainVM.getSongsFromPlaylist(mInfo.getId());
         Playlist playlist = new Playlist(mInfo, songs);
         mActivity.playingVM.startPlaylist(mActivity, playlist, songs.get(0).getSongId());
-        mActivity.navController.navigate(R.id.fragment_playing);
+
+        if (mActivity.mainVM.myUser.getValue().getOpenPlayingScreen()) {
+            mActivity.navController.navigate(R.id.fragment_playing);
+        }
     }
 
     private void savePlaylist() {

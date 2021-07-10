@@ -39,11 +39,13 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         public void onSongClicked(Song song) {
             Info info = new Info(song.getSongId(), "Search Result", Collections.singletonList(song.getSongId()));
             Playlist playlist = new Playlist(info, Collections.singletonList(song));
-
-            NavDirections action = SearchFragmentDirections.openSearchSong();
-            navController.navigate(action);
             playingVM.startPlaylist(activity, playlist, song.getSongId());
             activity.hideKeyboard(SearchFragment.this.requireView());
+
+            if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
+                NavDirections action = SearchFragmentDirections.openSearchSong();
+                navController.navigate(action);
+            }
         }
 
         @Override

@@ -8,9 +8,9 @@
         <item name="backgroundColor">#EEEEEE</item>
         <item name="colorOnBackground">#737373</item>
         <item name="cardBackgroundColor">#FAFAFA</item>
-        <item name="colorControlHighlight">#DEE8ED</item>
-        <item name="colorControlActivated">#C1CCDD</item>
-        <item name="colorControlNormal">#DFDFE5</item>
+        <item name="colorControlHighlight">#DBDBDB</item>
+        <item name="colorControlActivated">@color/gold</item>
+        <item name="colorControlNormal">@color/gold</item>
         <item name="navigationIconTint">#737373</item>
         <item name="statusBarBackground">#485963</item>
     </style>

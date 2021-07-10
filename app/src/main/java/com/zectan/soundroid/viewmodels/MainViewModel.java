@@ -12,11 +12,13 @@ import com.zectan.soundroid.classes.StrictLiveData;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.SearchResult;
 import com.zectan.soundroid.models.Song;
+import com.zectan.soundroid.models.User;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MainViewModel extends ViewModel {
@@ -24,6 +26,7 @@ public class MainViewModel extends ViewModel {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     public final StrictLiveData<String> userId = new StrictLiveData<>("admin");
     public final MutableLiveData<Exception> error = new MutableLiveData<>();
+    public final StrictLiveData<User> myUser = new StrictLiveData<>(User.getEmpty());
     public final StrictLiveData<List<Info>> myInfos = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<List<Song>> mySongs = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<List<String>> downloading = new StrictLiveData<>(new ArrayList<>());
@@ -34,6 +37,17 @@ public class MainViewModel extends ViewModel {
 
     public void watch(MainActivity activity) {
         Log.d(TAG, "STARTED WATCHING TO FIREBASE VALUES");
+
+        db.collection("users")
+            .document(userId.getValue())
+            .addSnapshotListener(activity, (snap, error) -> {
+                if (error != null) {
+                    activity.handleError(error);
+                    return;
+                }
+                assert snap != null;
+                myUser.postValue(Objects.requireNonNull(snap.toObject(User.class)));
+            });
 
         db.collection("playlists")
             .whereEqualTo("userId", userId.getValue())

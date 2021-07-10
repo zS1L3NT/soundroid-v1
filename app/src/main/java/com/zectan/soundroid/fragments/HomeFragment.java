@@ -9,7 +9,6 @@ import android.widget.ImageView;
 
 import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.FragmentNavigator;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,10 +35,13 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
     private final HomeAdapter.Callback callback = new HomeAdapter.Callback() {
         @Override
         public void onSongClicked(ImageView cover, String transitionName, Playlist playlist, String songId) {
-            FragmentNavigator.Extras extras = Anonymous.makeExtras(cover, transitionName);
-            NavDirections action = HomeFragmentDirections.openDownloadedSong().setTransitionName(transitionName);
-            NavHostFragment.findNavController(HomeFragment.this).navigate(action, extras);
             playingVM.startPlaylist(activity, playlist, songId);
+
+            if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
+                FragmentNavigator.Extras extras = Anonymous.makeExtras(cover, transitionName);
+                NavDirections action = HomeFragmentDirections.openDownloadedSong().setTransitionName(transitionName);
+                navController.navigate(action, extras);
+            }
         }
 
         @Override
@@ -66,14 +68,20 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
         mainVM.mySongs.observe(this, homeVM.songs::setValue);
         B.searchbar.setOnClickListener(this::onSearchbarClicked);
         B.swipeRefresh.setOnRefreshListener(this::onReload);
+        B.settingsImage.setOnClickListener(this::onSettingsClicked);
 
         return B.getRoot();
+    }
+
+    private void onSettingsClicked(View view) {
+        NavDirections action = HomeFragmentDirections.openSettings();
+        navController.navigate(action);
     }
 
     private void onSearchbarClicked(View view) {
         FragmentNavigator.Extras extras = Anonymous.makeExtras(B.searchbar, getString(R.string.TRANSITION_searchbar));
         NavDirections action = HomeFragmentDirections.openSearch();
-        NavHostFragment.findNavController(this).navigate(action, extras);
+        navController.navigate(action, extras);
         searchVM.results.postValue(new ArrayList<>());
     }
 
