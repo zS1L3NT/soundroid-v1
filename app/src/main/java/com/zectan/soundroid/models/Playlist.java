@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Playlist {
     private final Info info;
@@ -34,24 +33,6 @@ public class Playlist {
 
     public List<Song> getSongs() {
         return songs;
-    }
-
-    public Song getSong(int position) {
-        return this.songs.get(position);
-    }
-
-    public Song getSong(String id) {
-        return songs.stream().filter(song -> song.getSongId().equals(id)).collect(Collectors.toList()).get(0);
-    }
-
-    public int getIndexOfSong(String id) {
-        return songs.indexOf(getSong(id));
-    }
-
-    public void removeSong(String id) {
-        List<Song> newSongs = songs.stream().filter(song -> !song.getSongId().equals(id)).collect(Collectors.toList());
-        songs.clear();
-        songs.addAll(newSongs);
     }
 
     public boolean isDownloaded(Context context) {

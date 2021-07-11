@@ -26,8 +26,8 @@ import com.zectan.soundroid.connection.EditPlaylistRequest;
 import com.zectan.soundroid.databinding.FragmentPlaylistEditBinding;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Song;
-import com.zectan.soundroid.utils.Anonymous;
 import com.zectan.soundroid.utils.ListArrayUtils;
+import com.zectan.soundroid.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -130,7 +130,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
             info.getColorHex(),
             info.getUserId(),
             order,
-            Anonymous.getQueries(newName)
+            Utils.getQueries(newName)
         );
 
         StorageReference ref = storage.getReference().child(String.format("covers/%s.png", info.getId()));

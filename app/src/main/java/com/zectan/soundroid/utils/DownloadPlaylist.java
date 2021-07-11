@@ -42,7 +42,7 @@ public class DownloadPlaylist {
         downloading.add(mInfo.getId());
         mActivity.mainVM.downloading.setValue(downloading);
 
-        int SUMMARY_ID = Anonymous.getRandomInt();
+        int SUMMARY_ID = Utils.getRandomInt();
         Notification summaryNotification = new NotificationCompat.Builder(mActivity, MainActivity.DOWNLOAD_CHANNEL_ID)
             .setContentTitle("Downloading songs")
             .setContentText(mInfo.getName())
@@ -71,7 +71,7 @@ public class DownloadPlaylist {
             return;
         }
 
-        int NOTIFICATION_ID = Anonymous.getRandomInt();
+        int NOTIFICATION_ID = Utils.getRandomInt();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mActivity, MainActivity.DOWNLOAD_CHANNEL_ID);
         builder
             .setContentTitle(String.format("%s (%s/%s)", song.getTitle(), indexInQueue + 1, mSongs.size()))
@@ -113,7 +113,7 @@ public class DownloadPlaylist {
                     .setContentText("Failed")
                     .setSmallIcon(R.drawable.ic_close);
                 mNotificationManager.cancel(NOTIFICATION_ID);
-                mNotificationManager.notify(Anonymous.getRandomInt(), builder.build());
+                mNotificationManager.notify(Utils.getRandomInt(), builder.build());
                 song.deleteLocally(mActivity);
                 if (++mDownloaded == mSongs.size()) {
                     sendDone();
@@ -125,7 +125,7 @@ public class DownloadPlaylist {
     }
 
     private void sendDone() {
-        int NOTIFICATION_ID = Anonymous.getRandomInt();
+        int NOTIFICATION_ID = Utils.getRandomInt();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mActivity, MainActivity.DOWNLOAD_CHANNEL_ID);
         builder
             .setContentTitle("Downloading Finished")

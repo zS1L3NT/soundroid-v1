@@ -1,6 +1,6 @@
 package com.zectan.soundroid.models;
 
-import com.zectan.soundroid.utils.Anonymous;
+import com.zectan.soundroid.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -32,7 +32,7 @@ public class Info {
         this.colorHex = "#7b828b";
         this.userId = "";
         this.order = order;
-        this.queries = Anonymous.getQueries(name);
+        this.queries = Utils.getQueries(name);
     }
 
     public Info(String id, String name, String cover, String colorHex, String userId, List<String> order, List<String> queries) {

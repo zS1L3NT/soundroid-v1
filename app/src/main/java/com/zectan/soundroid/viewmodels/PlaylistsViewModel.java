@@ -6,7 +6,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.classes.StrictLiveData;
 import com.zectan.soundroid.models.Info;
-import com.zectan.soundroid.utils.Anonymous;
+import com.zectan.soundroid.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -27,7 +27,7 @@ public class PlaylistsViewModel extends ViewModel {
             "#7b828b",
             userId,
             new ArrayList<>(),
-            Anonymous.getQueries("New Playlist")
+            Utils.getQueries("New Playlist")
         );
 
         return db.collection("playlists")

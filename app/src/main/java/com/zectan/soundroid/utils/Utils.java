@@ -7,7 +7,7 @@ import androidx.navigation.fragment.FragmentNavigator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Anonymous {
+public class Utils {
 
     /**
      * Shortcut to make navigator extras

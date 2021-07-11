@@ -17,7 +17,7 @@ import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentHomeBinding;
 import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.models.Song;
-import com.zectan.soundroid.utils.Anonymous;
+import com.zectan.soundroid.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -77,7 +77,7 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
     }
 
     private void onSearchbarClicked(View view) {
-        FragmentNavigator.Extras extras = Anonymous.makeExtras(B.searchbar, getString(R.string.TRANSITION_searchbar));
+        FragmentNavigator.Extras extras = Utils.makeExtras(B.searchbar, getString(R.string.TRANSITION_searchbar));
         NavDirections action = HomeFragmentDirections.openSearch();
         navController.navigate(action, extras);
         searchVM.results.postValue(new ArrayList<>());

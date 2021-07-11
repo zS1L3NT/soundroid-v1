@@ -2,32 +2,43 @@ package com.zectan.soundroid.connection;
 
 import android.util.Log;
 
-import com.zectan.soundroid.classes.Socket;
 import com.zectan.soundroid.models.SearchResult;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchSocket extends Socket {
+import io.socket.client.IO;
+import io.socket.client.Socket;
+
+public class SearchSocket {
     private static final String TAG = "(SounDroid) SearchSocket";
+    private static final String SocketURL = "http://soundroid.zectan.com/";
     private final Callback callback;
+    private final Socket socket;
 
     public SearchSocket(String query, Callback callback) {
-        super(TAG, callback, "search", query);
         this.callback = callback;
+        IO.Options options = IO.Options.builder().setTimeout(60_000).build();
+        socket = IO.socket(URI.create(SocketURL), options).connect();
 
         Log.d(TAG, "Search: " + query);
-        super.on("search_result", this::onResult);
-        super.on("search_done", this::onDone);
+        socket.emit("search", query);
+        socket.on("search_result_" + query, this::onResult);
+        socket.on("search_done_" + query, this::onDone);
+        socket.on(Socket.EVENT_CONNECT, this::onConnect);
+        socket.on("error_" + query, this::onError);
+        socket.on(Socket.EVENT_DISCONNECT, this::onDisconnect);
+        socket.on(Socket.EVENT_CONNECT_ERROR, this::onConnectError);
     }
 
     private void onResult(Object... args) {
         if (callback.isInactive()) {
-            closeSocket();
+            socket.close();
             Log.i(TAG, "(SOCKET) <close>");
             return;
         }
@@ -43,7 +54,7 @@ public class SearchSocket extends Socket {
 
     private void onDone(Object... args) {
         if (callback.isInactive()) {
-            closeSocket();
+            socket.close();
             Log.i(TAG, "(SOCKET) <close>");
             return;
         }
@@ -60,10 +71,55 @@ public class SearchSocket extends Socket {
             callback.onError("Could not parse server response");
             e.printStackTrace();
         }
-        closeSocket();
+        socket.close();
     }
 
-    public interface Callback extends Socket.Callback {
+    private void onConnect(Object... args) {
+        if (callback.isInactive()) {
+            socket.close();
+            Log.i(TAG, "(SOCKET) <close>");
+            return;
+        }
+        Log.i(TAG, "(SOCKET) Connected!");
+    }
+
+    private void onError(Object... args) {
+        if (callback.isInactive()) {
+            socket.close();
+            Log.i(TAG, "(SOCKET) <close>");
+            return;
+        }
+        String message = (String) args[0];
+        Log.e(TAG, "(SOCKET) Error: " + message);
+        callback.onError(message);
+    }
+
+    private void onDisconnect(Object... args) {
+        if (callback.isInactive()) {
+            socket.close();
+            Log.i(TAG, "(SOCKET) <close>");
+            return;
+        }
+        String message = (String) args[0];
+        Log.w(TAG, "(SOCKET) Disconnected: " + message);
+    }
+
+    private void onConnectError(Object... args) {
+        if (callback.isInactive()) {
+            socket.close();
+            Log.i(TAG, "(SOCKET) <close>");
+            return;
+        }
+        Log.e(TAG, "(SOCKET) Connect error");
+        callback.onError("Could not connect to Server");
+        socket.close();
+    }
+
+    public interface Callback {
+        void onError(String message);
+
+        boolean isInactive();
+
         void onResult(SearchResult results);
 
         void onDone(List<SearchResult> sortedResults);

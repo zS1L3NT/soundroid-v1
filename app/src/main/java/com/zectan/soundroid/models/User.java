@@ -12,7 +12,6 @@ public class User {
     private boolean highDownloadQuality;
 
     public User() {
-
     }
 
     public User(String id, String usnm, String profilePicture, boolean openPlayingScreen, boolean highStreamQuality, boolean highDownloadQuality) {
