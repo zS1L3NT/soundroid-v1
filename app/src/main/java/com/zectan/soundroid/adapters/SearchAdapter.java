@@ -89,15 +89,12 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
 
         if (result.getSong() != null) {
             Song song = result.getSong();
-            String id = song.getSongId();
             String title = song.getTitle();
             String artiste = song.getArtiste();
             String cover = song.getCover();
-            String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_song_cover), id);
 
             B.titleText.setText(title);
             B.descriptionText.setText(String.format("%s • Song • %s", result.getLocation(), artiste));
-            B.coverImage.setTransitionName(transitionName);
             Glide
                 .with(context)
                 .load(cover)
@@ -115,10 +112,8 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             ));
         } else if (result.getPlaylistInfo() != null) {
             Info info = result.getPlaylistInfo();
-            String id = info.getId();
             String name = info.getName();
             String cover = info.getCover();
-            String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_song_cover), id);
             @MenuRes int menu_id;
 
             switch (result.getLocation()) {
@@ -134,7 +129,6 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
 
             B.titleText.setText(name);
             B.descriptionText.setText(String.format("%s • Playlist", result.getLocation()));
-            B.coverImage.setTransitionName(transitionName);
             Glide
                 .with(context)
                 .load(cover)

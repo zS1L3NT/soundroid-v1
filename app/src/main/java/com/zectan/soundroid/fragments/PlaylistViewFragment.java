@@ -9,12 +9,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import androidx.annotation.MenuRes;
-import androidx.navigation.NavDirections;
-import androidx.navigation.fragment.FragmentNavigator;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,7 +24,6 @@ import com.zectan.soundroid.databinding.FragmentPlaylistViewBinding;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.models.Song;
-import com.zectan.soundroid.utils.Anonymous;
 import com.zectan.soundroid.utils.ListArrayUtils;
 import com.zectan.soundroid.utils.MenuItemsBuilder;
 
@@ -43,23 +38,18 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
     private final PlaylistViewAdapter.Callback callback = new PlaylistViewAdapter.Callback() {
 
         @Override
-        public void onSongClicked(ImageView cover, String transitionName, String songId) {
+        public void onSongClicked(String songId) {
             Playlist playlist = new Playlist(playlistViewVM.info.getValue(), playlistViewVM.songs.getValue());
             playingVM.startPlaylist(activity, playlist, songId, mainVM.myUser.getValue().getHighStreamQuality());
 
             if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
-                FragmentNavigator.Extras extras = Anonymous.makeExtras(cover, transitionName);
-                NavDirections action = PlaylistViewFragmentDirections.openPlaylistSong().setTransitionName(transitionName);
-                navController.navigate(action, extras);
+                navController.navigate(PlaylistViewFragmentDirections.openPlaylistSong());
             }
         }
 
         @Override
         public boolean onMenuItemClicked(Song song, MenuItem item) {
-            return activity.handleMenuItemClick(playlistViewVM.info.getValue(), song, item, () -> {
-                NavDirections action = PlaylistViewFragmentDirections.openEditPlaylist();
-                NavHostFragment.findNavController(PlaylistViewFragment.this).navigate(action);
-            });
+            return activity.handleMenuItemClick(playlistViewVM.info.getValue(), song, item, () -> navController.navigate(PlaylistViewFragmentDirections.openEditPlaylist()));
         }
     };
     private PlaylistViewAdapter playlistViewAdapter;
@@ -144,10 +134,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             view,
             menu_id,
             playlistViewVM.info.getValue(),
-            (info, item) -> activity.handleMenuItemClick(info, null, item, () -> {
-                NavDirections action = PlaylistViewFragmentDirections.openEditPlaylist();
-                NavHostFragment.findNavController(PlaylistViewFragment.this).navigate(action);
-            })
+            (info, item) -> activity.handleMenuItemClick(info, null, item, () -> navController.navigate(PlaylistViewFragmentDirections.openEditPlaylist()))
         );
     }
 

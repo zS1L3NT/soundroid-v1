@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.navigation.NavDirections;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.TransitionInflater;
@@ -43,8 +42,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
             activity.hideKeyboard(SearchFragment.this.requireView());
 
             if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
-                NavDirections action = SearchFragmentDirections.openSearchSong();
-                navController.navigate(action);
+                navController.navigate(SearchFragmentDirections.openSearchSong());
             }
         }
 
@@ -53,8 +51,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
             playlistViewVM.playlistId.setValue(info.getId());
             playlistViewVM.info.postValue(info);
 
-            NavDirections action = SearchFragmentDirections.openPlaylistView();
-            navController.navigate(action);
+            navController.navigate(SearchFragmentDirections.openPlaylistView());
         }
 
         @Override

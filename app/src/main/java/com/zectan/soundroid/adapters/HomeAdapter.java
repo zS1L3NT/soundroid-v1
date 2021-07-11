@@ -5,7 +5,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
@@ -72,7 +71,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
     }
 
     public interface Callback extends MenuItemsBuilder.MenuItemCallback<Song> {
-        void onSongClicked(ImageView cover, String transitionName, Playlist playlist, String songId);
+        void onSongClicked(Playlist playlist, String songId);
     }
 }
 
@@ -95,9 +94,7 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
         String title = song.getTitle();
         String artiste = song.getArtiste();
         String cover = song.getCover();
-        String transitionName = String.format("%s %s", context.getString(R.string.TRANSITION_song_cover), id);
 
-        B.coverImage.setTransitionName(transitionName);
         B.titleText.setText(title);
         B.descriptionText.setText(artiste);
         Glide
@@ -116,7 +113,7 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
         Info info = new Info("", "All Songs", order);
         Playlist playlist = new Playlist(info, songs);
 
-        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(B.coverImage, transitionName, playlist, id));
+        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(playlist, id));
         B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.song_menu, song, mCallback));
     }
 }

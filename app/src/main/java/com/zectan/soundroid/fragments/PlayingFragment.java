@@ -14,13 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.transition.TransitionInflater;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
@@ -31,6 +28,7 @@ import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlayingBinding;
 import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.utils.Animations;
+import com.zectan.soundroid.utils.MenuItemsBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -57,21 +55,6 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     };
     private QueueAdapter mQueueAdapter;
 
-    @Override
-    public void onViewCreated(@NonNull @NotNull View view,
-                              @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        String transitionName = PlayingFragmentArgs.fromBundle(getArguments()).getTransitionName();
-        ViewCompat.setTransitionName(view.findViewById(R.id.cover_image), transitionName);
-    }
-
-    @Override
-    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        TransitionInflater inflater = TransitionInflater.from(requireContext());
-        setSharedElementEnterTransition(inflater.inflateTransition(R.transition.shared_image));
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     @Nullable
     @Override
@@ -97,6 +80,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         playingVM.isLooping.observe(this, this::onIsLoopingChange);
         playingVM.error.observe(this, this::onErrorChange);
 
+        B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.playPauseImage.setOnClickListener(this::playPauseSong);
         B.playPauseImage.setOnTouchListener(Animations::animationSmallSqueeze);
         B.playPauseMiniImage.setOnClickListener(this::playPauseSong);
@@ -111,8 +95,13 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         B.loopImage.setOnTouchListener(Animations::animationMediumSqueeze);
 
         B.playingSeekbar.setPlayer(playingVM.getPlayer());
+        B.parent.setBackground(playingVM.background.getValue());
 
         return B.getRoot();
+    }
+
+    private void onMoreImageClicked(View view) {
+        MenuItemsBuilder.createMenu(view, R.menu.queue_menu, playingVM.currentSong.getValue(), (song, item) -> activity.handleMenuItemClick(null, song, item));
     }
 
     public void playPauseSong(View v) {
@@ -152,13 +141,14 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
                 .into(B.coverImage);
         }
 
-        Drawable oldGD = B.parent.getBackground();
+        GradientDrawable oldGD = playingVM.background.getValue();
         int[] colors = {Color.parseColor(colorHex), activity.getAttributeResource(R.attr.colorSecondary)};
         GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
 
         Drawable[] layers = {oldGD, newGD};
         TransitionDrawable transition = new TransitionDrawable(layers);
         B.parent.setBackground(transition);
+        playingVM.background.setValue(newGD);
         transition.startTransition(500);
     }
 

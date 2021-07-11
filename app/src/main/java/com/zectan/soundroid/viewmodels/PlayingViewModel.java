@@ -1,10 +1,12 @@
 package com.zectan.soundroid.viewmodels;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.util.Log;
 
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -50,6 +52,7 @@ public class PlayingViewModel extends ViewModel {
     public final StrictLiveData<Boolean> isLooping = new StrictLiveData<>(true);
     public final StrictLiveData<String> error = new StrictLiveData<>("");
     public final StrictLiveData<List<Song>> queue = new StrictLiveData<>(new ArrayList<>());
+    public final MutableLiveData<GradientDrawable> background = new MutableLiveData<>();
     private QueueManager mQueueManager;
     private SimpleExoPlayer mPlayer;
     private boolean initialised = false;

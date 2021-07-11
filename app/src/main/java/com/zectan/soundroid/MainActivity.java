@@ -2,6 +2,7 @@ package com.zectan.soundroid;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationManager;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -71,6 +72,11 @@ public class MainActivity extends AppCompatActivity {
         // Music Player
         SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
         playingVM.setPlayer(this, player);
+
+        // Playing Screen background
+        int[] colors = {getColor(R.color.default_cover_color), getAttributeResource(R.attr.colorSecondary)};
+        GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
+        playingVM.background.setValue(newGD);
     }
 
     @Override

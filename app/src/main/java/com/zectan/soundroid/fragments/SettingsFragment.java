@@ -35,6 +35,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
         super.onCreateView(inflater, container, savedInstanceState);
         settingsPreference = new SettingsPreference();
 
+        // Observers
         mainVM.myUser.observe(this, this::onMyUserChange);
 
         activity

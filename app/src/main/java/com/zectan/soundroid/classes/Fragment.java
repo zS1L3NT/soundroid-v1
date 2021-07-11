@@ -55,6 +55,7 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
         playlistViewVM = new ViewModelProvider(activity).get(PlaylistViewViewModel.class);
         searchVM = new ViewModelProvider(activity).get(SearchViewModel.class);
         activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        activity.hideKeyboard(B.getRoot());
 
         return B.getRoot();
     }

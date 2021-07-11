@@ -67,10 +67,6 @@
         android:name="com.zectan.soundroid.fragments.PlayingFragment"
         android:label="fragment_playing"
         tools:layout="@layout/fragment_playing">
-        <argument
-            android:name="transition_name"
-            android:defaultValue=""
-            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/fragment_search"
