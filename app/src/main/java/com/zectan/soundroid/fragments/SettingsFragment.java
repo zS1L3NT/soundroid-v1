@@ -1,5 +1,6 @@
 package com.zectan.soundroid.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,15 +12,21 @@ import androidx.preference.SwitchPreferenceCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.zectan.soundroid.AuthActivity;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentSettingsBinding;
+import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.models.User;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
     private static final String TAG = "(SounDroid) SettingsFragment";
@@ -37,6 +44,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
 
         // Observers
         mainVM.myUser.observe(this, this::onMyUserChange);
+        B.logoutButton.setOnClickListener(this::logout);
 
         activity
             .getSupportFragmentManager()
@@ -58,6 +66,26 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.profilePictureImage);
+    }
+
+    private void logout(View view) {
+        new MaterialAlertDialogBuilder(activity)
+            .setTitle("Are you sure?")
+            .setMessage("All downloaded songs will be deleted")
+            .setNegativeButton("Cancel", (dialog, which) -> {
+            })
+            .setPositiveButton("Sign Out", (dialog, which) -> {
+                List<Song> songs = activity.mainVM.mySongs.getValue();
+                for (Song song : songs) {
+                    song.deleteLocally(activity);
+                }
+                playingVM.clearQueue(activity);
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(activity, AuthActivity.class);
+                startActivity(intent);
+                activity.finish();
+            })
+            .show();
     }
 
     public static class SettingsPreference extends PreferenceFragmentCompat {

@@ -6,6 +6,8 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.classes.StrictLiveData;
@@ -24,12 +26,12 @@ import java.util.stream.Collectors;
 public class MainViewModel extends ViewModel {
     private static final String TAG = "(SounDroid) MainViewModel";
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    public final StrictLiveData<String> userId = new StrictLiveData<>("admin");
     public final MutableLiveData<Exception> error = new MutableLiveData<>();
     public final StrictLiveData<User> myUser = new StrictLiveData<>(User.getEmpty());
     public final StrictLiveData<List<Info>> myInfos = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<List<Song>> mySongs = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<List<String>> downloading = new StrictLiveData<>(new ArrayList<>());
+    public String userId;
 
     public MainViewModel() {
 
@@ -37,9 +39,12 @@ public class MainViewModel extends ViewModel {
 
     public void watch(MainActivity activity) {
         Log.d(TAG, "STARTED WATCHING TO FIREBASE VALUES");
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        assert firebaseUser != null;
+        userId = firebaseUser.getUid();
 
         db.collection("users")
-            .document(userId.getValue())
+            .document(userId)
             .addSnapshotListener(activity, (snap, error) -> {
                 if (error != null) {
                     activity.handleError(error);
@@ -50,7 +55,7 @@ public class MainViewModel extends ViewModel {
             });
 
         db.collection("playlists")
-            .whereEqualTo("userId", userId.getValue())
+            .whereEqualTo("userId", userId)
             .addSnapshotListener(activity, (snaps, error) -> {
                 if (error != null) {
                     activity.handleError(error);
@@ -61,7 +66,7 @@ public class MainViewModel extends ViewModel {
             });
 
         db.collection("songs")
-            .whereEqualTo("userId", userId.getValue())
+            .whereEqualTo("userId", userId)
             .addSnapshotListener(activity, (snaps, error) -> {
                 if (error != null) {
                     activity.handleError(error);

@@ -57,7 +57,7 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
     }
 
     private void createPlaylist(View view) {
-        playlistsVM.createPlaylist()
+        playlistsVM.createPlaylist(mainVM.userId)
             .addOnSuccessListener(__ -> activity.snack("Created Playlist"))
             .addOnFailureListener(activity::handleError);
     }

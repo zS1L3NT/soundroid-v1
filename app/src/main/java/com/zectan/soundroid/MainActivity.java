@@ -2,6 +2,7 @@ package com.zectan.soundroid;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -18,6 +19,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.zectan.soundroid.databinding.ActivityMainBinding;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Song;
@@ -49,6 +51,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(B.getRoot());
         imm = getSystemService(InputMethodManager.class);
         notificationManager = getSystemService(NotificationManager.class);
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            Intent intent = new Intent(this, AuthActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
         // View Model
         mainVM = new ViewModelProvider(this).get(MainViewModel.class);

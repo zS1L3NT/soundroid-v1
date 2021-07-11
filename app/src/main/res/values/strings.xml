@@ -49,4 +49,7 @@
     <string name="profile_picture">Profile Picture</string>
     <string name="logout">Logout</string>
     <string name="clear_queue">Clear Queue</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="google_icon">Google Icon</string>
+    <string name="default_profile_icon">https://exceleratelabs.com/wp-content/uploads/2017/08/default-user.png</string>
 </resources>

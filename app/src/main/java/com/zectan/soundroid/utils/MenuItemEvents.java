@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class MenuItemEvents {
-    private static final String USER_ID = "admin";
     private final MainActivity mActivity;
     private final Info mInfo;
     private final Song mSong;
@@ -112,7 +111,7 @@ public class MenuItemEvents {
                 mActivity.handleError(new Exception("Song already in playlist!"));
             } else {
                 mSong.setPlaylistId(info.getId());
-                mSong.setUserId(USER_ID);
+                mSong.setUserId(mActivity.mainVM.userId);
                 db.collection("songs")
                     .add(mSong.toMap())
                     .addOnSuccessListener(onSuccessListener)
@@ -146,7 +145,7 @@ public class MenuItemEvents {
     }
 
     private void savePlaylist() {
-        mInfo.setUserId(USER_ID);
+        mInfo.setUserId(mActivity.mainVM.userId);
         new SavePlaylistRequest(mInfo, new SavePlaylistRequest.Callback() {
             @Override
             public void onComplete() {

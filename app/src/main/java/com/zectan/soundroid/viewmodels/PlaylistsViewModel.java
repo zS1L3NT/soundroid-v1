@@ -11,7 +11,6 @@ import com.zectan.soundroid.utils.Anonymous;
 import java.util.ArrayList;
 
 public class PlaylistsViewModel extends ViewModel {
-    private static final String USER_ID = "admin";
     public final StrictLiveData<Boolean> loading = new StrictLiveData<>(false);
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -19,14 +18,14 @@ public class PlaylistsViewModel extends ViewModel {
         // Required empty public constructor
     }
 
-    public Task<Void> createPlaylist() {
+    public Task<Void> createPlaylist(String userId) {
         String id = db.collection("songs").document().getId();
         Info info = new Info(
             id,
             "New Playlist",
             "https://firebasestorage.googleapis.com/v0/b/android-soundroid.appspot.com/o/playing_cover_default.png?alt=media&token=e8980e80-ab5d-4f21-8ed4-6bc6e7e06ef7",
             "#7b828b",
-            USER_ID,
+            userId,
             new ArrayList<>(),
             Anonymous.getQueries("New Playlist")
         );
