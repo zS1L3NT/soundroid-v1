@@ -34,6 +34,21 @@
         app:layout_constraintStart_toStartOf="@+id/playing_from_text"
         app:layout_constraintTop_toBottomOf="@+id/playing_from_text" />
 
+    <TextView
+        android:id="@+id/more_image"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:elevation="1dp"
+        android:gravity="center"
+        android:text="@string/menu_special_string"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/cover_image"
         android:layout_width="340dp"

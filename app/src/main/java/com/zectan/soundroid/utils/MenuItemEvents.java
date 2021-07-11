@@ -54,6 +54,9 @@ public class MenuItemEvents {
             case R.id.add_to_queue:
                 addToQueue();
                 break;
+            case R.id.clear_queue:
+                clearQueue();
+                break;
             case R.id.play_playlist:
                 playPlaylist();
                 break;
@@ -125,6 +128,11 @@ public class MenuItemEvents {
     private void addToQueue() {
         mActivity.playingVM.addToQueue(mSong);
         mActivity.snack("Song added to queue");
+    }
+
+    private void clearQueue() {
+        mActivity.playingVM.clearQueue(mActivity);
+        mActivity.snack("Cleared queue");
     }
 
     private void playPlaylist() {

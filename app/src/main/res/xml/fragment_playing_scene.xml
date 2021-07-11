@@ -3,6 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ConstraintSet android:id="@+id/start">
+        <Constraint android:id="@+id/more_image">
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="true" />
+        </Constraint>
         <Constraint android:id="@+id/playing_seekbar">
             <CustomAttribute
                 app:attributeName="enabled"
@@ -59,6 +64,18 @@
                 app:layout_constraintStart_toStartOf="@+id/playing_from_text"
                 app:layout_constraintTop_toBottomOf="@+id/playing_from_text" />
             <PropertySet android:alpha="0" />
+        </Constraint>
+        <Constraint android:id="@+id/more_image">
+            <Layout
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <PropertySet android:alpha="0" />
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="false" />
         </Constraint>
         <Constraint android:id="@+id/cover_image">
             <Layout

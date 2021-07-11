@@ -212,6 +212,23 @@ public class PlayingViewModel extends ViewModel {
         mQueueManager.addSong(song);
     }
 
+    public void clearQueue(MainActivity activity) {
+        currentSong.setValue(Song.getEmpty());
+        queue.setValue(new ArrayList<>());
+        mQueueManager = new QueueManager(
+            activity,
+            new ArrayList<>(),
+            new ArrayList<>(),
+            isLooping,
+            isShuffling,
+            currentSong,
+            queue,
+            mPlayer,
+            true
+        );
+        mPlayer.clearMediaItems();
+    }
+
     private void requestAudioFocus() {
         if (am == null || afr == null) return;
         am.requestAudioFocus(afr);
@@ -231,5 +248,4 @@ public class PlayingViewModel extends ViewModel {
                 break;
         }
     }
-
 }
