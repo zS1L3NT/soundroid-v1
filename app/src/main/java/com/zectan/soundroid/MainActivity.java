@@ -1,6 +1,7 @@
 package com.zectan.soundroid;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
@@ -80,6 +81,15 @@ public class MainActivity extends AppCompatActivity {
         // Music Player
         SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
         playingVM.setPlayer(this, player);
+
+        // Notification Channels
+        NotificationChannel downloadChannel = new NotificationChannel(
+            MainActivity.DOWNLOAD_CHANNEL_ID,
+            MainActivity.DOWNLOAD_CHANNEL_ID,
+            NotificationManager.IMPORTANCE_DEFAULT
+        );
+        downloadChannel.setDescription("Download songs for offline listening");
+        notificationManager.createNotificationChannel(downloadChannel);
 
         // Playing Screen background
         int[] colors = {getColor(R.color.default_cover_color), getAttributeResource(R.attr.colorSecondary)};

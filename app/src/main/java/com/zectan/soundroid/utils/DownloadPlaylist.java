@@ -114,6 +114,7 @@ public class DownloadPlaylist {
                     .setSmallIcon(R.drawable.ic_close);
                 mNotificationManager.cancel(NOTIFICATION_ID);
                 mNotificationManager.notify(Anonymous.getRandomInt(), builder.build());
+                song.deleteLocally(mActivity);
                 if (++mDownloaded == mSongs.size()) {
                     sendDone();
                 } else {
