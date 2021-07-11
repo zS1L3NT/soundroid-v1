@@ -39,7 +39,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         public void onSongClicked(Song song) {
             Info info = new Info(song.getSongId(), "Search Result", Collections.singletonList(song.getSongId()));
             Playlist playlist = new Playlist(info, Collections.singletonList(song));
-            playingVM.startPlaylist(activity, playlist, song.getSongId());
+            playingVM.startPlaylist(activity, playlist, song.getSongId(), mainVM.myUser.getValue().getHighStreamQuality());
             activity.hideKeyboard(SearchFragment.this.requireView());
 
             if (mainVM.myUser.getValue().getOpenPlayingScreen()) {

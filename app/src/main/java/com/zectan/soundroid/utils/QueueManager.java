@@ -26,6 +26,7 @@ public class QueueManager {
 
     private final List<String> mSortedOrder;
     private final List<String> mShuffledOrder;
+    private final boolean mHighQuality;
     private int mPosition;
 
     public QueueManager(
@@ -36,7 +37,8 @@ public class QueueManager {
         StrictLiveData<Boolean> isShuffling,
         StrictLiveData<Song> currentSong,
         StrictLiveData<List<Song>> queue,
-        SimpleExoPlayer player
+        SimpleExoPlayer player,
+        boolean highQuality
     ) {
         mContext = context;
         mIsLooping = isLooping;
@@ -46,6 +48,7 @@ public class QueueManager {
         mCurrentSong = currentSong;
         mPlayer = player;
         mQueue = queue;
+        mHighQuality = highQuality;
 
         mSortedOrder = new ArrayList<>(order);
         mShuffledOrder = ListArrayUtils.shuffleOrder(new ArrayList<>(order));
@@ -223,7 +226,7 @@ public class QueueManager {
         mCurrentSong.setValue(song);
 
         mPlayer.stop();
-        mPlayer.setMediaItem(song.getMediaItem(mContext));
+        mPlayer.setMediaItem(song.getMediaItem(mContext, mHighQuality));
         mPlayer.prepare();
         mPlayer.play();
 

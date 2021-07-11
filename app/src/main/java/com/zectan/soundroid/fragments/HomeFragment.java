@@ -35,7 +35,7 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
     private final HomeAdapter.Callback callback = new HomeAdapter.Callback() {
         @Override
         public void onSongClicked(ImageView cover, String transitionName, Playlist playlist, String songId) {
-            playingVM.startPlaylist(activity, playlist, songId);
+            playingVM.startPlaylist(activity, playlist, songId, mainVM.myUser.getValue().getHighStreamQuality());
 
             if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
                 FragmentNavigator.Extras extras = Anonymous.makeExtras(cover, transitionName);

@@ -19,17 +19,19 @@ public class DownloadPlaylist {
     private final NotificationManager mNotificationManager;
     private final List<Song> mSongs;
     private final Info mInfo;
+    private final boolean mHighQuality;
 
-    private int nextInQueue;
-    private int downloaded;
+    private int mNextInQueue;
+    private int mDownloaded;
 
-    public DownloadPlaylist(MainActivity activity, Info info) {
+    public DownloadPlaylist(MainActivity activity, Info info, boolean highQuality) {
         mActivity = activity;
         mNotificationManager = activity.notificationManager;
         mInfo = info;
         mSongs = mActivity.mainVM.getSongsFromPlaylist(mInfo.getId());
-        nextInQueue = 0;
-        downloaded = 0;
+        mNextInQueue = 0;
+        mDownloaded = 0;
+        mHighQuality = highQuality;
 
         List<String> downloading = mActivity.mainVM.downloading.getValue();
         if (downloading.contains(mInfo.getId())) {
@@ -56,12 +58,12 @@ public class DownloadPlaylist {
     }
 
     public void downloadOne() {
-        if (nextInQueue == mSongs.size()) return;
-        int indexInQueue = nextInQueue++;
+        if (mNextInQueue == mSongs.size()) return;
+        int indexInQueue = mNextInQueue++;
         Song song = mSongs.get(indexInQueue);
 
         if (song.isDownloaded(mActivity)) {
-            if (++downloaded == mSongs.size()) {
+            if (++mDownloaded == mSongs.size()) {
                 sendDone();
             } else {
                 downloadOne();
@@ -81,7 +83,7 @@ public class DownloadPlaylist {
             .setProgress(100, 0, false);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
 
-        new DownloadRequest(song, mActivity, new DownloadRequest.Callback() {
+        new DownloadRequest(mActivity, song, mHighQuality, new DownloadRequest.Callback() {
             @Override
             public void onFinish() {
                 builder
@@ -89,7 +91,7 @@ public class DownloadPlaylist {
                     .setContentText("Done")
                     .setSmallIcon(R.drawable.ic_check);
                 mNotificationManager.cancel(NOTIFICATION_ID);
-                if (++downloaded == mSongs.size()) {
+                if (++mDownloaded == mSongs.size()) {
                     sendDone();
                 } else {
                     downloadOne();
@@ -112,7 +114,7 @@ public class DownloadPlaylist {
                     .setSmallIcon(R.drawable.ic_close);
                 mNotificationManager.cancel(NOTIFICATION_ID);
                 mNotificationManager.notify(Anonymous.getRandomInt(), builder.build());
-                if (++downloaded == mSongs.size()) {
+                if (++mDownloaded == mSongs.size()) {
                     sendDone();
                 } else {
                     downloadOne();

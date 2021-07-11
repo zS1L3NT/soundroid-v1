@@ -45,7 +45,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         @Override
         public void onSongClicked(ImageView cover, String transitionName, String songId) {
             Playlist playlist = new Playlist(playlistViewVM.info.getValue(), playlistViewVM.songs.getValue());
-            playingVM.startPlaylist(activity, playlist, songId);
+            playingVM.startPlaylist(activity, playlist, songId, mainVM.myUser.getValue().getHighStreamQuality());
 
             if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
                 FragmentNavigator.Extras extras = Anonymous.makeExtras(cover, transitionName);

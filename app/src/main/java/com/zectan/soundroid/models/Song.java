@@ -19,7 +19,7 @@ import java.util.Objects;
 
 public class Song {
     private static final String TAG = "(SounDroid) Song";
-    private static final String SongsURL = "http://soundroid.zectan.com/song";
+    private static final String SongsURL = "http://soundroid.zectan.com/song/%s/%s.mp3";
     private String songId;
     private String title;
     private String artiste;
@@ -126,13 +126,13 @@ public class Song {
         return this.queries;
     }
 
-    public MediaItem getMediaItem(Context context) {
+    public MediaItem getMediaItem(Context context, boolean highQuality) {
         Uri uri;
 
         if (isDownloaded(context)) {
             uri = Uri.fromFile(getFileDir(context));
         } else {
-            uri = Uri.parse(String.format("%s/%s.mp3", SongsURL, songId));
+            uri = Uri.parse(String.format(SongsURL, highQuality ? "highest" : "lowest", songId));
         }
 
         return new MediaItem.Builder().setUri(uri).setMediaId(songId).build();

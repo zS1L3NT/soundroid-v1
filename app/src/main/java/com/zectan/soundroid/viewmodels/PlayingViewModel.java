@@ -60,7 +60,7 @@ public class PlayingViewModel extends ViewModel {
         // Required empty public constructor
     }
 
-    public void startPlaylist(Context context, Playlist playlist, String songId) {
+    public void startPlaylist(Context context, Playlist playlist, String songId, boolean highQuality) {
         Log.i(TAG, String.format("Start Playlist (%s)[%s]", playlist.getInfo().getId(), songId));
 
         this.playlist.setValue(playlist);
@@ -72,7 +72,8 @@ public class PlayingViewModel extends ViewModel {
             isShuffling,
             currentSong,
             queue,
-            mPlayer
+            mPlayer,
+            highQuality
         );
 
         changeSong(songId);
@@ -188,7 +189,8 @@ public class PlayingViewModel extends ViewModel {
             isShuffling,
             currentSong,
             queue,
-            mPlayer
+            mPlayer,
+            true
         );
     }
 

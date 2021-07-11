@@ -130,7 +130,7 @@ public class MenuItemEvents {
     private void playPlaylist() {
         List<Song> songs = mActivity.mainVM.getSongsFromPlaylist(mInfo.getId());
         Playlist playlist = new Playlist(mInfo, songs);
-        mActivity.playingVM.startPlaylist(mActivity, playlist, songs.get(0).getSongId());
+        mActivity.playingVM.startPlaylist(mActivity, playlist, songs.get(0).getSongId(), mActivity.mainVM.myUser.getValue().getHighStreamQuality());
 
         if (mActivity.mainVM.myUser.getValue().getOpenPlayingScreen()) {
             mActivity.navController.navigate(R.id.fragment_playing);
@@ -153,7 +153,7 @@ public class MenuItemEvents {
     }
 
     private void downloadPlaylist() {
-        new DownloadPlaylist(mActivity, mInfo);
+        new DownloadPlaylist(mActivity, mInfo, mActivity.mainVM.myUser.getValue().getHighDownloadQuality());
     }
 
     private void deleteDownloads() {

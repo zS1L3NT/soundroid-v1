@@ -15,14 +15,14 @@ import java.net.URLConnection;
 
 public class DownloadRequest {
     private static final String TAG = "(SounDroid) SongDownloadTask";
-    private static final String URL = "http://soundroid.zectan.com/song/%s.mp3";
+    private static final String URL = "http://soundroid.zectan.com/song/%s/%s.mp3";
 
-    public DownloadRequest(Song song, Context context, Callback callback) {
+    public DownloadRequest(Context context, Song song, boolean highQuality, Callback callback) {
         File file = new File(context.getFilesDir(), String.format("/%s%s.mp3", song.getPlaylistId(), song.getSongId()));
         new Thread(() -> {
             int count;
             try {
-                URL fileURL = new URL(String.format(URL, song.getSongId()));
+                URL fileURL = new URL(String.format(URL, highQuality ? "highest" : "lowest", song.getSongId()));
                 URLConnection connection = fileURL.openConnection();
                 connection.connect();
 
