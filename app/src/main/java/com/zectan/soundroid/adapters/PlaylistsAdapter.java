@@ -1,6 +1,5 @@
 package com.zectan.soundroid.adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +15,13 @@ import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.PlaylistListItemBinding;
 import com.zectan.soundroid.models.Info;
-import com.zectan.soundroid.models.Song;
+import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.utils.MenuItemsBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistViewHolder> {
     private final Callback mCallback;
@@ -78,7 +76,8 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bind(Info info) {
-        Context context = B.parent.getContext();
+        MainActivity activity = (MainActivity) B.parent.getContext();
+        Playlist playlist = new Playlist(info, activity.mainVM.getSongsFromPlaylist(info.getId()));
 
         String name = info.getName();
         String cover = info.getCover();
@@ -86,8 +85,9 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
 
         B.titleText.setText(name);
         B.descriptionText.setText(songCount);
+        B.downloadedDot.setAlpha(playlist.isDownloaded(activity) ? 1 : 0);
         Glide
-            .with(context)
+            .with(activity)
             .load(cover)
             .placeholder(R.drawable.playing_cover_default)
             .error(R.drawable.playing_cover_default)
@@ -96,15 +96,13 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
             .into(B.coverImage);
         B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
 
-
         B.menuClickable.setOnClickListener(v -> {
             @MenuRes int menu_id;
-            List<Song> songs = ((MainActivity) context).mainVM.getSongsFromPlaylist(info.getId());
-            List<Boolean> downloaded = songs.stream().map(song -> song.isDownloaded(context)).collect(Collectors.toList());
+            Playlist playlist_ = new Playlist(info, activity.mainVM.getSongsFromPlaylist(info.getId()));
 
-            if (downloaded.stream().allMatch(d -> d)) {
+            if (playlist_.isDownloaded(activity)) {
                 menu_id = R.menu.playlist_menu_playlists_delete;
-            } else if (downloaded.contains(true)) {
+            } else if (playlist_.hasDownloaded(activity)) {
                 menu_id = R.menu.playlist_menu_playlist_both;
             } else {
                 menu_id = R.menu.playlist_menu_playlists_download;

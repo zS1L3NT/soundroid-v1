@@ -102,6 +102,7 @@ class PlaylistViewViewHolder extends RecyclerView.ViewHolder {
 
         B.titleText.setText(title);
         B.descriptionText.setText(artiste);
+        B.downloadedDot.setAlpha(song.isDownloaded(activity) ? 1 : 0);
         Glide
             .with(activity)
             .load(cover)

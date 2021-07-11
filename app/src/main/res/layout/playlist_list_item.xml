@@ -25,6 +25,18 @@
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearanceOverlay="@style/shapeableImageViewStyle" />
 
+        <View
+            android:id="@+id/downloaded_dot"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginStart="63.75dp"
+            android:layout_marginTop="63.75dp"
+            android:alpha="0"
+            android:background="@drawable/downloaded_dot"
+            android:elevation="1dp"
+            app:layout_constraintStart_toStartOf="@+id/cover_image"
+            app:layout_constraintTop_toTopOf="@+id/cover_image" />
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"

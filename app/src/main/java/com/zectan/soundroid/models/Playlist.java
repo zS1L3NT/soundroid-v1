@@ -1,5 +1,7 @@
 package com.zectan.soundroid.models;
 
+import android.content.Context;
+
 import com.zectan.soundroid.utils.ListArrayUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -50,6 +52,14 @@ public class Playlist {
         List<Song> newSongs = songs.stream().filter(song -> !song.getSongId().equals(id)).collect(Collectors.toList());
         songs.clear();
         songs.addAll(newSongs);
+    }
+
+    public boolean isDownloaded(Context context) {
+        return songs.stream().allMatch(song -> song.isDownloaded(context));
+    }
+
+    public boolean hasDownloaded(Context context) {
+        return songs.stream().anyMatch(song -> song.isDownloaded(context));
     }
 
     public int size() {

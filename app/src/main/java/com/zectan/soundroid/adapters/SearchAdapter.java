@@ -15,6 +15,7 @@ import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.SongListItemBinding;
 import com.zectan.soundroid.models.Info;
+import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.models.SearchResult;
 import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.utils.MenuItemsBuilder;
@@ -112,6 +113,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
 
             B.titleText.setText(title);
             B.descriptionText.setText(String.format("%s • Song • %s", result.getLocation(), artiste));
+            B.downloadedDot.setAlpha(song.isDownloaded(activity) ? 1 : 0);
             Glide
                 .with(activity)
                 .load(cover)
@@ -153,6 +155,11 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
                     break;
                 default:
                     throw new RuntimeException(String.format("Unknown result location %s", result.getLocation()));
+            }
+
+            if (result.getLocation().equals("Local")) {
+                Playlist playlist = new Playlist(info, activity.mainVM.getSongsFromPlaylist(info.getId()));
+                B.downloadedDot.setAlpha(playlist.isDownloaded(activity) ? 1 : 0);
             }
 
             B.titleText.setText(name);

@@ -28,7 +28,7 @@ public class DownloadPlaylist {
         mActivity = activity;
         mNotificationManager = activity.notificationManager;
         mInfo = info;
-        mSongs = mActivity.mainVM.getSongsFromPlaylist(mInfo.getId());
+        mSongs = ListArrayUtils.sortSongs(mActivity.mainVM.getSongsFromPlaylist(mInfo.getId()), info.getOrder());
         mNextInQueue = 0;
         mDownloaded = 0;
         mHighQuality = highQuality;
