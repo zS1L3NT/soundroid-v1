@@ -1,7 +1,6 @@
 package com.zectan.soundroid.adapters;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.SongListItemBinding;
 import com.zectan.soundroid.models.Info;
@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
     private final Callback mCallback;
     private final List<Song> mSongs;
+    private Song mCurrentSong, mPreviousSong;
 
     public HomeAdapter(Callback callback) {
         mCallback = callback;
@@ -54,15 +55,29 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
 
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new HomeDiffCallback(
             mSongs,
-            sortedSongs
+            sortedSongs,
+            mCurrentSong,
+            mPreviousSong
         ));
         diffResult.dispatchUpdatesTo(this);
         mSongs.clear();
         mSongs.addAll(sortedSongs);
     }
 
+    public void updateCurrentSong(Song song) {
+        mPreviousSong = mCurrentSong;
+        mCurrentSong = song;
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new HomeDiffCallback(
+            mSongs,
+            mSongs,
+            mCurrentSong,
+            mPreviousSong
+        ));
+        diffResult.dispatchUpdatesTo(this);
+    }
+
     public void onBindViewHolder(@NonNull HomeViewHolder holder, int position) {
-        holder.bind(mSongs, position);
+        holder.bind(mSongs, mCurrentSong, position);
     }
 
     @Override
@@ -86,9 +101,9 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
     }
 
     @SuppressLint("RestrictedApi")
-    public void bind(List<Song> songs, int position) {
+    public void bind(List<Song> songs, Song currentSong, int position) {
         Song song = songs.get(position);
-        Context context = B.parent.getContext();
+        MainActivity activity = (MainActivity) B.parent.getContext();
 
         String id = song.getSongId();
         String title = song.getTitle();
@@ -98,13 +113,23 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
         B.titleText.setText(title);
         B.descriptionText.setText(artiste);
         Glide
-            .with(context)
+            .with(activity)
             .load(cover)
             .placeholder(R.drawable.playing_cover_default)
             .error(R.drawable.playing_cover_default)
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
+
+        if (song.equals(currentSong)) {
+            B.titleText.setTextColor(activity.getColor(R.color.green));
+            B.descriptionText.setTextColor(activity.getColor(R.color.green));
+            B.menuClickable.setTextColor(activity.getColor(R.color.green));
+        } else {
+            B.titleText.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
+            B.descriptionText.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
+            B.menuClickable.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
+        }
 
         List<String> order = songs
             .stream()
@@ -121,10 +146,13 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
 class HomeDiffCallback extends DiffUtil.Callback {
 
     private final List<Song> oldSongs, newSongs;
+    private final Song currentSong, previousSong;
 
-    public HomeDiffCallback(List<Song> oldSongs, List<Song> newSongs) {
+    public HomeDiffCallback(List<Song> oldSongs, List<Song> newSongs, Song currentSong, Song previousSong) {
         this.oldSongs = oldSongs;
         this.newSongs = newSongs;
+        this.currentSong = currentSong;
+        this.previousSong = previousSong;
     }
 
     @Override
@@ -148,6 +176,6 @@ class HomeDiffCallback extends DiffUtil.Callback {
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
         Song oldSong = oldSongs.get(oldItemPosition);
         Song newSong = newSongs.get(newItemPosition);
-        return oldSong.equals(newSong);
+        return oldSong.equals(newSong) && !oldSong.equals(currentSong) && !oldSong.equals(previousSong);
     }
 }

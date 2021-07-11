@@ -1,6 +1,5 @@
 package com.zectan.soundroid.adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.SongListItemBinding;
 import com.zectan.soundroid.models.Info;
@@ -26,9 +26,9 @@ import java.util.List;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     private static final String TAG = "(SounDroid) SearchAdapter";
-    //    private static final int FOOTER_VIEW = 1;
     private final Callback mCallback;
     private final List<SearchResult> mResults;
+    private Song mCurrentSong, mPreviousSong;
 
     public SearchAdapter(Callback callback) {
         mCallback = callback;
@@ -47,15 +47,32 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     }
 
     public void updateResults(List<SearchResult> results) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SearchDiffCallback(mResults, results));
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SearchDiffCallback(
+            mResults,
+            results,
+            mCurrentSong,
+            mPreviousSong
+        ));
         diffResult.dispatchUpdatesTo(this);
         mResults.clear();
         mResults.addAll(results);
     }
 
+    public void updateCurrentSong(Song song) {
+        mPreviousSong = mCurrentSong;
+        mCurrentSong = song;
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SearchDiffCallback(
+            mResults,
+            mResults,
+            mCurrentSong,
+            mPreviousSong
+        ));
+        diffResult.dispatchUpdatesTo(this);
+    }
+
     @Override
     public void onBindViewHolder(@NonNull @NotNull SearchViewHolder holder, int position) {
-        holder.bind(mResults, position);
+        holder.bind(mResults, mCurrentSong, position);
     }
 
     @Override
@@ -81,11 +98,11 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
         mCallback = callback;
     }
 
-    public void bind(List<SearchResult> results, int position) {
+    public void bind(List<SearchResult> results, Song currentSong, int position) {
         if (B == null) return;
 
         SearchResult result = results.get(position);
-        Context context = B.parent.getContext();
+        MainActivity activity = (MainActivity) B.parent.getContext();
 
         if (result.getSong() != null) {
             Song song = result.getSong();
@@ -96,13 +113,24 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             B.titleText.setText(title);
             B.descriptionText.setText(String.format("%s • Song • %s", result.getLocation(), artiste));
             Glide
-                .with(context)
+                .with(activity)
                 .load(cover)
                 .placeholder(R.drawable.playing_cover_default)
                 .error(R.drawable.playing_cover_default)
                 .transition(new DrawableTransitionOptions().crossFade())
                 .centerCrop()
                 .into(B.coverImage);
+
+            if (currentSong == null || song.getSongId().equals(currentSong.getSongId())) {
+                B.titleText.setTextColor(activity.getColor(R.color.green));
+                B.descriptionText.setTextColor(activity.getColor(R.color.green));
+                B.menuClickable.setTextColor(activity.getColor(R.color.green));
+            } else {
+                B.titleText.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
+                B.descriptionText.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
+                B.menuClickable.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
+            }
+
             B.parent.setOnClickListener(__ -> mCallback.onSongClicked(song));
             B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(
                 v,
@@ -130,11 +158,14 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             B.titleText.setText(name);
             B.descriptionText.setText(String.format("%s • Playlist", result.getLocation()));
             Glide
-                .with(context)
+                .with(activity)
                 .load(cover)
                 .error(R.drawable.playing_cover_default)
                 .centerCrop()
                 .into(B.coverImage);
+            B.titleText.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
+            B.descriptionText.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
+            B.menuClickable.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
             B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
             B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(
                 v,
@@ -149,10 +180,13 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
 class SearchDiffCallback extends DiffUtil.Callback {
 
     private final List<SearchResult> oldResults, newResults;
+    private final Song currentSong, previousSong;
 
-    public SearchDiffCallback(List<SearchResult> oldResults, List<SearchResult> newResults) {
+    public SearchDiffCallback(List<SearchResult> oldResults, List<SearchResult> newResults, Song currentSong, Song previousSong) {
         this.oldResults = oldResults;
         this.newResults = newResults;
+        this.currentSong = currentSong;
+        this.previousSong = previousSong;
     }
 
     @Override
@@ -176,6 +210,8 @@ class SearchDiffCallback extends DiffUtil.Callback {
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
         SearchResult oldResult = oldResults.get(oldItemPosition);
         SearchResult newResult = newResults.get(newItemPosition);
-        return oldResult.equals(newResult);
+        return oldResult.equals(newResult)
+            && (currentSong == null || !currentSong.getSongId().equals(oldResult.getId()))
+            && (previousSong == null || !previousSong.getSongId().equals(oldResult.getId()));
     }
 }

@@ -61,6 +61,7 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
         // Live Observers
         homeVM.songs.observe(this, homeAdapter::updateSongs);
         homeVM.loading.observe(this, B.swipeRefresh::setRefreshing);
+        playingVM.currentSong.observe(this, homeAdapter::updateCurrentSong);
 
         mainVM.mySongs.observe(this, homeVM.songs::setValue);
         B.searchbar.setOnClickListener(this::onSearchbarClicked);

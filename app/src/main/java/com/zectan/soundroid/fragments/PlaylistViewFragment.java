@@ -69,6 +69,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         playlistViewVM.info.observe(this, this::onInfoChange);
         playlistViewVM.songs.observe(this, this::onSongsChange);
         playlistViewVM.loading.observe(this, B.swipeRefresh::setRefreshing);
+        playingVM.currentSong.observe(this, playlistViewAdapter::updateCurrentSong);
 
         mainVM.watchInfoFromPlaylist(this, playlistViewVM.playlistId.getValue(), playlistViewVM.info::setValue);
         mainVM.watchSongsFromPlaylist(this, playlistViewVM.playlistId.getValue(), playlistViewVM.songs::setValue);

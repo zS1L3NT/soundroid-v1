@@ -85,6 +85,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         searchVM.loading.observe(this, this::onLoadingChange);
         searchVM.error.observe(this, this::onErrorChange);
         B.headerBackImage.setOnClickListener(this::onBackPressed);
+        playingVM.currentSong.observe(this, searchAdapter::updateCurrentSong);
 
         RxTextView
             .textChanges(B.headerTextEditor)
