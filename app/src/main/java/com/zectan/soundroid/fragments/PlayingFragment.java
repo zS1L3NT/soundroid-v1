@@ -96,6 +96,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
 
         B.playingSeekbar.setPlayer(playingVM.getPlayer());
         B.parent.setBackground(playingVM.background.getValue());
+        playingVM.error.setValue("");
 
         return B.getRoot();
     }
