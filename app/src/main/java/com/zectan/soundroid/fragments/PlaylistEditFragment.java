@@ -100,6 +100,12 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         return B.getRoot();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        activity.hideKeyboard(requireView());
+    }
+
     private void onCoverClicked(View view) {
         Intent intent = new Intent();
         intent.setType("image/*");

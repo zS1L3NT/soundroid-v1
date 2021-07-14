@@ -39,7 +39,6 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
             Info info = new Info(song.getSongId(), "Search Result", Collections.singletonList(song.getSongId()));
             Playlist playlist = new Playlist(info, Collections.singletonList(song));
             playingVM.startPlaylist(activity, playlist, song.getSongId(), mainVM.myUser.getValue().getHighStreamQuality());
-            activity.hideKeyboard(SearchFragment.this.requireView());
 
             if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
                 navController.navigate(SearchFragmentDirections.openSearchSong());
@@ -97,9 +96,14 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         return B.getRoot();
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        activity.hideKeyboard(requireView());
+    }
+
     private void onBackPressed(View view) {
         activity.onBackPressed();
-        activity.hideKeyboard(requireView());
     }
 
     private void afterSearchDebounce(String text) {
