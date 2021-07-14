@@ -20,7 +20,7 @@
     <string name="playlist_list_item_cover">Playlist cover</string>
     <string name="playing_click_to_retry">Click to retry</string>
     <string name="playing_error_message">Undefined error message</string>
-    <string name="downloads">Downloads</string>
+    <string name="all_songs">All Songs</string>
     <string name="settings">Settings</string>
     <string name="TRANSITION_searchbar">TRANSITION searchbar</string>
     <string name="playlist_cover">Playlist Cover</string>
