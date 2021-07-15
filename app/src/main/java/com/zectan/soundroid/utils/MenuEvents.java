@@ -27,7 +27,7 @@ public class MenuEvents {
     private final Song mSong;
     private final MenuItem mItem;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private Runnable mOpenEditPlaylist;
+    private Runnable mRunnable;
 
     public MenuEvents(MainActivity activity, Info info, Song song, MenuItem item) {
         mActivity = activity;
@@ -36,12 +36,12 @@ public class MenuEvents {
         mItem = item;
     }
 
-    public MenuEvents(MainActivity activity, Info info, Song song, MenuItem item, Runnable openEditPlaylist) {
+    public MenuEvents(MainActivity activity, Info info, Song song, MenuItem item, Runnable runnable) {
         mActivity = activity;
         mInfo = info;
         mSong = song;
         mItem = item;
-        mOpenEditPlaylist = openEditPlaylist;
+        mRunnable = runnable;
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -137,7 +137,7 @@ public class MenuEvents {
     }
 
     private void openQueue() {
-
+        mRunnable.run();
     }
 
     private void clearQueue() {
@@ -197,7 +197,7 @@ public class MenuEvents {
 
     private void editPlaylist() {
         mActivity.playlistEditVM.playlistId.setValue(mInfo.getId());
-        mOpenEditPlaylist.run();
+        mRunnable.run();
     }
 
     private void deletePlaylist() {

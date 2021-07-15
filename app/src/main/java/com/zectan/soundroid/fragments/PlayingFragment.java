@@ -107,7 +107,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         items.addToPlaylist();
         items.openQueue();
         items.clearQueue();
-        MenuBuilder.createMenu(view, items, playingVM.currentSong.getValue(), (song, item) -> activity.handleMenuItemClick(null, song, item));
+        MenuBuilder.createMenu(view, items, playingVM.currentSong.getValue(), (song, item) -> activity.handleMenuItemClick(null, song, item, B.parent::transitionToEnd));
     }
 
     public void playPauseSong(View v) {

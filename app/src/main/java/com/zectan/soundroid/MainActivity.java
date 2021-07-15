@@ -129,8 +129,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("NonConstantResourceId")
-    public boolean handleMenuItemClick(Info info, Song song, MenuItem item, Runnable openEditPlaylist) {
-        return new MenuEvents(this, info, song, item, openEditPlaylist).handle();
+    public boolean handleMenuItemClick(Info info, Song song, MenuItem item, Runnable runnable) {
+        return new MenuEvents(this, info, song, item, runnable).handle();
     }
 
     public void snack(String message) {
