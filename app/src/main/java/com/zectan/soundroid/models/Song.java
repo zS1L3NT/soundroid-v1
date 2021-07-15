@@ -148,7 +148,7 @@ public class Song {
     }
 
     private File getFileDir(Context context) {
-        return new File(context.getFilesDir(), String.format("/%s%s.mp3", playlistId, songId));
+        return new File(context.getFilesDir(), String.format("/%s.mp3", songId));
     }
 
     public Map<String, Object> toMap() {

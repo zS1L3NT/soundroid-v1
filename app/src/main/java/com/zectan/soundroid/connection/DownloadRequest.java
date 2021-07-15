@@ -18,7 +18,7 @@ public class DownloadRequest {
     private static final String URL = "http://soundroid.zectan.com/song/%s/%s.mp3";
 
     public DownloadRequest(Context context, Song song, boolean highQuality, Callback callback) {
-        File file = new File(context.getFilesDir(), String.format("/%s%s.mp3", song.getPlaylistId(), song.getSongId()));
+        File file = new File(context.getFilesDir(), String.format("/%s.mp3", song.getSongId()));
         new Thread(() -> {
             int count;
             try {
