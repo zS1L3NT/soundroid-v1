@@ -34,6 +34,7 @@ public class DownloadRequest {
                 byte[] data = new byte[1024];
                 while ((count = input.read(data)) != -1) {
                     downloadSize += count;
+                    if (callback.isCancelled()) throw new Exception("Cancelled");
                     callback.onProgress((int) ((downloadSize * 100) / fileSize));
 
                     output.write(data, 0, count);
@@ -59,6 +60,8 @@ public class DownloadRequest {
         void onProgress(int progress);
 
         void onError(String message);
+
+        boolean isCancelled();
     }
 
 }

@@ -150,7 +150,9 @@ public class MenuEvents {
     }
 
     private void stopDownloads() {
-
+        List<String> downloading = mActivity.mainVM.downloading.getValue();
+        List<String> newDownloading = downloading.stream().filter(id -> !id.equals(mInfo.getId())).collect(Collectors.toList());
+        mActivity.mainVM.downloading.setValue(newDownloading);
     }
 
     private void clearDownloads() {

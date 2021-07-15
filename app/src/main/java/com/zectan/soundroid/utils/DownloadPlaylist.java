@@ -64,6 +64,17 @@ public class DownloadPlaylist {
         int indexInQueue = mNextInQueue++;
         Song song = mSongs.get(indexInQueue);
 
+        if (!mActivity.mainVM.downloading.getValue().contains(mInfo.getId())) {
+            mFailed++;
+            song.deleteLocally(mActivity);
+            if (++mDownloaded == mSongs.size()) {
+                sendDone();
+            } else {
+                downloadOne();
+            }
+            return;
+        }
+
         if (song.isDownloaded(mActivity)) {
             if (++mDownloaded == mSongs.size()) {
                 sendDone();
@@ -118,6 +129,11 @@ public class DownloadPlaylist {
                 } else {
                     downloadOne();
                 }
+            }
+
+            @Override
+            public boolean isCancelled() {
+                return !mActivity.mainVM.downloading.getValue().contains(mInfo.getId());
             }
         });
     }
