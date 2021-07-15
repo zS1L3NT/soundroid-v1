@@ -36,11 +36,11 @@ public class Playlist {
     }
 
     public boolean isDownloaded(Context context) {
-        return songs.stream().allMatch(song -> song.isDownloaded(context));
+        return size() > 0 && songs.stream().allMatch(song -> song.isDownloaded(context));
     }
 
     public boolean hasDownloaded(Context context) {
-        return songs.stream().anyMatch(song -> song.isDownloaded(context));
+        return size() > 0 && songs.stream().anyMatch(song -> song.isDownloaded(context));
     }
 
     public int size() {
