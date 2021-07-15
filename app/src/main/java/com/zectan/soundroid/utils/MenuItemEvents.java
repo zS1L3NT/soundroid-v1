@@ -53,6 +53,9 @@ public class MenuItemEvents {
             case R.id.add_to_queue:
                 addToQueue();
                 break;
+            case R.id.delete_song:
+                deleteSongDownload();
+                break;
             case R.id.clear_queue:
                 clearQueue();
                 break;
@@ -66,7 +69,7 @@ public class MenuItemEvents {
                 downloadPlaylist();
                 break;
             case R.id.clear_downloads:
-                deleteDownloads();
+                clearDownloads();
                 break;
             case R.id.edit_playlist:
                 editPlaylist();
@@ -129,6 +132,11 @@ public class MenuItemEvents {
         mActivity.snack("Song added to queue");
     }
 
+    private void deleteSongDownload() {
+        mSong.deleteLocally(mActivity);
+        mActivity.snack("Song deleted locally");
+    }
+
     private void clearQueue() {
         mActivity.playingVM.clearQueue(mActivity);
         mActivity.snack("Cleared queue");
@@ -163,7 +171,7 @@ public class MenuItemEvents {
         new DownloadPlaylist(mActivity, mInfo, mActivity.mainVM.myUser.getValue().getHighDownloadQuality());
     }
 
-    private void deleteDownloads() {
+    private void clearDownloads() {
         List<Song> songs = mActivity.mainVM.getSongsFromPlaylist(mInfo.getId());
 
         for (Song song : songs) {

@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -123,7 +124,17 @@ class PlaylistViewViewHolder extends RecyclerView.ViewHolder {
         }
 
         B.parent.setOnClickListener(__ -> mCallback.onSongClicked(id));
-        B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(v, R.menu.song_menu, song, mCallback));
+
+        B.menuClickable.setOnClickListener(v -> {
+            @MenuRes int menu_id;
+            if (song.isDownloaded(v.getContext())) {
+                menu_id = R.menu.song_menu_downloaded;
+            } else {
+                menu_id = R.menu.song_menu;
+            }
+
+            MenuItemsBuilder.createMenu(v, menu_id, song, mCallback);
+        });
     }
 }
 

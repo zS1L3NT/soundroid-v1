@@ -134,12 +134,16 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             }
 
             B.parent.setOnClickListener(__ -> mCallback.onSongClicked(song));
-            B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(
-                v,
-                R.menu.song_menu,
-                result,
-                mCallback
-            ));
+            B.menuClickable.setOnClickListener(v -> {
+                @MenuRes int menu_id;
+                if (song.isDownloaded(v.getContext())) {
+                    menu_id = R.menu.song_menu_downloaded;
+                } else {
+                    menu_id = R.menu.song_menu;
+                }
+
+                MenuItemsBuilder.createMenu(v, menu_id, result, mCallback);
+            });
         } else if (result.getPlaylistInfo() != null) {
             Info info = result.getPlaylistInfo();
             String name = info.getName();

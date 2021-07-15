@@ -23,6 +23,7 @@ public class DownloadPlaylist {
 
     private int mNextInQueue;
     private int mDownloaded;
+    private int mFailed;
 
     public DownloadPlaylist(MainActivity activity, Info info, boolean highQuality) {
         mActivity = activity;
@@ -31,6 +32,7 @@ public class DownloadPlaylist {
         mSongs = ListArrayUtils.sortSongs(mActivity.mainVM.getSongsFromPlaylist(mInfo.getId()), info.getOrder());
         mNextInQueue = 0;
         mDownloaded = 0;
+        mFailed = 0;
         mHighQuality = highQuality;
 
         List<String> downloading = mActivity.mainVM.downloading.getValue();
@@ -79,7 +81,7 @@ public class DownloadPlaylist {
             .setSmallIcon(R.drawable.ic_download)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setGroup(mInfo.getId())
-            .setOnlyAlertOnce(true)
+            .setSilent(true)
             .setProgress(100, 0, false);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
 
@@ -108,13 +110,9 @@ public class DownloadPlaylist {
 
             @Override
             public void onError(String message) {
-                builder
-                    .setProgress(0, 0, false)
-                    .setContentText("Failed")
-                    .setSmallIcon(R.drawable.ic_close);
                 mNotificationManager.cancel(NOTIFICATION_ID);
-                mNotificationManager.notify(Utils.getRandomInt(), builder.build());
                 song.deleteLocally(mActivity);
+                mFailed++;
                 if (++mDownloaded == mSongs.size()) {
                     sendDone();
                 } else {
@@ -128,7 +126,7 @@ public class DownloadPlaylist {
         int NOTIFICATION_ID = Utils.getRandomInt();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mActivity, MainActivity.DOWNLOAD_CHANNEL_ID);
         builder
-            .setContentTitle("Downloading Finished")
+            .setContentTitle(mFailed == 0 ? "Downloading Finished" : "Downloads Incomplete")
             .setContentText(mInfo.getName())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSmallIcon(R.drawable.ic_launcher)
