@@ -97,16 +97,9 @@ public class MenuItemEvents {
                 }
             };
 
-            db.collection("playlists")
-                .document(info.getId())
-                .update("order", FieldValue.arrayUnion(mSong.getSongId()))
-                .addOnSuccessListener(onSuccessListener)
-                .addOnFailureListener(mActivity::handleError);
-
             boolean inPlaylist = mActivity
                 .mainVM
-                .mySongs
-                .getValue()
+                .getSongsFromPlaylist(info.getId())
                 .stream()
                 .anyMatch(song -> song.getSongId().equals(mSong.getSongId()));
 
@@ -117,6 +110,11 @@ public class MenuItemEvents {
                 mSong.setUserId(mActivity.mainVM.userId);
                 db.collection("songs")
                     .add(mSong.toMap())
+                    .addOnSuccessListener(onSuccessListener)
+                    .addOnFailureListener(mActivity::handleError);
+                db.collection("playlists")
+                    .document(info.getId())
+                    .update("order", FieldValue.arrayUnion(mSong.getSongId()))
                     .addOnSuccessListener(onSuccessListener)
                     .addOnFailureListener(mActivity::handleError);
             }
