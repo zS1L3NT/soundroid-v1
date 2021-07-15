@@ -80,6 +80,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         playingVM.isLooping.observe(this, this::onIsLoopingChange);
         playingVM.error.observe(this, this::onErrorChange);
 
+        B.backNavigateImage.setOnClickListener(__ -> activity.onBackPressed());
         B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.playPauseImage.setOnClickListener(this::playPauseSong);
         B.playPauseImage.setOnTouchListener(Animations::animationSmallSqueeze);

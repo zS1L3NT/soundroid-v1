@@ -10,6 +10,21 @@
     app:layoutDescription="@xml/fragment_playing_scene"
     tools:context=".fragments.PlayingFragment">
 
+    <ImageView
+        android:id="@+id/back_navigate_image"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/back"
+        android:elevation="1dp"
+        android:padding="5dp"
+        android:src="@drawable/ic_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
+
     <TextView
         android:id="@+id/playing_from_text"
         android:layout_width="wrap_content"
