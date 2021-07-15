@@ -71,6 +71,17 @@
 
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/message_text"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:alpha="0.4"
+        android:fontFamily="@font/sans_bold"
+        android:maxLines="1"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@+id/header" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
@@ -78,7 +89,7 @@
         android:layoutAnimation="@anim/songs_recycler_animation"
         android:overScrollMode="never"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header"
+        app:layout_constraintTop_toBottomOf="@+id/message_text"
         tools:listitem="@layout/song_list_item" />
 
     <LinearLayout

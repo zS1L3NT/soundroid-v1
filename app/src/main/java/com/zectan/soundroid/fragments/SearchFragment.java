@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.TransitionInflater;
@@ -82,6 +83,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         // Observers
         searchVM.results.observe(this, this::onResultsChange);
         searchVM.loading.observe(this, this::onLoadingChange);
+        searchVM.message.observe(this, this::onMessageChange);
         searchVM.error.observe(this, this::onErrorChange);
         B.headerBackImage.setOnClickListener(this::onBackPressed);
         playingVM.currentSong.observe(this, searchAdapter::updateCurrentSong);
@@ -148,6 +150,18 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         } else {
             B.responseLayout.animate().setDuration(250).alpha(0f).start();
         }
+    }
+
+    private void onMessageChange(String message) {
+        B.messageText.setText(message);
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(B.parent);
+        if (message.equals("")) {
+            constraintSet.connect(R.id.recycler_view, ConstraintSet.TOP, R.id.header, ConstraintSet.BOTTOM);
+        } else {
+            constraintSet.connect(R.id.recycler_view, ConstraintSet.TOP, R.id.message_text, ConstraintSet.BOTTOM);
+        }
+        constraintSet.applyTo(B.parent);
     }
 
     private void onErrorChange(String error) {

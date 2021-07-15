@@ -17,6 +17,7 @@ public class SearchViewModel extends ViewModel {
     public final StrictLiveData<List<SearchResult>> results = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<String> query = new StrictLiveData<>("");
     public final StrictLiveData<Boolean> loading = new StrictLiveData<>(false);
+    public final StrictLiveData<String> message = new StrictLiveData<>("");
     public final StrictLiveData<String> error = new StrictLiveData<>("");
     private int search_count = 0;
 
@@ -58,6 +59,7 @@ public class SearchViewModel extends ViewModel {
         if (query.isEmpty()) {
             loading.postValue(false);
             results.postValue(new ArrayList<>());
+            message.postValue("");
             serverResults.postValue(new ArrayList<>());
             databaseResults.postValue(new ArrayList<>());
             return;
@@ -81,6 +83,11 @@ public class SearchViewModel extends ViewModel {
             public void onDone(List<SearchResult> sortedResults) {
                 SearchViewModel.this.serverResults.postValue(sortedResults);
                 loading.postValue(false);
+            }
+
+            @Override
+            public void onMessage(String message) {
+                SearchViewModel.this.message.postValue(message);
             }
 
             @Override

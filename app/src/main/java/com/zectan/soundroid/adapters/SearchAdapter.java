@@ -161,7 +161,9 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             Glide
                 .with(activity)
                 .load(cover)
+                .placeholder(R.drawable.playing_cover_default)
                 .error(R.drawable.playing_cover_default)
+                .transition(new DrawableTransitionOptions().crossFade())
                 .centerCrop()
                 .into(B.coverImage);
             B.titleText.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
