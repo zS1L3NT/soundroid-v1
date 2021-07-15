@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class MenuItemEvents {
+public class MenuEvents {
     private final MainActivity mActivity;
     private final Info mInfo;
     private final Song mSong;
@@ -29,14 +29,14 @@ public class MenuItemEvents {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private Runnable mOpenEditPlaylist;
 
-    public MenuItemEvents(MainActivity activity, Info info, Song song, MenuItem item) {
+    public MenuEvents(MainActivity activity, Info info, Song song, MenuItem item) {
         mActivity = activity;
         mInfo = info;
         mSong = song;
         mItem = item;
     }
 
-    public MenuItemEvents(MainActivity activity, Info info, Song song, MenuItem item, Runnable openEditPlaylist) {
+    public MenuEvents(MainActivity activity, Info info, Song song, MenuItem item, Runnable openEditPlaylist) {
         mActivity = activity;
         mInfo = info;
         mSong = song;
@@ -47,34 +47,40 @@ public class MenuItemEvents {
     @SuppressLint("NonConstantResourceId")
     public boolean handle() {
         switch (mItem.getItemId()) {
-            case R.id.add_to_playlist:
+            case MenuBuilder.ADD_TO_PLAYLIST:
                 addToPlaylist();
                 break;
-            case R.id.add_to_queue:
+            case MenuBuilder.ADD_TO_QUEUE:
                 addToQueue();
                 break;
-            case R.id.delete_song:
-                deleteSongDownload();
+            case MenuBuilder.OPEN_QUEUE:
+                openQueue();
                 break;
-            case R.id.clear_queue:
+            case MenuBuilder.CLEAR_QUEUE:
                 clearQueue();
                 break;
-            case R.id.play_playlist:
-                playPlaylist();
+            case MenuBuilder.START_DOWNLOADS:
+                startDownloads();
                 break;
-            case R.id.save_playlist:
-                savePlaylist();
+            case MenuBuilder.STOP_DOWNLOADS:
+                stopDownloads();
                 break;
-            case R.id.download_playlist:
-                downloadPlaylist();
-                break;
-            case R.id.clear_downloads:
+            case MenuBuilder.CLEAR_DOWNLOADS:
                 clearDownloads();
                 break;
-            case R.id.edit_playlist:
+            case MenuBuilder.REMOVE_DOWNLOAD:
+                removeDownload();
+                break;
+            case MenuBuilder.SAVE_PLAYLIST:
+                savePlaylist();
+                break;
+            case MenuBuilder.PLAY_PLAYLIST:
+                playPlaylist();
+                break;
+            case MenuBuilder.EDIT_PLAYLIST:
                 editPlaylist();
                 break;
-            case R.id.delete_playlist:
+            case MenuBuilder.DELETE_PLAYLIST:
                 deletePlaylist();
                 break;
             default:
@@ -130,9 +136,8 @@ public class MenuItemEvents {
         mActivity.snack("Song added to queue");
     }
 
-    private void deleteSongDownload() {
-        mSong.deleteLocally(mActivity);
-        mActivity.snack("Song deleted locally");
+    private void openQueue() {
+
     }
 
     private void clearQueue() {
@@ -140,14 +145,27 @@ public class MenuItemEvents {
         mActivity.snack("Cleared queue");
     }
 
-    private void playPlaylist() {
-        List<Song> songs = mActivity.mainVM.getSongsFromPlaylist(mInfo.getId());
-        Playlist playlist = new Playlist(mInfo, songs);
-        mActivity.playingVM.startPlaylist(mActivity, playlist, songs.get(0).getSongId(), mActivity.mainVM.myUser.getValue().getHighStreamQuality());
+    private void startDownloads() {
+        new DownloadPlaylist(mActivity, mInfo, mActivity.mainVM.myUser.getValue().getHighDownloadQuality());
+    }
 
-        if (mActivity.mainVM.myUser.getValue().getOpenPlayingScreen()) {
-            mActivity.navController.navigate(R.id.fragment_playing);
+    private void stopDownloads() {
+
+    }
+
+    private void clearDownloads() {
+        List<Song> songs = mActivity.mainVM.getSongsFromPlaylist(mInfo.getId());
+
+        for (Song song : songs) {
+            song.deleteLocally(mActivity);
         }
+
+        mActivity.snack("Songs deleted");
+    }
+
+    private void removeDownload() {
+        mSong.deleteLocally(mActivity);
+        mActivity.snack("Song deleted locally");
     }
 
     private void savePlaylist() {
@@ -165,18 +183,14 @@ public class MenuItemEvents {
         });
     }
 
-    private void downloadPlaylist() {
-        new DownloadPlaylist(mActivity, mInfo, mActivity.mainVM.myUser.getValue().getHighDownloadQuality());
-    }
-
-    private void clearDownloads() {
+    private void playPlaylist() {
         List<Song> songs = mActivity.mainVM.getSongsFromPlaylist(mInfo.getId());
+        Playlist playlist = new Playlist(mInfo, songs);
+        mActivity.playingVM.startPlaylist(mActivity, playlist, songs.get(0).getSongId(), mActivity.mainVM.myUser.getValue().getHighStreamQuality());
 
-        for (Song song : songs) {
-            song.deleteLocally(mActivity);
+        if (mActivity.mainVM.myUser.getValue().getOpenPlayingScreen()) {
+            mActivity.navController.navigate(R.id.fragment_playing);
         }
-
-        mActivity.snack("Songs deleted");
     }
 
     private void editPlaylist() {

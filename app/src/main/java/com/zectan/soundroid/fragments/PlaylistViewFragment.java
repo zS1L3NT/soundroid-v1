@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.MenuRes;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,12 +24,11 @@ import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.utils.ListArrayUtils;
-import com.zectan.soundroid.utils.MenuItemsBuilder;
+import com.zectan.soundroid.utils.MenuBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> {
     private Boolean isLocal;
@@ -117,25 +115,15 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
     public void onMoreImageClicked(View view) {
         if (isLocal == null) return;
 
-        @MenuRes int menu_id;
-        List<Song> songs = activity.mainVM.getSongsFromPlaylist(playlistViewVM.info.getValue().getId());
-        List<Boolean> downloaded = songs.stream().map(song -> song.isDownloaded(activity)).collect(Collectors.toList());
+        Info info = playlistViewVM.info.getValue();
+        List<Song> songs = activity.mainVM.getSongsFromPlaylist(info.getId());
+        Playlist playlist = new Playlist(info, songs);
 
-        if (!isLocal) {
-            menu_id = R.menu.playlist_menu_search_server;
-        } else if (downloaded.stream().allMatch(d -> d)) {
-            menu_id = R.menu.playlist_menu_playlists_delete;
-        } else if (downloaded.contains(true)) {
-            menu_id = R.menu.playlist_menu_playlist_both;
-        } else {
-            menu_id = R.menu.playlist_menu_playlists_download;
-        }
-
-        MenuItemsBuilder.createMenu(
+        MenuBuilder.createMenu(
             view,
-            menu_id,
+            MenuBuilder.MenuItems.forPlaylist(playlist, activity),
             playlistViewVM.info.getValue(),
-            (info, item) -> activity.handleMenuItemClick(info, null, item, () -> navController.navigate(PlaylistViewFragmentDirections.openEditPlaylist()))
+            (info_, item) -> activity.handleMenuItemClick(info_, null, item, () -> navController.navigate(PlaylistViewFragmentDirections.openEditPlaylist()))
         );
     }
 

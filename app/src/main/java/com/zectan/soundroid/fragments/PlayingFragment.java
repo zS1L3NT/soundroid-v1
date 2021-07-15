@@ -28,7 +28,7 @@ import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlayingBinding;
 import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.utils.Animations;
-import com.zectan.soundroid.utils.MenuItemsBuilder;
+import com.zectan.soundroid.utils.MenuBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -102,7 +102,11 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     }
 
     private void onMoreImageClicked(View view) {
-        MenuItemsBuilder.createMenu(view, R.menu.queue_menu, playingVM.currentSong.getValue(), (song, item) -> activity.handleMenuItemClick(null, song, item));
+        MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
+        items.addToPlaylist();
+        items.openQueue();
+        items.clearQueue();
+        MenuBuilder.createMenu(view, items, playingVM.currentSong.getValue(), (song, item) -> activity.handleMenuItemClick(null, song, item));
     }
 
     public void playPauseSong(View v) {

@@ -4,7 +4,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,7 +15,7 @@ import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.PlaylistListItemBinding;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Playlist;
-import com.zectan.soundroid.utils.MenuItemsBuilder;
+import com.zectan.soundroid.utils.MenuBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -59,7 +58,7 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistViewHolder> {
         return mInfos.size();
     }
 
-    public interface Callback extends MenuItemsBuilder.MenuItemCallback<Info> {
+    public interface Callback extends MenuBuilder.MenuItemCallback<Info> {
         void onPlaylistClicked(Info info);
     }
 
@@ -96,20 +95,7 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
             .into(B.coverImage);
         B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
 
-        B.menuClickable.setOnClickListener(v -> {
-            @MenuRes int menu_id;
-            Playlist playlist_ = new Playlist(info, activity.mainVM.getSongsFromPlaylist(info.getId()));
-
-            if (playlist_.isDownloaded(activity)) {
-                menu_id = R.menu.playlist_menu_playlists_delete;
-            } else if (playlist_.hasDownloaded(activity)) {
-                menu_id = R.menu.playlist_menu_playlist_both;
-            } else {
-                menu_id = R.menu.playlist_menu_playlists_download;
-            }
-
-            MenuItemsBuilder.createMenu(v, menu_id, info, mCallback);
-        });
+        B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forPlaylist(new Playlist(info, activity.mainVM.getSongsFromPlaylist(info.getId())), activity), info, mCallback));
     }
 
 }

@@ -24,7 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.zectan.soundroid.databinding.ActivityMainBinding;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Song;
-import com.zectan.soundroid.utils.MenuItemEvents;
+import com.zectan.soundroid.utils.MenuEvents;
 import com.zectan.soundroid.viewmodels.MainViewModel;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistEditViewModel;
@@ -125,12 +125,12 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("NonConstantResourceId")
     public boolean handleMenuItemClick(Info info, Song song, MenuItem item) {
-        return new MenuItemEvents(this, info, song, item).handle();
+        return new MenuEvents(this, info, song, item).handle();
     }
 
     @SuppressLint("NonConstantResourceId")
     public boolean handleMenuItemClick(Info info, Song song, MenuItem item, Runnable openEditPlaylist) {
-        return new MenuItemEvents(this, info, song, item, openEditPlaylist).handle();
+        return new MenuEvents(this, info, song, item, openEditPlaylist).handle();
     }
 
     public void snack(String message) {

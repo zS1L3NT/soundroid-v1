@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,7 +17,7 @@ import com.zectan.soundroid.databinding.SongListItemBinding;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.models.Song;
-import com.zectan.soundroid.utils.MenuItemsBuilder;
+import com.zectan.soundroid.utils.MenuBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -86,7 +85,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
         return mSongs.size();
     }
 
-    public interface Callback extends MenuItemsBuilder.MenuItemCallback<Song> {
+    public interface Callback extends MenuBuilder.MenuItemCallback<Song> {
         void onSongClicked(Playlist playlist, String songId);
     }
 }
@@ -142,16 +141,7 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
 
         B.parent.setOnClickListener(__ -> mCallback.onSongClicked(playlist, id));
 
-        B.menuClickable.setOnClickListener(v -> {
-            @MenuRes int menu_id;
-            if (song.isDownloaded(v.getContext())) {
-                menu_id = R.menu.song_menu_downloaded;
-            } else {
-                menu_id = R.menu.song_menu;
-            }
-
-            MenuItemsBuilder.createMenu(v, menu_id, song, mCallback);
-        });
+        B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forSong(song, activity), song, mCallback));
     }
 }
 

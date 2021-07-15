@@ -4,7 +4,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,7 +17,7 @@ import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.models.SearchResult;
 import com.zectan.soundroid.models.Song;
-import com.zectan.soundroid.utils.MenuItemsBuilder;
+import com.zectan.soundroid.utils.MenuBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -81,7 +80,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
         return mResults.size();
     }
 
-    public interface Callback extends MenuItemsBuilder.MenuItemCallback<SearchResult> {
+    public interface Callback extends MenuBuilder.MenuItemCallback<SearchResult> {
         void onSongClicked(Song song);
 
         void onPlaylistClicked(Info info);
@@ -134,28 +133,19 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             }
 
             B.parent.setOnClickListener(__ -> mCallback.onSongClicked(song));
-            B.menuClickable.setOnClickListener(v -> {
-                @MenuRes int menu_id;
-                if (song.isDownloaded(v.getContext())) {
-                    menu_id = R.menu.song_menu_downloaded;
-                } else {
-                    menu_id = R.menu.song_menu;
-                }
-
-                MenuItemsBuilder.createMenu(v, menu_id, result, mCallback);
-            });
+            B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forSong(song, activity), result, mCallback));
         } else if (result.getPlaylistInfo() != null) {
             Info info = result.getPlaylistInfo();
             String name = info.getName();
             String cover = info.getCover();
-            @MenuRes int menu_id;
 
+            MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
             switch (result.getLocation()) {
                 case "Local":
-                    menu_id = R.menu.playlist_menu_search_local;
+                    items.playPlaylist();
                     break;
                 case "Server":
-                    menu_id = R.menu.playlist_menu_search_server;
+                    items.savePlaylist();
                     break;
                 default:
                     throw new RuntimeException(String.format("Unknown result location %s", result.getLocation()));
@@ -178,9 +168,9 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             B.descriptionText.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
             B.menuClickable.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
             B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
-            B.menuClickable.setOnClickListener(v -> MenuItemsBuilder.createMenu(
+            B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(
                 v,
-                menu_id,
+                items,
                 result,
                 mCallback
             ));
