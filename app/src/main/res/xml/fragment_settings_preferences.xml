@@ -24,4 +24,13 @@
 
     </com.zectan.soundroid.classes.PreferenceCategory>
 
+    <com.zectan.soundroid.classes.PreferenceCategory app:title="Downloads">
+
+        <Preference
+            app:key="clear_all_downloads"
+            app:summary="Clear all downloads from all playlists"
+            app:title="Clear All Downloads" />
+
+    </com.zectan.soundroid.classes.PreferenceCategory>
+
 </PreferenceScreen>

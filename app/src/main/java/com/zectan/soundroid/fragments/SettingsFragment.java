@@ -109,6 +109,10 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             highDownloadQuality.setOnPreferenceChangeListener(this::onHighDownloadQualityChange);
             highStreamQuality.setOnPreferenceChangeListener(this::onHighStreamQualityChange);
 
+            Preference clearAllDownloads = findPreference("clear_all_downloads");
+            assert clearAllDownloads != null;
+            clearAllDownloads.setOnPreferenceClickListener(this::onClearAllDownloadsClick);
+
             activity = (MainActivity) requireContext();
             if (activity.mainVM != null) updatePreferences(activity.mainVM.myUser.getValue());
         }
@@ -147,6 +151,23 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
                 userRef
                     .update("highStreamQuality", Boolean.parseBoolean(o.toString()))
                     .addOnFailureListener(activity::handleError);
+            return false;
+        }
+
+        private boolean onClearAllDownloadsClick(Preference preference) {
+            new MaterialAlertDialogBuilder(activity)
+                .setTitle("Are you sure?")
+                .setMessage("All downloaded songs will be deleted")
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                })
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    List<Song> songs = activity.mainVM.mySongs.getValue();
+                    for (Song song : songs) {
+                        song.deleteLocally(activity);
+                    }
+                    activity.playingVM.clearQueue(activity);
+                })
+                .show();
             return false;
         }
     }
