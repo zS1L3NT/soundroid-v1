@@ -178,9 +178,15 @@ public class QueueManager {
 
     public void moveSong(int oldPosition, int newPosition) {
         if (mIsShuffling.getValue()) {
-            mShuffledOrder.add(newPosition, mShuffledOrder.remove(oldPosition));
+            mShuffledOrder.add(
+                (newPosition + mPosition) % mShuffledOrder.size(),
+                mShuffledOrder.remove((oldPosition + mPosition) % mShuffledOrder.size())
+            );
         } else {
-            mSortedOrder.add(newPosition, mSortedOrder.remove(oldPosition));
+            mSortedOrder.add(
+                (newPosition + mPosition) % mSortedOrder.size(),
+                mSortedOrder.remove((oldPosition + mPosition) % mSortedOrder.size())
+            );
         }
 
         updateLiveQueue();
