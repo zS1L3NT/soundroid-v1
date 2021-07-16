@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Update", (dialog, which) -> {
                     Intent browserIntent = new Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("http://www.google.com")
+                        Uri.parse("http://soundroid.zectan.com")
                     );
                     startActivity(browserIntent);
                     onShowUpdateDialogChange(true);
