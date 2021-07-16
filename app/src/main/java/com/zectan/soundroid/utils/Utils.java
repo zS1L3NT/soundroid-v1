@@ -5,6 +5,7 @@ import android.view.View;
 import androidx.navigation.fragment.FragmentNavigator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Utils {
@@ -31,6 +32,23 @@ public class Utils {
 
     public static int getRandomInt() {
         return (int) (Math.random() * 1000000000);
+    }
+
+    public static boolean versionAtLeast(String current, String test) {
+        List<String> currentPortions = Arrays.asList(current.split("\\."));
+        List<String> testPortions = Arrays.asList(test.split("\\."));
+        assert currentPortions.size() == 3;
+        assert testPortions.size() == 3;
+
+        for (int i = 0; i < 3; i++) {
+            if (!currentPortions.get(i).equals(testPortions.get(i))) {
+                int currentInt = Integer.parseInt(currentPortions.get(i));
+                int testInt = Integer.parseInt(testPortions.get(i));
+                return currentInt > testInt;
+            }
+        }
+
+        return true;
     }
 
 }

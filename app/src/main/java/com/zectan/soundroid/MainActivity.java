@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -19,12 +20,15 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.zectan.soundroid.connection.VersionCheckRequest;
 import com.zectan.soundroid.databinding.ActivityMainBinding;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.utils.MenuEvents;
+import com.zectan.soundroid.utils.Utils;
 import com.zectan.soundroid.viewmodels.MainViewModel;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistEditViewModel;
@@ -68,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Live Observers
         mainVM.error.observe(this, this::handleError);
+        mainVM.showUpdateDialog.observe(this, this::onShowUpdateDialogChange);
         searchVM.watch(this);
 
         // Navigation
@@ -95,6 +100,20 @@ public class MainActivity extends AppCompatActivity {
         int[] colors = {getColor(R.color.default_cover_color), getAttributeResource(R.attr.colorSecondary)};
         GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
         playingVM.background.setValue(newGD);
+
+        new VersionCheckRequest(new VersionCheckRequest.Callback() {
+            @Override
+            public void onComplete(String version) {
+                if (!Utils.versionAtLeast(BuildConfig.VERSION_NAME, version)) {
+                    mainVM.showUpdateDialog.postValue(true);
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                handleError(new Exception("Could not check for latest version"));
+            }
+        });
     }
 
     @Override
@@ -139,6 +158,24 @@ public class MainActivity extends AppCompatActivity {
             .setAction(R.string.done, __ -> {
             })
             .show();
+    }
+
+    private void onShowUpdateDialogChange(Boolean showUpdateDialog) {
+        if (showUpdateDialog) {
+            new MaterialAlertDialogBuilder(MainActivity.this)
+                .setTitle("Update SounDroid")
+                .setMessage("A new version of SounDroid exists, so this version won't work anymore")
+                .setPositiveButton("Update", (dialog, which) -> {
+                    Intent browserIntent = new Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("http://www.google.com")
+                    );
+                    startActivity(browserIntent);
+                    onShowUpdateDialogChange(true);
+                })
+                .setCancelable(false)
+                .show();
+        }
     }
 
 }
