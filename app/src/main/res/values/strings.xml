@@ -15,7 +15,7 @@
     <string name="navigation_playlist">Playlist</string>
     <string name="navigation_playing">Playing</string>
     <string name="Nil">-</string>
-    <string name="searchbar_placeholder">Search for songs</string>
+    <string name="searchbar_placeholder">Search for songs or playlists</string>
     <string name="searchbar_back_icon">Searchbar back icon</string>
     <string name="playlist_list_item_cover">Playlist cover</string>
     <string name="playing_click_to_retry">Click to retry</string>
@@ -31,7 +31,6 @@
     <string name="no_results">No Results</string>
     <string name="connect_to_the_internet">Connect to the internet for online results</string>
     <string name="search">Search</string>
-    <string name="search_for_some_songs">Search for some songs</string>
     <string name="no_song_match_found">No song match found</string>
     <string name="add_to_queue">Add To Queue</string>
     <string name="add_to_playlist">Add To Playlist</string>

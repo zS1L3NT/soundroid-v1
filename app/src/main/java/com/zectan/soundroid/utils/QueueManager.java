@@ -162,6 +162,9 @@ public class QueueManager {
         mSongs.add(song);
         mSortedOrder.add(song.getSongId());
         mShuffledOrder.add((int) (Math.random() * mShuffledOrder.size()), song.getSongId());
+        if (mSongs.size() == 1) {
+            goToSong(song);
+        }
 
         updateLiveQueue();
     }

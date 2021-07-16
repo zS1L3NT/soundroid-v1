@@ -91,6 +91,7 @@ public class PlayingViewModel extends ViewModel {
         }
 
         requestAudioFocus();
+        error.postValue("");
         mQueueManager.goToSong(song);
     }
 

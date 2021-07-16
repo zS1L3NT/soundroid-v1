@@ -140,7 +140,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
                 if (B.headerTextEditor.getText().toString().isEmpty()) {
                     B.responseImage.setImageDrawable(activity.getDrawable(R.drawable.ic_search));
                     B.responseHeaderText.setText(R.string.search);
-                    B.responseMessageText.setText(R.string.search_for_some_songs);
+                    B.responseMessageText.setText(R.string.searchbar_placeholder);
                 } else {
                     B.responseImage.setImageDrawable(activity.getDrawable(R.drawable.ic_search_no_results));
                     B.responseHeaderText.setText(R.string.no_results);
