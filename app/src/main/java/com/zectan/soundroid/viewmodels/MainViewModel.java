@@ -39,10 +39,7 @@ public class MainViewModel extends ViewModel {
     }
 
     public void watch(MainActivity activity) {
-        Log.d(TAG, "STARTED WATCHING TO FIREBASE VALUES");
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        assert firebaseUser != null;
-        userId = firebaseUser.getUid();
+        Log.d(TAG, "STARTED WATCHING FIREBASE VALUES");
 
         db.collection("users")
             .document(userId)

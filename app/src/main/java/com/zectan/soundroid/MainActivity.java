@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.connection.VersionCheckRequest;
 import com.zectan.soundroid.databinding.ActivityMainBinding;
 import com.zectan.soundroid.models.Info;
@@ -37,11 +39,18 @@ import com.zectan.soundroid.viewmodels.PlaylistsViewModel;
 import com.zectan.soundroid.viewmodels.SearchViewModel;
 import com.zectan.soundroid.viewmodels.SongEditViewModel;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 // https://www.glyric.com/2018/merlin/aagaya-nilave
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "(SounDroid) MainActivity";
     public static final String DOWNLOAD_CHANNEL_ID = "Downloads";
+    public final FirebaseFirestore db = FirebaseFirestore.getInstance();
     public ActivityMainBinding B;
     public NavController navController;
     public NotificationManager notificationManager;
@@ -107,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
         playingVM.background.setValue(newGD);
 
+        mainVM.userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         new VersionCheckRequest(new VersionCheckRequest.Callback() {
             @Override
             public void onComplete(String version) {
@@ -140,6 +150,21 @@ public class MainActivity extends AppCompatActivity {
         String message = e.getMessage() != null ? e.getMessage() : "Unknown error occurred";
         snack(message);
         e.printStackTrace();
+
+        Map<String, Object> error = new HashMap<>();
+        error.put("date", Calendar.getInstance().getTime().toString());
+        error.put("message", e.getMessage());
+        error.put("class", e.getClass().getName());
+        List<String> stack = new ArrayList<>();
+        for (StackTraceElement el : e.getStackTrace()) stack.add(el.toString());
+        error.put("stack", stack);
+
+        db.collection("users")
+            .document(mainVM.userId)
+            .collection("errors")
+            .add(error)
+            .addOnSuccessListener(__ -> Log.i(TAG, "Error stored successfully"))
+            .addOnFailureListener(e_ -> Log.e(TAG, "Error stored unsuccessfully: " + e_.getMessage()));
     }
 
     public int getAttributeResource(int id) {
