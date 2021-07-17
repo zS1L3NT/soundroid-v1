@@ -53,6 +53,9 @@ public class MenuEvents {
             case MenuBuilder.ADD_TO_QUEUE:
                 addToQueue();
                 break;
+            case MenuBuilder.EDIT_SONG:
+                editSong();
+                break;
             case MenuBuilder.OPEN_QUEUE:
                 openQueue();
                 break;
@@ -134,6 +137,11 @@ public class MenuEvents {
     private void addToQueue() {
         mActivity.playingVM.addToQueue(mSong);
         mActivity.snack("Song added to queue");
+    }
+
+    private void editSong() {
+        mActivity.songEditVM.song.setValue(mSong);
+        mRunnable.run();
     }
 
     private void openQueue() {

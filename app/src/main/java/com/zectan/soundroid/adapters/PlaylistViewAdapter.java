@@ -124,7 +124,7 @@ class PlaylistViewViewHolder extends RecyclerView.ViewHolder {
 
         B.parent.setOnClickListener(__ -> mCallback.onSongClicked(id));
 
-        B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forSong(song, activity), song, mCallback));
+        B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forSong(song, activity, true), song, mCallback));
     }
 }
 

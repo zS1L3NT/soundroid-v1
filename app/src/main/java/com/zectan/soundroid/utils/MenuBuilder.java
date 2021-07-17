@@ -21,16 +21,17 @@ import java.util.List;
 public class MenuBuilder {
     public static final int ADD_TO_PLAYLIST = 0;
     public static final int ADD_TO_QUEUE = 1;
-    public static final int OPEN_QUEUE = 2;
-    public static final int CLEAR_QUEUE = 3;
-    public static final int START_DOWNLOADS = 4;
-    public static final int STOP_DOWNLOADS = 5;
-    public static final int CLEAR_DOWNLOADS = 6;
-    public static final int REMOVE_DOWNLOAD = 7;
-    public static final int SAVE_PLAYLIST = 8;
-    public static final int PLAY_PLAYLIST = 9;
-    public static final int EDIT_PLAYLIST = 10;
-    public static final int DELETE_PLAYLIST = 11;
+    public static final int EDIT_SONG = 2;
+    public static final int OPEN_QUEUE = 3;
+    public static final int CLEAR_QUEUE = 4;
+    public static final int START_DOWNLOADS = 5;
+    public static final int STOP_DOWNLOADS = 6;
+    public static final int CLEAR_DOWNLOADS = 7;
+    public static final int REMOVE_DOWNLOAD = 8;
+    public static final int SAVE_PLAYLIST = 9;
+    public static final int PLAY_PLAYLIST = 10;
+    public static final int EDIT_PLAYLIST = 11;
+    public static final int DELETE_PLAYLIST = 12;
 
     public static <T> void createMenu(View v, MenuItems items, T object, MenuItemCallback<T> callback) {
         Context context = v.getContext();
@@ -122,8 +123,9 @@ public class MenuBuilder {
             return items;
         }
 
-        public static MenuItems forSong(Song song, Context context) {
+        public static MenuItems forSong(Song song, Context context, boolean editable) {
             MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
+            if (editable) items.editSong();
             items.addToQueue();
             items.addToPlaylist();
             if (song.isDownloaded(context)) {
@@ -148,6 +150,13 @@ public class MenuBuilder {
          */
         public void addToQueue() {
             mItems.add(new MenuItem(ADD_TO_QUEUE, "Add To Queue", R.drawable.ic_add_to_queue));
+        }
+
+        /**
+         * Edit song details
+         */
+        public void editSong() {
+            mItems.add(new MenuItem(EDIT_SONG, "Edit Song", R.drawable.ic_edit));
         }
 
         /**

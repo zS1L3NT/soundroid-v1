@@ -11,37 +11,27 @@ import android.view.ViewGroup;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.zectan.soundroid.R;
-import com.zectan.soundroid.adapters.PlaylistEditAdapter;
 import com.zectan.soundroid.classes.Fragment;
-import com.zectan.soundroid.connection.EditPlaylistRequest;
-import com.zectan.soundroid.databinding.FragmentPlaylistEditBinding;
-import com.zectan.soundroid.models.Info;
+import com.zectan.soundroid.connection.SongEditRequest;
+import com.zectan.soundroid.databinding.FragmentSongEditBinding;
 import com.zectan.soundroid.models.Song;
-import com.zectan.soundroid.utils.ListArrayUtils;
 import com.zectan.soundroid.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static android.app.Activity.RESULT_OK;
 
-public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> {
+public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
-    private final List<String> removed = new ArrayList<>();
-    private PlaylistEditAdapter playlistEditAdapter;
     private Uri newFilePath;
     private final ActivityResultLauncher<Intent> chooseCoverImage = registerForActivityResult(
         new ActivityResultContracts.StartActivityForResult(),
@@ -58,20 +48,17 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         }
     );
 
+    public SongEditFragment() {
+        // Required empty public constructor
+    }
+
+    @Nullable
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        B = FragmentPlaylistEditBinding.inflate(inflater, container, false);
+        B = FragmentSongEditBinding.inflate(inflater, container, false);
         super.onCreateView(inflater, container, savedInstanceState);
 
-        // Recycler Views
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
-        playlistEditAdapter = new PlaylistEditAdapter(removed::add);
-        B.recyclerView.setAdapter(playlistEditAdapter);
-        B.recyclerView.setLayoutManager(layoutManager);
-        B.recyclerView.setOrientation(DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING);
-        B.recyclerView.setReduceItemAlphaOnSwiping(true);
-
-        // Live Observers
+        // Observers
         playlistEditVM.navigateNow.observe(this, this::onNavigateNowChange);
         playlistEditVM.saving.observe(this, this::onSavingChange);
 
@@ -79,23 +66,17 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         B.saveImage.setOnClickListener(this::onSaveClicked);
         B.coverImage.setOnClickListener(this::onCoverClicked);
 
-        Info info = mainVM.getInfoFromPlaylist(playlistEditVM.playlistId.getValue());
-        List<Song> songs = mainVM.getSongsFromPlaylist(playlistEditVM.playlistId.getValue());
-        assert info != null;
-        playlistEditVM.info.setValue(info);
-        playlistEditVM.songs.setValue(songs);
-
-        B.nameTextInput.setText(info.getName());
+        Song song = songEditVM.song.getValue();
+        B.titleTextInput.setText(song.getTitle());
+        B.artisteTextInput.setText(song.getArtiste());
         Glide
             .with(activity)
-            .load(info.getCover())
+            .load(song.getCover())
             .placeholder(R.drawable.playing_cover_default)
             .error(R.drawable.playing_cover_default)
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
-        playlistEditAdapter.setDataSet(ListArrayUtils.sortSongs(songs, playlistEditVM.info.getValue().getOrder()));
-        removed.clear();
 
         return B.getRoot();
     }
@@ -115,37 +96,40 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
 
     private void onSaveClicked(View view) {
         playlistEditVM.saving.setValue(true);
-        Info info = playlistEditVM.info.getValue();
-        List<String> order = playlistEditAdapter
-            .getDataSet()
-            .stream()
-            .map(Song::getSongId)
-            .collect(Collectors.toList());
+        Song song = songEditVM.song.getValue();
 
-        String newName;
-        if (B.nameTextInput.getText() == null) {
-            newName = info.getName();
+        String newTitle;
+        if (B.titleTextInput.getText() == null) {
+            newTitle = song.getTitle();
         } else {
-            newName = B.nameTextInput.getText().toString();
+            newTitle = B.titleTextInput.getText().toString();
         }
 
-        Info newInfo = new Info(
-            info.getId(),
-            newName,
-            info.getCover(),
-            info.getColorHex(),
-            info.getUserId(),
-            order,
-            Utils.getQueries(newName)
+        String newArtiste;
+        if (B.artisteTextInput.getText() == null) {
+            newArtiste = song.getArtiste();
+        } else {
+            newArtiste = B.artisteTextInput.getText().toString();
+        }
+
+        Song newSong = new Song(
+            song.getSongId(),
+            newTitle,
+            newArtiste,
+            song.getCover(),
+            song.getColorHex(),
+            song.getPlaylistId(),
+            song.getUserId(),
+            Utils.getQueries(newTitle)
         );
 
-        StorageReference ref = storage.getReference().child(String.format("playlists/%s.png", info.getId()));
+        StorageReference ref = storage.getReference().child(String.format("songs/%s.png", song.getSongId()));
         if (newFilePath != null) {
             ref.putFile(newFilePath)
                 .addOnSuccessListener(snap -> ref.getDownloadUrl()
                     .addOnSuccessListener(uri -> {
-                        newInfo.setCover(uri.toString());
-                        sendEditPlaylistRequest(newInfo);
+                        newSong.setCover(uri.toString());
+                        sendColorHexRequest(newSong);
                     })
                     .addOnFailureListener(error -> {
                         playlistEditVM.saving.postValue(false);
@@ -156,20 +140,14 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
                     mainVM.error.postValue(error);
                 });
         } else {
-            sendEditPlaylistRequest(newInfo);
+            sendColorHexRequest(newSong);
         }
     }
 
-    private void sendEditPlaylistRequest(Info info) {
-        new EditPlaylistRequest(info, removed, new EditPlaylistRequest.Callback() {
+    private void sendColorHexRequest(Song song) {
+        new SongEditRequest(song, new SongEditRequest.Callback() {
             @Override
             public void onComplete() {
-                playlistEditVM.songs
-                    .getValue()
-                    .stream()
-                    .filter(song -> removed.contains(song.getSongId()))
-                    .forEach(song -> song.deleteIfNotUsed(activity, mainVM.mySongs.getValue()));
-
                 playlistEditVM.navigateNow.postValue(1);
                 playlistEditVM.saving.postValue(false);
             }
@@ -198,4 +176,5 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         playlistEditVM.navigateNow.postValue(0);
         activity.onBackPressed();
     }
+
 }

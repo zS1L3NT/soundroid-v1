@@ -43,7 +43,7 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
 
         @Override
         public boolean onMenuItemClicked(Song song, MenuItem item) {
-            return activity.handleMenuItemClick(null, song, item);
+            return activity.handleMenuItemClick(null, song, item, () -> navController.navigate(HomeFragmentDirections.openEditSong()));
         }
     };
 

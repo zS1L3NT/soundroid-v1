@@ -34,6 +34,7 @@ import com.zectan.soundroid.viewmodels.PlayingViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistEditViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 import com.zectan.soundroid.viewmodels.SearchViewModel;
+import com.zectan.soundroid.viewmodels.SongEditViewModel;
 
 // https://www.glyric.com/2018/merlin/aagaya-nilave
 
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     public PlayingViewModel playingVM;
     public PlaylistViewViewModel playlistViewVM;
     public PlaylistEditViewModel playlistEditVM;
+    public SongEditViewModel songEditVM;
     private InputMethodManager imm;
 
     @Override
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         SearchViewModel searchVM = new ViewModelProvider(this).get(SearchViewModel.class);
         playlistViewVM = new ViewModelProvider(this).get(PlaylistViewViewModel.class);
         playlistEditVM = new ViewModelProvider(this).get(PlaylistEditViewModel.class);
+        songEditVM = new ViewModelProvider(this).get(SongEditViewModel.class);
 
         // Live Observers
         mainVM.error.observe(this, this::handleError);

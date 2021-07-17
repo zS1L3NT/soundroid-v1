@@ -50,4 +50,7 @@
     <string name="google_icon">Google Icon</string>
     <string name="default_profile_icon">https://exceleratelabs.com/wp-content/uploads/2017/08/default-user.png</string>
     <string name="delete_download">Delete Download</string>
+    <string name="edit_song">Edit Song</string>
+    <string name="song_artiste">Song Artiste</string>
+    <string name="song_title">Song Title</string>
 </resources>

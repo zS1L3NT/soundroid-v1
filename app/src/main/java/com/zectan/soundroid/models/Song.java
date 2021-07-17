@@ -87,6 +87,21 @@ public class Song {
         return new Song(songId, title, artiste, cover, colorHex, playlistId, userId, queries);
     }
 
+    public JSONObject toJSON() throws JSONException {
+        JSONObject object = new JSONObject();
+        object.put("songId", songId);
+        object.put("title", title);
+        object.put("artiste", artiste);
+        object.put("cover", cover);
+        object.put("colorHex", colorHex);
+        object.put("playlistId", playlistId);
+        object.put("userId", userId);
+        JSONArray queriesArray = new JSONArray();
+        for (String query : queries) queriesArray.put(query);
+        object.put("queries", queriesArray);
+        return object;
+    }
+
     public String getSongId() {
         return songId;
     }
@@ -101,6 +116,10 @@ public class Song {
 
     public String getCover() {
         return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     public String getColorHex() {

@@ -47,7 +47,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
 
         @Override
         public boolean onMenuItemClicked(Song song, MenuItem item) {
-            return activity.handleMenuItemClick(playlistViewVM.info.getValue(), song, item, () -> navController.navigate(PlaylistViewFragmentDirections.openEditPlaylist()));
+            return activity.handleMenuItemClick(playlistViewVM.info.getValue(), song, item, () -> navController.navigate(PlaylistViewFragmentDirections.openEditSong()));
         }
     };
     private PlaylistViewAdapter playlistViewAdapter;
