@@ -17,6 +17,7 @@ import com.zectan.soundroid.viewmodels.HomeViewModel;
 import com.zectan.soundroid.viewmodels.MainViewModel;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistEditViewModel;
+import com.zectan.soundroid.viewmodels.PlaylistImportViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistsViewModel;
 import com.zectan.soundroid.viewmodels.SearchViewModel;
@@ -37,6 +38,7 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
     protected PlaylistViewViewModel playlistViewVM;
     protected SearchViewModel searchVM;
     protected SongEditViewModel songEditVM;
+    protected PlaylistImportViewModel playlistImportVM;
 
     public Fragment() {
     }
@@ -57,6 +59,7 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
         playlistViewVM = new ViewModelProvider(activity).get(PlaylistViewViewModel.class);
         searchVM = new ViewModelProvider(activity).get(SearchViewModel.class);
         songEditVM = new ViewModelProvider(activity).get(SongEditViewModel.class);
+        playlistImportVM = new ViewModelProvider(activity).get(PlaylistImportViewModel.class);
         activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         activity.hideKeyboard(B.getRoot());
 

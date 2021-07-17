@@ -32,6 +32,8 @@ public class MenuBuilder {
     public static final int PLAY_PLAYLIST = 10;
     public static final int EDIT_PLAYLIST = 11;
     public static final int DELETE_PLAYLIST = 12;
+    public static final int ADD_PLAYLIST = 13;
+    public static final int IMPORT_PLAYLIST = 14;
 
     public static <T> void createMenu(View v, MenuItems items, T object, MenuItemCallback<T> callback) {
         Context context = v.getContext();
@@ -227,6 +229,20 @@ public class MenuBuilder {
          */
         public void deletePlaylist() {
             mItems.add(new MenuItem(DELETE_PLAYLIST, "Delete Playlist", R.drawable.ic_delete));
+        }
+
+        /**
+         * Create a add playlist
+         */
+        public void addPlaylist() {
+            mItems.add(new MenuItem(ADD_PLAYLIST, "Add Playlist", R.drawable.ic_add));
+        }
+
+        /**
+         * Generate a playlist from an external platform
+         */
+        public void importPlaylist() {
+            mItems.add(new MenuItem(IMPORT_PLAYLIST, "Import Playlist", R.drawable.ic_download));
         }
 
     }

@@ -86,6 +86,12 @@ public class MenuEvents {
             case MenuBuilder.DELETE_PLAYLIST:
                 deletePlaylist();
                 break;
+            case MenuBuilder.ADD_PLAYLIST:
+                addPlaylist();
+                break;
+            case MenuBuilder.IMPORT_PLAYLIST:
+                importPlaylist();
+                break;
             default:
                 break;
         }
@@ -220,6 +226,16 @@ public class MenuEvents {
                 mActivity.handleError(new Exception(message));
             }
         });
+    }
+
+    private void addPlaylist() {
+        mActivity.playlistsVM.createPlaylist(mActivity.mainVM.userId)
+            .addOnSuccessListener(__ -> mActivity.snack("Created Playlist"))
+            .addOnFailureListener(mActivity::handleError);
+    }
+
+    private void importPlaylist() {
+        mRunnable.run();
     }
 
 }

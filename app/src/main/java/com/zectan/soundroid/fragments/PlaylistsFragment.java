@@ -13,6 +13,7 @@ import com.zectan.soundroid.adapters.PlaylistsAdapter;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlaylistsBinding;
 import com.zectan.soundroid.models.Info;
+import com.zectan.soundroid.utils.MenuBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -50,21 +51,23 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
         playlistsVM.loading.observe(this, B.swipeRefresh::setRefreshing);
         mainVM.myInfos.observe(this, playlistsAdapter::updateInfos);
 
-        B.headerAddImage.setOnClickListener(this::createPlaylist);
+        B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.swipeRefresh.setOnRefreshListener(this::onReload);
 
         return B.getRoot();
     }
 
-    private void createPlaylist(View view) {
-        playlistsVM.createPlaylist(mainVM.userId)
-            .addOnSuccessListener(__ -> activity.snack("Created Playlist"))
-            .addOnFailureListener(activity::handleError);
-    }
-
     private void onReload() {
         playlistsAdapter.updateInfos(mainVM.myInfos.getValue());
         playlistsVM.loading.postValue(false);
+    }
+
+    private void onMoreImageClicked(View view) {
+        MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
+        items.addPlaylist();
+        items.importPlaylist();
+
+        MenuBuilder.createMenu(view, items, null, (object, item) -> activity.handleMenuItemClick(null, null, item, () -> navController.navigate(PlaylistsFragmentDirections.openImportPlaylist())));
     }
 
 }

@@ -68,6 +68,9 @@
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/fade_out"
             app:popUpTo="@id/fragment_playlists" />
+        <action
+            android:id="@+id/open_import_playlist"
+            app:destination="@id/fragment_playlist_import" />
     </fragment>
     <fragment
         android:id="@+id/fragment_playing"
@@ -140,4 +143,8 @@
         android:id="@+id/fragment_edit_song"
         android:name="com.zectan.soundroid.fragments.SongEditFragment"
         android:label="fragment_edit_song" />
+    <fragment
+        android:id="@+id/fragment_playlist_import"
+        android:name="com.zectan.soundroid.fragments.PlaylistImportFragment"
+        android:label="fragment_playlist_import" />
 </navigation>

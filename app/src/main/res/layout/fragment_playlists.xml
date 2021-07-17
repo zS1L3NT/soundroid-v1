@@ -38,18 +38,20 @@
             app:layout_constraintStart_toEndOf="@id/playlists_icon"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/header_add_image"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="15dp"
+        <TextView
+            android:id="@+id/more_image"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="10dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/create_playlist"
-            android:src="@drawable/ic_add"
+            android:elevation="1dp"
+            android:gravity="center"
+            android:text="@string/menu_special_string"
+            android:textColor="@color/white"
+            android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/white" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

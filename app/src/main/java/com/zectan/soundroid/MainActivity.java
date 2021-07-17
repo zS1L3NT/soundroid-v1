@@ -33,6 +33,7 @@ import com.zectan.soundroid.viewmodels.MainViewModel;
 import com.zectan.soundroid.viewmodels.PlayingViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistEditViewModel;
 import com.zectan.soundroid.viewmodels.PlaylistViewViewModel;
+import com.zectan.soundroid.viewmodels.PlaylistsViewModel;
 import com.zectan.soundroid.viewmodels.SearchViewModel;
 import com.zectan.soundroid.viewmodels.SongEditViewModel;
 
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     public NotificationManager notificationManager;
     public MainViewModel mainVM;
     public PlayingViewModel playingVM;
+    public PlaylistsViewModel playlistsVM;
     public PlaylistViewViewModel playlistViewVM;
     public PlaylistEditViewModel playlistEditVM;
     public SongEditViewModel songEditVM;
@@ -66,9 +68,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // View Model
+        SearchViewModel searchVM = new ViewModelProvider(this).get(SearchViewModel.class);
         mainVM = new ViewModelProvider(this).get(MainViewModel.class);
         playingVM = new ViewModelProvider(this).get(PlayingViewModel.class);
-        SearchViewModel searchVM = new ViewModelProvider(this).get(SearchViewModel.class);
+        playlistsVM = new ViewModelProvider(this).get(PlaylistsViewModel.class);
         playlistViewVM = new ViewModelProvider(this).get(PlaylistViewViewModel.class);
         playlistEditVM = new ViewModelProvider(this).get(PlaylistEditViewModel.class);
         songEditVM = new ViewModelProvider(this).get(SongEditViewModel.class);
