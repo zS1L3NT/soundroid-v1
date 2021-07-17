@@ -29,11 +29,17 @@ public class DownloadPlaylist {
         mActivity = activity;
         mNotificationManager = activity.notificationManager;
         mInfo = info;
-        mSongs = ListArrayUtils.sortSongs(mActivity.mainVM.getSongsFromPlaylist(mInfo.getId()), info.getOrder());
         mNextInQueue = 0;
         mDownloaded = 0;
         mFailed = 0;
         mHighQuality = highQuality;
+        mSongs = ListArrayUtils.sortSongs(
+            mActivity.mainVM.getSongsFromPlaylist(mInfo.getId()),
+            info.getOrder()
+        )
+            .stream()
+            .filter(song -> !song.isDownloaded(mActivity))
+            .collect(Collectors.toList());
 
         List<String> downloading = mActivity.mainVM.downloading.getValue();
         if (downloading.contains(mInfo.getId())) {

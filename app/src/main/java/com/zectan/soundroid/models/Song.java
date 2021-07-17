@@ -146,6 +146,7 @@ public class Song {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void deleteLocally(Context context) {
         getFileDir(context).delete();
+        getDownloadFileDir(context).delete();
     }
 
     public void deleteIfNotUsed(Context context, List<Song> allSongs) {
@@ -161,6 +162,10 @@ public class Song {
 
     private File getFileDir(Context context) {
         return new File(context.getFilesDir(), String.format("/%s.mp3", songId));
+    }
+
+    private File getDownloadFileDir(Context context) {
+        return new File(context.getFilesDir(), String.format("/download__%s.mp3", songId));
     }
 
     public Map<String, Object> toMap() {

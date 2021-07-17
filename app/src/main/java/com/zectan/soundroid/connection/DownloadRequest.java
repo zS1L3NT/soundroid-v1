@@ -17,8 +17,9 @@ public class DownloadRequest {
     private static final String TAG = "(SounDroid) SongDownloadTask";
     private static final String URL = "http://soundroid.zectan.com/song/%s/%s.mp3";
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public DownloadRequest(Context context, Song song, boolean highQuality, Callback callback) {
-        File file = new File(context.getFilesDir(), String.format("/%s.mp3", song.getSongId()));
+        File file = new File(context.getFilesDir(), String.format("/downloading__%s.mp3", song.getSongId()));
         new Thread(() -> {
             int count;
             try {
@@ -45,6 +46,7 @@ public class DownloadRequest {
                 input.close();
 
                 Log.i(TAG, "DOWNLOAD_SUCCESS: " + song);
+                file.renameTo(new File(context.getFilesDir(), String.format("/%s.mp3", song.getSongId())));
                 callback.onFinish();
             } catch (Exception e) {
                 Log.e(TAG, "DOWNLOAD_FAILURE: " + song);
