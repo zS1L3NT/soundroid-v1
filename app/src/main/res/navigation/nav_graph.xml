@@ -70,7 +70,12 @@
             app:popUpTo="@id/fragment_playlists" />
         <action
             android:id="@+id/open_import_playlist"
-            app:destination="@id/fragment_playlist_import" />
+            app:destination="@id/fragment_playlist_import"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out"
+            app:popUpTo="@id/fragment_playlists"/>
     </fragment>
     <fragment
         android:id="@+id/fragment_playing"
