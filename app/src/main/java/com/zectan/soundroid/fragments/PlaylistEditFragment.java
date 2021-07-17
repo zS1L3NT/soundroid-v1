@@ -168,7 +168,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
                     .getValue()
                     .stream()
                     .filter(song -> removed.contains(song.getSongId()))
-                    .forEach(song -> song.deleteLocally(activity));
+                    .forEach(song -> song.deleteIfNotUsed(activity, mainVM.mySongs.getValue()));
 
                 playlistEditVM.navigateNow.postValue(1);
                 playlistEditVM.saving.postValue(false);
