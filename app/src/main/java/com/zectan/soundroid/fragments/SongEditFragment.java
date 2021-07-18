@@ -40,7 +40,12 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
                 newFilePath = result.getData().getData();
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), newFilePath);
-                    B.coverImage.setImageBitmap(bitmap);
+                    Glide
+                        .with(activity)
+                        .load(bitmap)
+                        .transition(new DrawableTransitionOptions().crossFade())
+                        .centerCrop()
+                        .into(B.coverImage);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
