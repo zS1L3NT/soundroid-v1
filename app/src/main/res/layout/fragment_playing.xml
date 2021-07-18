@@ -72,7 +72,7 @@
         android:background="@drawable/playing_cover_shadow"
         android:elevation="5dp"
         android:src="@drawable/playing_cover_loading"
-        app:layout_constraintBottom_toTopOf="@+id/playing_seekbar"
+        app:layout_constraintBottom_toTopOf="@+id/seekbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/playlist_name_text"
@@ -133,7 +133,7 @@
         android:text="@string/Nil"
         android:textColor="@color/white"
         android:textSize="15sp"
-        app:layout_constraintBottom_toTopOf="@+id/playing_seekbar"
+        app:layout_constraintBottom_toTopOf="@+id/seekbar"
         app:layout_constraintEnd_toStartOf="@id/loading_circle"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -149,13 +149,44 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/title_text" />
 
-    <com.google.android.exoplayer2.ui.PlayerControlView
-        android:id="@+id/playing_seekbar"
+    <SeekBar
+        android:id="@+id/seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="140dp"
-        app:controller_layout_id="@layout/controls_time_bar"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="157dp"
+        android:progressTint="@color/white"
+        android:progressBackgroundTint="@color/playing_buffered"
+        android:max="1000"
+        android:maxHeight="10dp"
+        android:minHeight="10dp"
+        android:thumbTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/time_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="17dp"
+        android:alpha="0.5"
+        android:text="@string/playing_default_time"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@id/seekbar"
+        app:layout_constraintTop_toBottomOf="@id/seekbar" />
+
+    <TextView
+        android:id="@+id/duration_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="17dp"
+        android:alpha="0.5"
+        android:text="@string/playing_default_time"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@id/seekbar"
+        app:layout_constraintTop_toBottomOf="@id/seekbar" />
 
     <ImageView
         android:id="@+id/shuffle_image"
@@ -185,13 +216,14 @@
         android:id="@+id/play_pause_image"
         android:layout_width="85dp"
         android:layout_height="85dp"
+        android:layout_marginTop="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/playing_play_song"
         android:elevation="1dp"
         android:src="@drawable/controls_play_filled"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/playing_seekbar" />
+        app:layout_constraintTop_toBottomOf="@+id/seekbar" />
 
     <ImageView
         android:id="@+id/play_pause_mini_image"

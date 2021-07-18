@@ -9,10 +9,12 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.SeekBar;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -29,6 +31,7 @@ import com.zectan.soundroid.databinding.FragmentPlayingBinding;
 import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.utils.Animations;
 import com.zectan.soundroid.utils.MenuBuilder;
+import com.zectan.soundroid.utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -53,6 +56,31 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             playingVM.onRemoveSong(songId);
         }
     };
+    private int mFinalTouch;
+    private final SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if (fromUser) {
+                mFinalTouch = progress;
+
+                double percent = (double) progress / 1000;
+                double duration = (double) playingVM.duration.getValue();
+                int selectedTime = (int) (percent * duration);
+                B.timeText.setText(Utils.formatDuration(selectedTime));
+            }
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            playingVM.touchingSeekbar = true;
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            playingVM.seekTo(mFinalTouch);
+            playingVM.touchingSeekbar = false;
+        }
+    };
     private QueueAdapter mQueueAdapter;
 
     @SuppressLint("ClickableViewAccessibility")
@@ -74,6 +102,9 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         // Live Observers
         playingVM.queue.observe(this, mQueueAdapter::updateQueue);
         playingVM.currentSong.observe(this, this::onCurrentSongChange);
+        playingVM.time.observe(this, this::onTimeChange);
+        playingVM.progress.observe(this, B.seekbar::setProgress);
+        playingVM.duration.observe(this, this::onDurationChange);
         playingVM.isBuffering.observe(this, this::onIsBufferingChange);
         playingVM.isPlaying.observe(this, this::onIsPlayingChange);
         playingVM.isShuffling.observe(this, this::onIsShufflingChange);
@@ -94,10 +125,11 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         B.nextImage.setOnTouchListener(Animations::animationMediumSqueeze);
         B.loopImage.setOnClickListener(__ -> playingVM.toggleLoop());
         B.loopImage.setOnTouchListener(Animations::animationMediumSqueeze);
+        B.seekbar.setOnSeekBarChangeListener(onSeekBarChangeListener);
 
-        B.playingSeekbar.setPlayer(playingVM.getPlayer());
         B.parent.setBackground(playingVM.background.getValue());
         playingVM.error.setValue("");
+        mFinalTouch = 0;
 
         return B.getRoot();
     }
@@ -121,6 +153,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
 
     private void onCurrentSongChange(Song song) {
         String colorHex;
+        playingVM.onCurrentSongChanged(Looper.getMainLooper(), song);
 
         if (song == null) {
             mQueueAdapter.updateQueue(new ArrayList<>());
@@ -156,6 +189,14 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         B.parent.setBackground(transition);
         playingVM.background.setValue(newGD);
         transition.startTransition(500);
+    }
+
+    private void onTimeChange(int time) {
+        B.timeText.setText(Utils.formatDuration(time));
+    }
+
+    private void onDurationChange(int duration) {
+        B.durationText.setText(Utils.formatDuration(duration));
     }
 
     private void onIsPlayingChange(boolean isPlaying) {

@@ -51,4 +51,43 @@ public class Utils {
         return true;
     }
 
+    public static String formatDuration(int duration) {
+        StringBuilder hours = new StringBuilder();
+        StringBuilder minutes = new StringBuilder();
+        StringBuilder seconds = new StringBuilder();
+
+        if (duration >= 3600) {
+            hours.append(duration / 3600);
+        }
+        if (duration >= 60) {
+            if (duration >= 3600) {
+                // Hours, minutes must be double digits
+                int sDuration = duration % 3600;
+                minutes.append(sDuration / 60);
+                if (minutes.length() == 1) {
+                    minutes.insert(0, "0");
+                }
+            } else {
+                // No hours, minutes can be single digit
+                minutes.append(duration / 60);
+            }
+        }
+        seconds.append(duration % 60);
+        if (seconds.length() == 1) {
+            seconds.insert(0, "0");
+        }
+
+        StringBuilder formatted = new StringBuilder();
+        if (!hours.toString().equals("")) {
+            formatted.append(hours).append(":");
+        }
+        if (minutes.toString().equals("")) {
+            formatted.append("0").append(":");
+        } else {
+            formatted.append(minutes).append(":");
+        }
+        formatted.append(seconds);
+
+        return formatted.toString();
+    }
 }

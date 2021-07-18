@@ -4,8 +4,12 @@ import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -46,6 +50,9 @@ public class PlayingViewModel extends ViewModel {
     private static final String TAG = "(SounDroid) PlayingViewModel";
     public final StrictLiveData<Playlist> playlist = new StrictLiveData<>(Playlist.getEmpty());
     public final StrictLiveData<Song> currentSong = new StrictLiveData<>(Song.getEmpty());
+    public final StrictLiveData<Integer> time = new StrictLiveData<>(0);
+    public final StrictLiveData<Integer> progress = new StrictLiveData<>(0);
+    public final StrictLiveData<Integer> duration = new StrictLiveData<>(0);
     public final StrictLiveData<Boolean> isBuffering = new StrictLiveData<>(false);
     public final StrictLiveData<Boolean> isPlaying = new StrictLiveData<>(false);
     public final StrictLiveData<Boolean> isShuffling = new StrictLiveData<>(false);
@@ -53,11 +60,15 @@ public class PlayingViewModel extends ViewModel {
     public final StrictLiveData<String> error = new StrictLiveData<>("");
     public final StrictLiveData<List<Song>> queue = new StrictLiveData<>(new ArrayList<>());
     public final MutableLiveData<GradientDrawable> background = new MutableLiveData<>();
+    public TimeHandler timeHandler;
+    public ProgressHandler progressHandler;
     private QueueManager mQueueManager;
     private SimpleExoPlayer mPlayer;
-    private boolean initialised = false;
     private AudioManager am;
     private AudioFocusRequest afr;
+
+    private boolean initialised = false;
+    public boolean touchingSeekbar = false;
 
     public PlayingViewModel() {
         // Required empty public constructor
@@ -93,6 +104,21 @@ public class PlayingViewModel extends ViewModel {
         requestAudioFocus();
         error.postValue("");
         mQueueManager.goToSong(song);
+    }
+
+    public void onCurrentSongChanged(Looper looper, Song song) {
+        if (timeHandler != null) timeHandler.cancel();
+        if (progressHandler != null) progressHandler.cancel();
+
+        time.setValue(0);
+        progress.setValue(0);
+        if (!song.equals(Song.getEmpty())){
+            timeHandler = new TimeHandler(looper);
+            progressHandler = new ProgressHandler(looper);
+
+            timeHandler.start();
+            progressHandler.start();
+        }
     }
 
     public void retry() {
@@ -140,10 +166,6 @@ public class PlayingViewModel extends ViewModel {
         mPlayer.pause();
     }
 
-    public Player getPlayer() {
-        return mPlayer;
-    }
-
     /**
      * THIS METHOD SHOULD ONLY BE RUN ONCE
      *
@@ -164,6 +186,10 @@ public class PlayingViewModel extends ViewModel {
                 PlayingViewModel.this.isBuffering.postValue(state == Player.STATE_BUFFERING);
                 if (state == Player.STATE_ENDED) {
                     mQueueManager.nextSong();
+                }
+
+                if (state == Player.STATE_READY) {
+                    duration.setValue((int) mPlayer.getDuration() / 1000);
                 }
             }
 
@@ -216,6 +242,9 @@ public class PlayingViewModel extends ViewModel {
     public void clearQueue(MainActivity activity) {
         currentSong.setValue(Song.getEmpty());
         queue.setValue(new ArrayList<>());
+        time.setValue(0);
+        duration.setValue(0);
+        progress.setValue(0);
         mQueueManager = new QueueManager(
             activity,
             new ArrayList<>(),
@@ -228,6 +257,10 @@ public class PlayingViewModel extends ViewModel {
             true
         );
         mPlayer.clearMediaItems();
+    }
+
+    public void seekTo(int progress) {
+        mPlayer.seekTo(duration.getValue() * progress);
     }
 
     private void requestAudioFocus() {
@@ -247,6 +280,56 @@ public class PlayingViewModel extends ViewModel {
                 am.abandonAudioFocusRequest(afr);
                 pause();
                 break;
+        }
+    }
+
+    private class TimeHandler extends Handler {
+        private boolean mCancelled = false;
+
+        public TimeHandler(@NonNull @NotNull Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            if (!mCancelled) {
+                if (!touchingSeekbar)
+                    time.setValue((int) (mPlayer.getContentPosition() / 1000));
+                sendEmptyMessageDelayed(0, 250);
+            }
+        }
+
+        public void start() {
+            sendEmptyMessage(0);
+        }
+
+        public void cancel() {
+            mCancelled = true;
+        }
+    }
+
+    private class ProgressHandler extends Handler {
+        private boolean mCancelled = false;
+
+        public ProgressHandler(@NonNull @NotNull Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            if (!mCancelled) {
+                if (!touchingSeekbar)
+                    progress.setValue((int) ((mPlayer.getCurrentPosition() * 1000) / mPlayer.getDuration()));
+                sendEmptyMessageDelayed(0, mPlayer.getDuration() / 1000);
+            }
+        }
+
+        public void start() {
+            sendEmptyMessage(0);
+        }
+
+        public void cancel() {
+            mCancelled = true;
         }
     }
 }

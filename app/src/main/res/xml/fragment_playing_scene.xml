@@ -13,11 +13,6 @@
                 app:attributeName="enabled"
                 app:customBoolean="true" />
         </Constraint>
-        <Constraint android:id="@+id/playing_seekbar">
-            <CustomAttribute
-                app:attributeName="enabled"
-                app:customBoolean="true" />
-        </Constraint>
         <Constraint android:id="@+id/shuffle_image">
             <CustomAttribute
                 app:attributeName="enabled"
@@ -148,11 +143,6 @@
                 app:layout_constraintBottom_toBottomOf="@id/cover_image"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/cover_image" />
-        </Constraint>
-        <Constraint android:id="@+id/playing_seekbar">
-            <CustomAttribute
-                app:attributeName="enabled"
-                app:customBoolean="false" />
         </Constraint>
         <Constraint android:id="@+id/shuffle_image">
             <Layout
