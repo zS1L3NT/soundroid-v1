@@ -71,7 +71,7 @@
         android:layout_marginBottom="64dp"
         android:background="@drawable/playing_cover_shadow"
         android:elevation="5dp"
-        android:src="@drawable/playing_cover_default"
+        android:src="@drawable/playing_cover_loading"
         app:layout_constraintBottom_toTopOf="@+id/playing_seekbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

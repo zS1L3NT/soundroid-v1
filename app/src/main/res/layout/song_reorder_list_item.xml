@@ -19,7 +19,7 @@
             android:layout_height="50dp"
             android:layout_marginStart="10dp"
             android:contentDescription="@string/queue_list_item_cover"
-            android:src="@drawable/playing_cover_default"
+            android:src="@drawable/playing_cover_loading"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

@@ -125,7 +125,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         if (song == null) {
             mQueueAdapter.updateQueue(new ArrayList<>());
             B.playlistNameText.setText("-");
-            B.coverImage.setImageDrawable(activity.getDrawable(R.drawable.playing_cover_default));
+            B.coverImage.setImageDrawable(activity.getDrawable(R.drawable.playing_cover_loading));
             B.titleText.setText("-");
             B.descriptionText.setText("-");
             colorHex = "#7b828b";
@@ -142,7 +142,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
                 .with(activity)
                 .load(cover)
                 .transition(DrawableTransitionOptions.withCrossFade())
-                .error(R.drawable.playing_cover_default)
+                .error(R.drawable.playing_cover_failed)
                 .centerCrop()
                 .into(B.coverImage);
         }

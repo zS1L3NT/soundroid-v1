@@ -116,8 +116,8 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             Glide
                 .with(activity)
                 .load(cover)
-                .placeholder(R.drawable.playing_cover_default)
-                .error(R.drawable.playing_cover_default)
+                .placeholder(R.drawable.playing_cover_loading)
+                .error(R.drawable.playing_cover_failed)
                 .transition(new DrawableTransitionOptions().crossFade())
                 .centerCrop()
                 .into(B.coverImage);
@@ -161,8 +161,8 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             Glide
                 .with(activity)
                 .load(cover)
-                .placeholder(R.drawable.playing_cover_default)
-                .error(R.drawable.playing_cover_default)
+                .placeholder(R.drawable.playing_cover_loading)
+                .error(R.drawable.playing_cover_failed)
                 .transition(new DrawableTransitionOptions().crossFade())
                 .centerCrop()
                 .into(B.coverImage);

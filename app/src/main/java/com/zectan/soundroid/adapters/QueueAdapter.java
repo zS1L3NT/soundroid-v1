@@ -109,8 +109,8 @@ class QueueViewHolder extends DragDropSwipeAdapter.ViewHolder {
         Glide
             .with(context)
             .load(cover)
-            .placeholder(R.drawable.playing_cover_default)
-            .error(R.drawable.playing_cover_default)
+            .placeholder(R.drawable.playing_cover_loading)
+            .error(R.drawable.playing_cover_failed)
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
