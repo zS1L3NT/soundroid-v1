@@ -105,16 +105,14 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        app:behind_swiped_item_bg_color="#E53935"
-        app:behind_swiped_item_icon="@drawable/ic_delete"
-        app:behind_swiped_item_icon_margin="16dp"
-        app:item_layout="@layout/song_reorder_list_item"
+        android:layoutAnimation="@anim/songs_recycler_animation"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cover_image" />
+        app:layout_constraintTop_toBottomOf="@id/cover_image"
+        tools:listitem="@layout/song_reorder_list_item" />
 
 </androidx.constraintlayout.motion.widget.MotionLayout>

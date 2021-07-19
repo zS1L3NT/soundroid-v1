@@ -11,12 +11,12 @@ import android.view.ViewGroup;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.zectan.soundroid.R;
@@ -41,7 +41,19 @@ import static android.app.Activity.RESULT_OK;
 public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> {
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
     private final List<String> removed = new ArrayList<>();
+    private final PlaylistEditAdapter.Callback callback = new PlaylistEditAdapter.Callback() {
+        @Override
+        public void onRemove(String songId) {
+            removed.add(songId);
+        }
+
+        @Override
+        public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+            mItemTouchHelper.startDrag(viewHolder);
+        }
+    };
     private PlaylistEditAdapter playlistEditAdapter;
+    private ItemTouchHelper mItemTouchHelper;
     private Uri newFilePath;
     private final ActivityResultLauncher<Intent> chooseCoverImage = registerForActivityResult(
         new ActivityResultContracts.StartActivityForResult(),
@@ -70,11 +82,11 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
 
         // Recycler Views
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
-        playlistEditAdapter = new PlaylistEditAdapter(removed::add);
+        playlistEditAdapter = new PlaylistEditAdapter(callback);
+        mItemTouchHelper = new ItemTouchHelper(new PlaylistEditAdapter.PlaylistEditItemTouchHelper(playlistEditAdapter));
         B.recyclerView.setAdapter(playlistEditAdapter);
         B.recyclerView.setLayoutManager(layoutManager);
-        B.recyclerView.setOrientation(DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING);
-        B.recyclerView.setReduceItemAlphaOnSwiping(true);
+        mItemTouchHelper.attachToRecyclerView(B.recyclerView);
 
         // Live Observers
         playlistEditVM.navigateNow.observe(this, this::onNavigateNowChange);
@@ -99,7 +111,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
-        playlistEditAdapter.setDataSet(ListArrayUtils.sortSongs(songs, playlistEditVM.info.getValue().getOrder()));
+        playlistEditAdapter.updateSongs(ListArrayUtils.sortSongs(songs, playlistEditVM.info.getValue().getOrder()));
         removed.clear();
 
         return B.getRoot();
@@ -122,7 +134,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         playlistEditVM.saving.setValue(true);
         Info info = playlistEditVM.info.getValue();
         List<String> order = playlistEditAdapter
-            .getDataSet()
+            .getSongs()
             .stream()
             .map(Song::getSongId)
             .collect(Collectors.toList());

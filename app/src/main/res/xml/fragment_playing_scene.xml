@@ -189,11 +189,12 @@
                 app:attributeName="enabled"
                 app:customBoolean="false" />
         </Constraint>
-        <Constraint android:id="@+id/recycler_view_helper">
+        <Constraint android:id="@+id/recycler_view">
             <Layout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="82dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </Constraint>
     </ConstraintSet>

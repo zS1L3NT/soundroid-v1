@@ -12,6 +12,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
+import com.zectan.soundroid.adapters.DiffCallbacks.SearchResultDiffCallback;
+import com.zectan.soundroid.adapters.DiffCallbacks.SongsDiffCallback;
 import com.zectan.soundroid.databinding.SongListItemBinding;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Playlist;
@@ -47,7 +49,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     }
 
     public void updateResults(List<SearchResult> results) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SearchDiffCallback(
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SearchResultDiffCallback(
             mResults,
             results,
             mCurrentSong,
@@ -61,7 +63,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     public void updateCurrentSong(Song song) {
         mPreviousSong = mCurrentSong;
         mCurrentSong = song;
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SearchDiffCallback(
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SearchResultDiffCallback(
             mResults,
             mResults,
             mCurrentSong,
@@ -177,44 +179,5 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
                 mCallback
             ));
         }
-    }
-}
-
-class SearchDiffCallback extends DiffUtil.Callback {
-
-    private final List<SearchResult> oldResults, newResults;
-    private final Song currentSong, previousSong;
-
-    public SearchDiffCallback(List<SearchResult> oldResults, List<SearchResult> newResults, Song currentSong, Song previousSong) {
-        this.oldResults = oldResults;
-        this.newResults = newResults;
-        this.currentSong = currentSong;
-        this.previousSong = previousSong;
-    }
-
-    @Override
-    public int getOldListSize() {
-        return oldResults.size();
-    }
-
-    @Override
-    public int getNewListSize() {
-        return newResults.size();
-    }
-
-    @Override
-    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        SearchResult oldResult = oldResults.get(oldItemPosition);
-        SearchResult newResult = newResults.get(newItemPosition);
-        return oldResult.getId().equals(newResult.getId());
-    }
-
-    @Override
-    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        SearchResult oldResult = oldResults.get(oldItemPosition);
-        SearchResult newResult = newResults.get(newItemPosition);
-        return oldResult.equals(newResult)
-            && (currentSong == null || !currentSong.getSongId().equals(oldResult.getId()))
-            && (previousSong == null || !previousSong.getSongId().equals(oldResult.getId()));
     }
 }

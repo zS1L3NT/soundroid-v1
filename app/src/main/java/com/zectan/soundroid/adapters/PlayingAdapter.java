@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.R;
+import com.zectan.soundroid.adapters.DiffCallbacks.SongsDiffCallback;
 import com.zectan.soundroid.adapters.DiffCallbacks.SongsReorderDiffCallback;
 import com.zectan.soundroid.databinding.SongReorderListItemBinding;
 import com.zectan.soundroid.models.Song;
@@ -25,11 +26,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PlaylistEditAdapter extends RecyclerView.Adapter<PlaylistEditViewHolder> implements ItemTouchHelperAdapter {
+public class PlayingAdapter extends RecyclerView.Adapter<PlayingViewHolder> implements ItemTouchHelperAdapter {
     private final Callback mCallback;
     private final List<Song> mSongs;
 
-    public PlaylistEditAdapter(Callback callback) {
+    public PlayingAdapter(Callback callback) {
         mCallback = callback;
         mSongs = new ArrayList<>();
     }
@@ -37,12 +38,12 @@ public class PlaylistEditAdapter extends RecyclerView.Adapter<PlaylistEditViewHo
     @NonNull
     @NotNull
     @Override
-    public PlaylistEditViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+    public PlayingViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater
             .from(parent.getContext())
             .inflate(R.layout.song_reorder_list_item, parent, false);
 
-        return new PlaylistEditViewHolder(itemView, mCallback);
+        return new PlayingViewHolder(itemView, mCallback);
     }
 
     public void updateSongs(List<Song> songs) {
@@ -55,12 +56,8 @@ public class PlaylistEditAdapter extends RecyclerView.Adapter<PlaylistEditViewHo
         mSongs.addAll(songs);
     }
 
-    public List<Song> getSongs() {
-        return mSongs;
-    }
-
     @Override
-    public void onBindViewHolder(@NonNull @NotNull PlaylistEditViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull @NotNull PlayingViewHolder holder, int position) {
         holder.bind(mSongs.get(position));
     }
 
@@ -81,6 +78,7 @@ public class PlaylistEditAdapter extends RecyclerView.Adapter<PlaylistEditViewHo
             }
         }
         notifyItemMoved(fromPosition, toPosition);
+        mCallback.onMove(fromPosition, toPosition);
         return true;
     }
 
@@ -92,16 +90,20 @@ public class PlaylistEditAdapter extends RecyclerView.Adapter<PlaylistEditViewHo
     }
 
     public interface Callback {
+        void onSongClicked(Song song);
+
+        void onMove(int oldPosition, int newPosition);
+
         void onRemove(String songId);
 
         void onStartDrag(RecyclerView.ViewHolder viewHolder);
     }
 
-    public static class PlaylistEditItemTouchHelper extends ItemTouchHelper.Callback {
+    public static class PlayingItemTouchHelper extends ItemTouchHelper.Callback {
 
         private final ItemTouchHelperAdapter mAdapter;
 
-        public PlaylistEditItemTouchHelper(ItemTouchHelperAdapter adapter) {
+        public PlayingItemTouchHelper(ItemTouchHelperAdapter adapter) {
             mAdapter = adapter;
         }
 
@@ -133,11 +135,11 @@ public class PlaylistEditAdapter extends RecyclerView.Adapter<PlaylistEditViewHo
     }
 }
 
-class PlaylistEditViewHolder extends RecyclerView.ViewHolder {
-    private final PlaylistEditAdapter.Callback mCallback;
+class PlayingViewHolder extends RecyclerView.ViewHolder {
     public final SongReorderListItemBinding B;
+    private final PlayingAdapter.Callback mCallback;
 
-    public PlaylistEditViewHolder(@NotNull View itemView, PlaylistEditAdapter.Callback callback) {
+    public PlayingViewHolder(@NotNull View itemView, PlayingAdapter.Callback callback) {
         super(itemView);
         B = SongReorderListItemBinding.bind(itemView);
         mCallback = callback;
@@ -162,6 +164,7 @@ class PlaylistEditViewHolder extends RecyclerView.ViewHolder {
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
+        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(song));
         B.dragImage.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 mCallback.onStartDrag(this);

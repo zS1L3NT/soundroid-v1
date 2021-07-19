@@ -18,14 +18,14 @@ import android.widget.SeekBar;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView;
 import com.zectan.soundroid.R;
-import com.zectan.soundroid.adapters.QueueAdapter;
+import com.zectan.soundroid.adapters.PlayingAdapter;
 import com.zectan.soundroid.classes.Fragment;
 import com.zectan.soundroid.databinding.FragmentPlayingBinding;
 import com.zectan.soundroid.models.Song;
@@ -40,7 +40,7 @@ import java.util.ArrayList;
 @SuppressLint("UseCompatLoadingForDrawables")
 public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     private static final String TAG = "(SounDroid) PlayingFragment";
-    private final QueueAdapter.Callback callback = new QueueAdapter.Callback() {
+    private final PlayingAdapter.Callback callback = new PlayingAdapter.Callback() {
         @Override
         public void onSongClicked(Song song) {
             playingVM.changeSong(song.getSongId());
@@ -54,6 +54,11 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         @Override
         public void onRemove(String songId) {
             playingVM.onRemoveSong(songId);
+        }
+
+        @Override
+        public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+            mItemTouchHelper.startDrag(viewHolder);
         }
     };
     private int mFinalTouch;
@@ -81,7 +86,8 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             playingVM.touchingSeekbar = false;
         }
     };
-    private QueueAdapter mQueueAdapter;
+    private PlayingAdapter mPlayingAdapter;
+    private ItemTouchHelper mItemTouchHelper;
 
     @SuppressLint("ClickableViewAccessibility")
     @Nullable
@@ -93,14 +99,14 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
 
         // Recycler Views
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
-        mQueueAdapter = new QueueAdapter(callback);
-        B.recyclerView.setAdapter(mQueueAdapter);
+        mPlayingAdapter = new PlayingAdapter(callback);
+        mItemTouchHelper = new ItemTouchHelper(new PlayingAdapter.PlayingItemTouchHelper(mPlayingAdapter));
+        B.recyclerView.setAdapter(mPlayingAdapter);
         B.recyclerView.setLayoutManager(layoutManager);
-        B.recyclerView.setOrientation(DragDropSwipeRecyclerView.ListOrientation.VERTICAL_LIST_WITH_VERTICAL_DRAGGING);
-        B.recyclerView.setReduceItemAlphaOnSwiping(true);
+        mItemTouchHelper.attachToRecyclerView(B.recyclerView);
 
         // Live Observers
-        playingVM.queue.observe(this, mQueueAdapter::updateQueue);
+        playingVM.queue.observe(this, mPlayingAdapter::updateSongs);
         playingVM.currentSong.observe(this, this::onCurrentSongChange);
         playingVM.time.observe(this, this::onTimeChange);
         playingVM.progress.observe(this, B.seekbar::setProgress);
@@ -156,7 +162,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         playingVM.onCurrentSongChanged(Looper.getMainLooper(), song);
 
         if (song == null) {
-            mQueueAdapter.updateQueue(new ArrayList<>());
+            mPlayingAdapter.updateSongs(new ArrayList<>());
             B.playlistNameText.setText("-");
             B.coverImage.setImageDrawable(activity.getDrawable(R.drawable.playing_cover_loading));
             B.titleText.setText("-");

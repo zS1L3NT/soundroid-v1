@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
+import com.zectan.soundroid.adapters.DiffCallbacks.SongsDiffCallback;
 import com.zectan.soundroid.databinding.SongListItemBinding;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Playlist;
@@ -63,7 +64,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
             .sorted((song1, song2) -> song1.getTitle().compareTo(song2.getTitle()))
             .collect(Collectors.toList());
 
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new HomeDiffCallback(
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SongsDiffCallback(
             mSongs,
             sortedSongs,
             mCurrentSong,
@@ -77,7 +78,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
     public void updateCurrentSong(Song song) {
         mPreviousSong = mCurrentSong;
         mCurrentSong = song;
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new HomeDiffCallback(
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SongsDiffCallback(
             mSongs,
             mSongs,
             mCurrentSong,
@@ -152,42 +153,5 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
         B.parent.setOnClickListener(__ -> mCallback.onSongClicked(playlist, id));
 
         B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forSong(song, activity, true), song, mCallback));
-    }
-}
-
-class HomeDiffCallback extends DiffUtil.Callback {
-
-    private final List<Song> oldSongs, newSongs;
-    private final Song currentSong, previousSong;
-
-    public HomeDiffCallback(List<Song> oldSongs, List<Song> newSongs, Song currentSong, Song previousSong) {
-        this.oldSongs = oldSongs;
-        this.newSongs = newSongs;
-        this.currentSong = currentSong;
-        this.previousSong = previousSong;
-    }
-
-    @Override
-    public int getOldListSize() {
-        return oldSongs.size();
-    }
-
-    @Override
-    public int getNewListSize() {
-        return newSongs.size();
-    }
-
-    @Override
-    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        Song oldSong = oldSongs.get(oldItemPosition);
-        Song newSong = newSongs.get(newItemPosition);
-        return oldSong.getSongId().equals(newSong.getSongId());
-    }
-
-    @Override
-    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        Song oldSong = oldSongs.get(oldItemPosition);
-        Song newSong = newSongs.get(newItemPosition);
-        return oldSong.equals(newSong) && !oldSong.equals(currentSong) && !oldSong.equals(previousSong);
     }
 }

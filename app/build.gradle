@@ -58,6 +58,4 @@ dependencies {
     implementation "io.socket:socket.io-client:2.0.1"
     implementation "com.google.android.exoplayer:exoplayer:2.14.1"
     implementation "androidx.preference:preference:1.1.1"
-
-    implementation 'com.ernestoyaquello.dragdropswiperecyclerview:drag-drop-swipe-recyclerview:1.0.2'
 }

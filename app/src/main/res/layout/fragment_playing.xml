@@ -156,11 +156,11 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="157dp"
-        android:progressTint="@color/white"
-        android:progressBackgroundTint="@color/playing_buffered"
         android:max="1000"
         android:maxHeight="10dp"
         android:minHeight="10dp"
+        android:progressBackgroundTint="@color/playing_buffered"
+        android:progressTint="@color/white"
         android:thumbTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent" />
 
@@ -273,26 +273,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/recycler_view" />
 
-    <Space
-        android:id="@+id/recycler_view_helper"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.ernestoyaquello.dragdropswiperecyclerview.DragDropSwipeRecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="35dp"
         android:background="@drawable/playing_queue_background"
         android:elevation="10dp"
+        android:layoutAnimation="@anim/songs_recycler_animation"
         android:paddingTop="20dp"
-        app:behind_swiped_item_bg_color="#E53935"
-        app:behind_swiped_item_icon="@drawable/ic_delete"
-        app:behind_swiped_item_icon_margin="16dp"
-        app:item_layout="@layout/song_reorder_list_item"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/recycler_view_helper" />
+        tools:listitem="@layout/song_reorder_list_item" />
 
 </com.zectan.soundroid.classes.SavingMotionLayout>
