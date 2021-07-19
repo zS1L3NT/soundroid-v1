@@ -24,12 +24,17 @@
 
     </com.zectan.soundroid.classes.PreferenceCategory>
 
-    <com.zectan.soundroid.classes.PreferenceCategory app:title="Downloads">
+    <com.zectan.soundroid.classes.PreferenceCategory app:title="Others">
 
         <Preference
             app:key="clear_all_downloads"
             app:summary="Clear all downloads from all playlists"
             app:title="Clear All Downloads" />
+
+        <Preference
+            app:key="throw_error"
+            app:summary="Show an error so that you will be taken to the error preview screen"
+            app:title="Show an error" />
 
     </com.zectan.soundroid.classes.PreferenceCategory>
 

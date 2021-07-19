@@ -57,4 +57,8 @@
     <string name="import_playlist">Import Playlist</string>
     <string name="enter_playlist_or_album_url">Enter Playlist or Album URL</string>
     <string name="import_">Import</string>
+    <string name="something_went_wrong">Something went wrong.</string>
+    <string name="error_text">Sorry about that. Press the reload button to try again.</string>
+    <string name="refresh">Refresh</string>
+    <string name="show_error">Show Error</string>
 </resources>

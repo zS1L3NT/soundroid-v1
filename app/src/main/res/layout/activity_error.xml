@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/backgroundColor"
+    app:layoutDescription="@xml/activity_error_scene"
+    tools:context=".ErrorActivity">
+
+    <TextView
+        android:id="@+id/title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:fontFamily="@font/sans_regular"
+        android:text="@string/something_went_wrong"
+        android:textColor="@color/red"
+        android:textSize="26sp"
+        app:layout_constraintBottom_toTopOf="@+id/message_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/message_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:fontFamily="@font/sans_light"
+        android:text="@string/error_text"
+        android:textAlignment="center"
+        android:textColor="?attr/colorOnBackground"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/title_text"
+        app:layout_constraintStart_toStartOf="@id/title_text"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/reload_image"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="48dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/refresh"
+        android:src="@drawable/ic_refresh"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/message_text"
+        app:tint="?attr/colorOnBackground" />
+
+    <ImageView
+        android:id="@+id/arrow_image"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginBottom="24dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/show_error"
+        android:rotation="90"
+        android:src="@drawable/ic_back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:tint="?attr/colorOnBackground" />
+
+    <TextView
+        android:id="@+id/error_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="@font/fira_sans_regular"
+        android:textSize="13sp"
+        app:layout_constraintTop_toBottomOf="parent" />
+
+    <ScrollView
+        android:id="@+id/stack_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/cardBackgroundColor"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/error_text">
+
+        <TextView
+            android:id="@+id/stack_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/fira_code_regular"
+            android:textSize="12sp" />
+
+    </ScrollView>
+
+
+</androidx.constraintlayout.motion.widget.MotionLayout>

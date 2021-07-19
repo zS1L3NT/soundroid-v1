@@ -113,6 +113,10 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             assert clearAllDownloads != null;
             clearAllDownloads.setOnPreferenceClickListener(this::onClearAllDownloadsClick);
 
+            Preference throwError = findPreference("throw_error");
+            assert throwError != null;
+            throwError.setOnPreferenceClickListener(this::onThrowErrorClicked);
+
             activity = (MainActivity) requireContext();
             if (activity.mainVM != null) updatePreferences(activity.mainVM.myUser.getValue());
         }
@@ -169,6 +173,10 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
                 })
                 .show();
             return false;
+        }
+
+        private boolean onThrowErrorClicked(Preference preference) {
+            throw new RuntimeException("A Runtime Exception was thrown!");
         }
     }
 }

@@ -6,8 +6,9 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.zectan.soundroid.classes.CrashDebugApplication;
 
-public class SplashScreenActivity extends AppCompatActivity {
+public class SplashScreenActivity extends CrashDebugApplication {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

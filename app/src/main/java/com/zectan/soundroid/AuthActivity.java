@@ -25,10 +25,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.zectan.soundroid.classes.CrashDebugApplication;
 import com.zectan.soundroid.databinding.ActivityAuthBinding;
 import com.zectan.soundroid.models.User;
 
-public class AuthActivity extends AppCompatActivity {
+public class AuthActivity extends CrashDebugApplication {
     private static final String TAG = "(SounDroid) AuthActivity";
     private final FirebaseAuth auth = FirebaseAuth.getInstance();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.zectan.soundroid.classes.CrashDebugApplication;
 import com.zectan.soundroid.connection.VersionCheckRequest;
 import com.zectan.soundroid.databinding.ActivityMainBinding;
 import com.zectan.soundroid.models.Info;
@@ -47,7 +49,7 @@ import java.util.Map;
 
 // https://www.glyric.com/2018/merlin/aagaya-nilave
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends CrashDebugApplication {
     private static final String TAG = "(SounDroid) MainActivity";
     public static final String DOWNLOAD_CHANNEL_ID = "Downloads";
     public final FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -152,12 +154,13 @@ public class MainActivity extends AppCompatActivity {
         e.printStackTrace();
 
         Map<String, Object> error = new HashMap<>();
-        error.put("date", Calendar.getInstance().getTime().toString());
-        error.put("message", e.getMessage());
-        error.put("class", e.getClass().getName());
         List<String> stack = new ArrayList<>();
         for (StackTraceElement el : e.getStackTrace()) stack.add(el.toString());
         error.put("stack", stack);
+        error.put("type", "Safe");
+        error.put("date", Calendar.getInstance().getTime().toString());
+        error.put("message", e.getMessage());
+        error.put("class", e.getClass().getName());
 
         db.collection("users")
             .document(mainVM.userId)
