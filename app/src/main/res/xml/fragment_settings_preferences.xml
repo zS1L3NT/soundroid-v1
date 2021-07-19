@@ -24,12 +24,23 @@
 
     </com.zectan.soundroid.classes.PreferenceCategory>
 
-    <com.zectan.soundroid.classes.PreferenceCategory app:title="Others">
+    <com.zectan.soundroid.classes.PreferenceCategory app:title="Downloads">
+
+        <ListPreference
+            app:entries="@array/downloads_per_playlist"
+            app:entryValues="@array/downloads_per_playlist"
+            app:key="downloads_per_playlist"
+            app:summary="Indicate the number of downloads that run per playlist when downloading a playlist"
+            app:title="Downloads per Playlist" />
 
         <Preference
             app:key="clear_all_downloads"
             app:summary="Clear all downloads from all playlists"
             app:title="Clear All Downloads" />
+
+    </com.zectan.soundroid.classes.PreferenceCategory>
+
+    <com.zectan.soundroid.classes.PreferenceCategory app:title="Others">
 
         <Preference
             app:key="throw_error"

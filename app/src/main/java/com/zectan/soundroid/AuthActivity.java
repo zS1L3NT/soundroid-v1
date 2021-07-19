@@ -116,7 +116,8 @@ public class AuthActivity extends CrashDebugApplication {
                     photoUrl,
                     true,
                     true,
-                    true
+                    true,
+                    3
                 );
 
                 userRef.set(user.toMap())

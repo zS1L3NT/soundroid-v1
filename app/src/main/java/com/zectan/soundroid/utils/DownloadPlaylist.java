@@ -65,7 +65,7 @@ public class DownloadPlaylist {
             .build();
         mNotificationManager.notify(SUMMARY_ID, summaryNotification);
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < mActivity.mainVM.myUser.getValue().getDownloadsPerPlaylist(); i++) {
             downloadOne();
         }
     }
