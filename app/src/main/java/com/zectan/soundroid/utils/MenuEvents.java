@@ -179,10 +179,8 @@ public class MenuEvents {
     }
 
     private void clearDownloads() {
-        List<Song> songs = mActivity.mainVM.getSongsFromPlaylist(mInfo.getId());
-
-        for (Song song : songs) {
-            song.deleteLocally(mActivity);
+        for (Song song : mActivity.mainVM.getSongsFromPlaylist(mInfo.getId())) {
+            song.deleteIfNotUsed(mActivity, mActivity.mainVM.mySongs.getValue());
         }
 
         mActivity.snack("Songs deleted");
