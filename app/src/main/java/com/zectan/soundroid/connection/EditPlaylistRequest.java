@@ -1,56 +1,32 @@
 package com.zectan.soundroid.connection;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+import com.zectan.soundroid.classes.Request;
 import com.zectan.soundroid.models.Info;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.List;
 
-public class EditPlaylistRequest {
-    private static final String URL = "http://soundroid.zectan.com/playlist/edit";
+public class EditPlaylistRequest extends Request {
 
     public EditPlaylistRequest(Info info, List<String> removed, Callback callback) {
-        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        super("http://soundroid.zectan.com/playlist/edit", new Request.Callback() {
+            @Override
+            public void onComplete(String response) {
+                callback.onComplete();
+            }
 
-        JSONObject object = new JSONObject();
+            @Override
+            public void onError(String message) {
+                callback.onError(message);
+            }
+        });
+
         JSONArray removedArray = new JSONArray();
         for (String songId : removed) removedArray.put(songId);
-        try {
-            object.put("removed", removedArray);
-            object.put("info", info.toJSON());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        OkHttpClient client = new OkHttpClient();
-        RequestBody body = RequestBody.create(JSON, object.toString());
-
-        Request request = new Request.Builder()
-            .url(URL)
-            .put(body)
-            .build();
-
-        new Thread(() -> {
-            try {
-                Response response = client.newCall(request).execute();
-                if (response.code() == 200) {
-                    callback.onComplete();
-                } else {
-                    callback.onError(response.body().string());
-                }
-            } catch (IOException e) {
-                callback.onError(e.getMessage());
-                e.printStackTrace();
-            }
-        }).start();
+        putData("removed", removedArray);
+        putData("info", info.toJSON());
+        sendRequest(RequestType.PUT);
     }
 
     public interface Callback {
