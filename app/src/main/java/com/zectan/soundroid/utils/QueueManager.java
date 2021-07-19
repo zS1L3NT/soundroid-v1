@@ -181,15 +181,43 @@ public class QueueManager {
 
     public void moveSong(int oldPosition, int newPosition) {
         if (mIsShuffling.getValue()) {
+            String currentId = mShuffledOrder.get(mPosition);
+
             mShuffledOrder.add(
                 (newPosition + mPosition) % mShuffledOrder.size(),
                 mShuffledOrder.remove((oldPosition + mPosition) % mShuffledOrder.size())
             );
+
+            if (mShuffledOrder.indexOf(currentId) > mPosition) {
+                mShuffledOrder.add(
+                    mShuffledOrder.size() - 2,
+                    mShuffledOrder.remove(0)
+                );
+            } else if (mShuffledOrder.indexOf(currentId) < mPosition) {
+                mShuffledOrder.add(
+                    0,
+                    mShuffledOrder.remove(mShuffledOrder.size() - 2)
+                );
+            }
         } else {
+            String currentId = mSortedOrder.get(mPosition);
+
             mSortedOrder.add(
                 (newPosition + mPosition) % mSortedOrder.size(),
                 mSortedOrder.remove((oldPosition + mPosition) % mSortedOrder.size())
             );
+
+            if (mSortedOrder.indexOf(currentId) > mPosition) {
+                mSortedOrder.add(
+                    mSortedOrder.size() - 2,
+                    mSortedOrder.remove(0)
+                );
+            } else if (mSortedOrder.indexOf(currentId) < mPosition) {
+                mSortedOrder.add(
+                    0,
+                    mSortedOrder.remove(mSortedOrder.size() - 2)
+                );
+            }
         }
 
         updateLiveQueue();
