@@ -110,7 +110,7 @@ public class MenuBuilder {
                 items.clearDownloads();
             } else {
                 // If playlists is being downloaded
-                if (activity.mainVM.downloading.getValue().contains(playlist.getInfo().getId())) {
+                if (activity.mainVM.downloads.getValue().stream().anyMatch(d -> d.getPlaylistId().equals(playlist.getInfo().getId()))) {
                     items.stopDownloads();
                 } else {
                     items.startDownloads();

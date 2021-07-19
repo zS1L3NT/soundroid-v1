@@ -164,9 +164,18 @@ public class MenuEvents {
     }
 
     private void stopDownloads() {
-        List<String> downloading = mActivity.mainVM.downloading.getValue();
-        List<String> newDownloading = downloading.stream().filter(id -> !id.equals(mInfo.getId())).collect(Collectors.toList());
-        mActivity.mainVM.downloading.setValue(newDownloading);
+        List<DownloadPlaylist> downloads = mActivity.mainVM.downloads.getValue();
+        DownloadPlaylist download = downloads
+            .stream()
+            .filter(d -> d.getPlaylistId().equals(mInfo.getId()))
+            .collect(Collectors.toList())
+            .get(0);
+        List<DownloadPlaylist> newDownloads = downloads
+            .stream()
+            .filter(d -> d != download)
+            .collect(Collectors.toList());
+        download.cancel();
+        mActivity.mainVM.downloads.setValue(newDownloads);
     }
 
     private void clearDownloads() {

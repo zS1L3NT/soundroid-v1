@@ -15,6 +15,7 @@ import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.SearchResult;
 import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.models.User;
+import com.zectan.soundroid.utils.DownloadPlaylist;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +31,7 @@ public class MainViewModel extends ViewModel {
     public final StrictLiveData<User> myUser = new StrictLiveData<>(User.getEmpty());
     public final StrictLiveData<List<Info>> myInfos = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<List<Song>> mySongs = new StrictLiveData<>(new ArrayList<>());
-    public final StrictLiveData<List<String>> downloading = new StrictLiveData<>(new ArrayList<>());
+    public final StrictLiveData<List<DownloadPlaylist>> downloads = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<Boolean> showUpdateDialog = new StrictLiveData<>(false);
     public String userId;
 

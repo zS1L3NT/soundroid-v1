@@ -8,6 +8,7 @@ import androidx.core.app.NotificationCompat;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.connection.DownloadRequest;
+import com.zectan.soundroid.connection.PingSongRequest;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Song;
 
@@ -21,9 +22,11 @@ public class DownloadPlaylist {
     private final Info mInfo;
     private final boolean mHighQuality;
 
+    private int SUMMARY_ID;
     private int mNextInQueue;
     private int mDownloaded;
-    private int mFailed;
+    private boolean mFailed;
+    private boolean mIsCancelled;
 
     public DownloadPlaylist(MainActivity activity, Info info, boolean highQuality) {
         mActivity = activity;
@@ -31,7 +34,8 @@ public class DownloadPlaylist {
         mInfo = info;
         mNextInQueue = 0;
         mDownloaded = 0;
-        mFailed = 0;
+        mFailed = false;
+        mIsCancelled = false;
         mHighQuality = highQuality;
         mSongs = ListArrayUtils.sortSongs(
             mActivity.mainVM.getSongsFromPlaylist(mInfo.getId()),
@@ -41,20 +45,21 @@ public class DownloadPlaylist {
             .filter(song -> !song.isDownloaded(mActivity))
             .collect(Collectors.toList());
 
-        List<String> downloading = mActivity.mainVM.downloading.getValue();
-        if (downloading.contains(mInfo.getId())) {
+        List<DownloadPlaylist> downloads = mActivity.mainVM.downloads.getValue();
+        if (downloads.contains(this)) {
             activity.snack("Already downloading this playlist...");
             return;
         }
 
-        downloading.add(mInfo.getId());
-        mActivity.mainVM.downloading.setValue(downloading);
+        downloads.add(this);
+        mActivity.mainVM.downloads.setValue(downloads);
 
-        int SUMMARY_ID = Utils.getRandomInt();
+        SUMMARY_ID = Utils.getRandomInt();
         Notification summaryNotification = new NotificationCompat.Builder(mActivity, MainActivity.DOWNLOAD_CHANNEL_ID)
-            .setContentTitle("Downloading songs")
+            .setContentTitle("Downloading playlist")
             .setContentText(mInfo.getName())
             .setSmallIcon(R.drawable.ic_launcher)
+            .setStyle(new NotificationCompat.InboxStyle().setSummaryText(mInfo.getName()))
             .setGroup(mInfo.getId())
             .setGroupSummary(true)
             .build();
@@ -70,23 +75,14 @@ public class DownloadPlaylist {
         int indexInQueue = mNextInQueue++;
         Song song = mSongs.get(indexInQueue);
 
-        if (!mActivity.mainVM.downloading.getValue().contains(mInfo.getId())) {
-            mFailed++;
+        if (mIsCancelled) {
+            mFailed = true;
             song.deleteLocally(mActivity);
-            if (++mDownloaded == mSongs.size()) {
-                sendDone();
-            } else {
-                downloadOne();
-            }
             return;
         }
 
         if (song.isDownloaded(mActivity)) {
-            if (++mDownloaded == mSongs.size()) {
-                sendDone();
-            } else {
-                downloadOne();
-            }
+            downloadNext();
             return;
         }
 
@@ -94,27 +90,45 @@ public class DownloadPlaylist {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mActivity, MainActivity.DOWNLOAD_CHANNEL_ID);
         builder
             .setContentTitle(String.format("%s (%s/%s)", song.getTitle(), indexInQueue + 1, mSongs.size()))
-            .setContentText("0%")
+            .setContentText("Converting...")
             .setSmallIcon(R.drawable.ic_download)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setGroup(mInfo.getId())
-            .setSilent(true)
-            .setProgress(100, 0, false);
+            .setSilent(true);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
 
+        downloadOnePing(song, builder, NOTIFICATION_ID);
+    }
+
+    private void downloadOnePing(Song song, NotificationCompat.Builder builder, int NOTIFICATION_ID) {
+        new PingSongRequest(song.getSongId(), mHighQuality, new PingSongRequest.Callback() {
+            @Override
+            public void onCallback() {
+                if (mIsCancelled) return;
+                builder
+                    .setContentText("0%")
+                    .setProgress(100, 0, false);
+                mNotificationManager.notify(NOTIFICATION_ID, builder.build());
+                downloadOneStart(song, builder, NOTIFICATION_ID);
+            }
+
+            @Override
+            public void onError(String message) {
+                if (mIsCancelled) return;
+                mNotificationManager.cancel(NOTIFICATION_ID);
+                song.deleteLocally(mActivity);
+                mFailed = true;
+                downloadNext();
+            }
+        });
+    }
+
+    private void downloadOneStart(Song song, NotificationCompat.Builder builder, int NOTIFICATION_ID) {
         new DownloadRequest(mActivity, song, mHighQuality, new DownloadRequest.Callback() {
             @Override
             public void onFinish() {
-                builder
-                    .setProgress(0, 0, false)
-                    .setContentText("Done")
-                    .setSmallIcon(R.drawable.ic_check);
                 mNotificationManager.cancel(NOTIFICATION_ID);
-                if (++mDownloaded == mSongs.size()) {
-                    sendDone();
-                } else {
-                    downloadOne();
-                }
+                downloadNext();
             }
 
             @Override
@@ -129,39 +143,67 @@ public class DownloadPlaylist {
             public void onError(String message) {
                 mNotificationManager.cancel(NOTIFICATION_ID);
                 song.deleteLocally(mActivity);
-                mFailed++;
-                if (++mDownloaded == mSongs.size()) {
-                    sendDone();
-                } else {
-                    downloadOne();
-                }
+                mFailed = true;
+                downloadNext();
             }
 
             @Override
             public boolean isCancelled() {
-                return !mActivity.mainVM.downloading.getValue().contains(mInfo.getId());
+                return mIsCancelled;
             }
         });
     }
 
-    private void sendDone() {
+    /**
+     * Download next item in the queue
+     * If the queue is finished, run {@link DownloadPlaylist#downloadDone()}
+     */
+    private void downloadNext() {
+        if (++mDownloaded == mSongs.size()) {
+            downloadDone();
+        } else {
+            downloadOne();
+        }
+    }
+
+    /**
+     * Display the downloading finished notification
+     */
+    private void downloadDone() {
         int NOTIFICATION_ID = Utils.getRandomInt();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mActivity, MainActivity.DOWNLOAD_CHANNEL_ID);
         builder
-            .setContentTitle(mFailed == 0 ? "Downloading Finished" : "Downloads Incomplete")
+            .setContentTitle(mFailed ? "Downloads Incomplete" : "Downloading Finished")
             .setContentText(mInfo.getName())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setSmallIcon(R.drawable.ic_launcher)
-            .setGroup(mInfo.getId());
+            .setSmallIcon(R.drawable.ic_launcher);
+        mNotificationManager.cancel(SUMMARY_ID);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
 
-        List<String> downloading = mActivity.mainVM.downloading.getValue();
-        mActivity.mainVM.downloading.postValue(
-            downloading
+        List<DownloadPlaylist> downloads = mActivity.mainVM.downloads.getValue();
+        mActivity.mainVM.downloads.postValue(
+            downloads
                 .stream()
-                .filter(id -> !id.equals(mInfo.getId()))
+                .filter(d -> !d.getPlaylistId().equals(mInfo.getId()))
                 .collect(Collectors.toList())
         );
+    }
+
+    public String getPlaylistId() {
+        return mInfo.getId();
+    }
+
+    public void cancel() {
+        int NOTIFICATION_ID = Utils.getRandomInt();
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mActivity, MainActivity.DOWNLOAD_CHANNEL_ID);
+        builder
+            .setContentTitle("Downloads Cancelled")
+            .setContentText(mInfo.getName())
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setSmallIcon(R.drawable.ic_close);
+        mNotificationManager.cancel(SUMMARY_ID);
+        mNotificationManager.notify(NOTIFICATION_ID, builder.build());
+        mIsCancelled = true;
     }
 
 }
