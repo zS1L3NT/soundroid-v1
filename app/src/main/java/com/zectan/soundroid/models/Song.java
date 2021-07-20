@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class Song {
     private static final String TAG = "(SounDroid) Song";
-    private static final String SongsURL = "http://soundroid.zectan.com/song/%s/%s.mp3";
+    private static final String SongsURL = "http://soundroid.zectan.com/play/%s/%s.mp3";
     private String songId;
     private String title;
     private String artiste;
