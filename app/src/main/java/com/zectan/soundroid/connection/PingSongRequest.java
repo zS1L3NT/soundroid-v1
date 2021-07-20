@@ -8,12 +8,16 @@ public class PingSongRequest extends Request {
         super(String.format("http://soundroid.zectan.com/song/%s/%s.mp3", highQuality ? "highest" : "lowest", songId), new Request.Callback() {
             @Override
             public void onComplete(String response) {
-                callback.onCallback();
+                if (callback.isContinued()) {
+                    callback.onCallback();
+                }
             }
 
             @Override
             public void onError(String message) {
-                callback.onError(message);
+                if (callback.isContinued()) {
+                    callback.onError(message);
+                }
             }
         });
 
@@ -24,6 +28,8 @@ public class PingSongRequest extends Request {
         void onCallback();
 
         void onError(String message);
+
+        boolean isContinued();
     }
 
 }

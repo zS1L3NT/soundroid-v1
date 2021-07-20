@@ -10,19 +10,17 @@ public class User {
     private boolean openPlayingScreen;
     private boolean highStreamQuality;
     private boolean highDownloadQuality;
-    private int downloadsPerPlaylist;
 
     public User() {
     }
 
-    public User(String id, String usnm, String profilePicture, boolean openPlayingScreen, boolean highStreamQuality, boolean highDownloadQuality, int downloadsPerPlaylist) {
+    public User(String id, String usnm, String profilePicture, boolean openPlayingScreen, boolean highStreamQuality, boolean highDownloadQuality) {
         this.id = id;
         this.usnm = usnm;
         this.profilePicture = profilePicture;
         this.openPlayingScreen = openPlayingScreen;
         this.highStreamQuality = highStreamQuality;
         this.highDownloadQuality = highDownloadQuality;
-        this.downloadsPerPlaylist = downloadsPerPlaylist;
     }
 
     public static User getEmpty() {
@@ -32,8 +30,7 @@ public class User {
             "",
             true,
             true,
-            true,
-            3
+            true
         );
     }
 
@@ -59,10 +56,6 @@ public class User {
 
     public boolean getHighDownloadQuality() {
         return highDownloadQuality;
-    }
-
-    public int getDownloadsPerPlaylist() {
-        return downloadsPerPlaylist;
     }
 
     public Map<String, Object> toMap() {

@@ -8,6 +8,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.zectan.soundroid.DownloadService;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.connection.DeletePlaylistRequest;
@@ -15,6 +16,7 @@ import com.zectan.soundroid.connection.SavePlaylistRequest;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.Playlist;
 import com.zectan.soundroid.models.Song;
+import com.zectan.soundroid.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,22 +162,28 @@ public class MenuEvents {
     }
 
     private void startDownloads() {
-        new DownloadPlaylist(mActivity, mInfo, mActivity.mainVM.myUser.getValue().getHighDownloadQuality());
+        mActivity.getDownloadBinder(binder -> {
+            Playlist playlist = new Playlist(mInfo, mActivity.mainVM.getSongsFromPlaylist(mInfo.getId()));
+
+            User user = mActivity.mainVM.myUser.getValue();
+            if (binder.startDownload(playlist, user.getHighDownloadQuality())) {
+                mActivity.snack("Download starting");
+            } else {
+                mActivity.snack("Already downloading playlist...");
+            }
+        });
     }
 
     private void stopDownloads() {
-        List<DownloadPlaylist> downloads = mActivity.mainVM.downloads.getValue();
-        DownloadPlaylist download = downloads
-            .stream()
-            .filter(d -> d.getPlaylistId().equals(mInfo.getId()))
-            .collect(Collectors.toList())
-            .get(0);
-        List<DownloadPlaylist> newDownloads = downloads
-            .stream()
-            .filter(d -> d != download)
-            .collect(Collectors.toList());
-        download.cancel();
-        mActivity.mainVM.downloads.setValue(newDownloads);
+        Playlist playlist = new Playlist(mInfo, mActivity.mainVM.getSongsFromPlaylist(mInfo.getId()));
+        mActivity.getDownloadBinder(binder -> {
+            if (binder.isDownloading(playlist.getInfo().getId())) {
+                binder.stopDownload(playlist);
+                mActivity.snack("Download stopped");
+            } else {
+                mActivity.snack("This playlist isn't being downloaded...?");
+            }
+        });
     }
 
     private void clearDownloads() {

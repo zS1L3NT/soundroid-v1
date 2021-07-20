@@ -1,21 +1,22 @@
 package com.zectan.soundroid.viewmodels;
 
+import android.content.ComponentName;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.util.Log;
 
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.zectan.soundroid.DownloadService;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.classes.StrictLiveData;
 import com.zectan.soundroid.models.Info;
 import com.zectan.soundroid.models.SearchResult;
 import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.models.User;
-import com.zectan.soundroid.utils.DownloadPlaylist;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -31,12 +32,26 @@ public class MainViewModel extends ViewModel {
     public final StrictLiveData<User> myUser = new StrictLiveData<>(User.getEmpty());
     public final StrictLiveData<List<Info>> myInfos = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<List<Song>> mySongs = new StrictLiveData<>(new ArrayList<>());
-    public final StrictLiveData<List<DownloadPlaylist>> downloads = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<Boolean> showUpdateDialog = new StrictLiveData<>(false);
+    public final MutableLiveData<DownloadService.DownloadBinder> downloadBinder = new MutableLiveData<>();
     public String userId;
 
     public MainViewModel() {
 
+    }
+
+    public ServiceConnection getDownloadConnection() {
+        return new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder binder) {
+                MainViewModel.this.downloadBinder.postValue((DownloadService.DownloadBinder) binder);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                downloadBinder.postValue(null);
+            }
+        };
     }
 
     public void watch(MainActivity activity) {

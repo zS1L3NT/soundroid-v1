@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Playlist {
     private final Info info;
@@ -50,5 +51,18 @@ public class Playlist {
     @Override
     public @NotNull String toString() {
         return String.format("Playlist { info: %s, size: %s }", info, songs.size());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Playlist)) return false;
+        Playlist playlist = (Playlist) o;
+        return Objects.equals(info.getId(), playlist.info.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(info);
     }
 }

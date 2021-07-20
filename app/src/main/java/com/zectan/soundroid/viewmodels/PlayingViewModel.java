@@ -283,6 +283,10 @@ public class PlayingViewModel extends ViewModel {
         }
     }
 
+    public void cleanup() {
+        mPlayer.release();
+    }
+
     private class TimeHandler extends Handler {
         private boolean mCancelled = false;
 

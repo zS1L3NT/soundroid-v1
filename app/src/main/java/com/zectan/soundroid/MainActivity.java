@@ -3,11 +3,11 @@ package com.zectan.soundroid;
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -140,6 +139,13 @@ public class MainActivity extends CrashDebugApplication {
         mainVM.watch(this);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        playingVM.cleanup();
+//        stopService(new Intent(this, DownloadService.class));
+    }
+
     public void showKeyboard() {
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
@@ -194,6 +200,16 @@ public class MainActivity extends CrashDebugApplication {
             .show();
     }
 
+    public void getDownloadBinder(DownloadServiceCallback callback) {
+        if (mainVM.downloadBinder.getValue() != null) {
+            callback.onStart(mainVM.downloadBinder.getValue());
+        } else {
+            Intent downloadIntent = new Intent(this, DownloadService.class);
+            startForegroundService(downloadIntent);
+            bindService(downloadIntent, mainVM.getDownloadConnection(callback), Context.BIND_AUTO_CREATE);
+        }
+    }
+
     private void onShowUpdateDialogChange(Boolean showUpdateDialog) {
         if (showUpdateDialog) {
             new MaterialAlertDialogBuilder(MainActivity.this)
@@ -210,6 +226,10 @@ public class MainActivity extends CrashDebugApplication {
                 .setCancelable(false)
                 .show();
         }
+    }
+
+    public interface DownloadServiceCallback {
+        void onStart(DownloadService.DownloadBinder binder);
     }
 
 }
