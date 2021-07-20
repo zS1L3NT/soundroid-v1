@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.zectan.soundroid.classes.SavingMotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.zectan.soundroid.Classes.SavingMotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/parent"
@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     app:layoutDescription="@xml/fragment_playlist_view_scene"
-    tools:context=".fragments.PlaylistViewFragment">
+    tools:context=".Fragments.PlaylistViewFragment">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
@@ -117,4 +117,4 @@
         app:layout_constraintTop_toBottomOf="@+id/name_text"
         tools:listitem="@layout/song_list_item" />
 
-</com.zectan.soundroid.classes.SavingMotionLayout>
+</com.zectan.soundroid.Classes.SavingMotionLayout>

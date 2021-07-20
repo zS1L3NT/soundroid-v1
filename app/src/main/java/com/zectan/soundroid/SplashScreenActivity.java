@@ -3,10 +3,8 @@ package com.zectan.soundroid;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.firebase.auth.FirebaseAuth;
-import com.zectan.soundroid.classes.CrashDebugApplication;
+import com.zectan.soundroid.Classes.CrashDebugApplication;
 
 public class SplashScreenActivity extends CrashDebugApplication {
     @Override

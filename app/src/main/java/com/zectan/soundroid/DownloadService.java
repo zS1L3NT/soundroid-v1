@@ -15,11 +15,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import com.zectan.soundroid.connection.DownloadRequest;
-import com.zectan.soundroid.connection.PingSongRequest;
-import com.zectan.soundroid.models.Playlist;
-import com.zectan.soundroid.models.Song;
-import com.zectan.soundroid.utils.Utils;
+import com.zectan.soundroid.Connections.DownloadRequest;
+import com.zectan.soundroid.Connections.PingSongRequest;
+import com.zectan.soundroid.Models.Playlist;
+import com.zectan.soundroid.Models.Song;
+import com.zectan.soundroid.Utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Date;

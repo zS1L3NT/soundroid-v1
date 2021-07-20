@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/fragment_home"
-        android:name="com.zectan.soundroid.fragments.HomeFragment"
+        android:name="com.zectan.soundroid.Fragments.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home">
         <action
@@ -49,7 +49,7 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_playlists"
-        android:name="com.zectan.soundroid.fragments.PlaylistsFragment"
+        android:name="com.zectan.soundroid.Fragments.PlaylistsFragment"
         android:label="fragment_playlist"
         tools:layout="@layout/fragment_playlists">
         <action
@@ -79,13 +79,13 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_playing"
-        android:name="com.zectan.soundroid.fragments.PlayingFragment"
+        android:name="com.zectan.soundroid.Fragments.PlayingFragment"
         android:label="fragment_playing"
         tools:layout="@layout/fragment_playing">
     </fragment>
     <fragment
         android:id="@+id/fragment_search"
-        android:name="com.zectan.soundroid.fragments.SearchFragment"
+        android:name="com.zectan.soundroid.Fragments.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search">
         <action
@@ -105,12 +105,12 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_settings"
-        android:name="com.zectan.soundroid.fragments.SettingsFragment"
+        android:name="com.zectan.soundroid.Fragments.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/fragment_playlist_edit"
-        android:name="com.zectan.soundroid.fragments.PlaylistEditFragment"
+        android:name="com.zectan.soundroid.Fragments.PlaylistEditFragment"
         android:label="fragment_playlist_edit"
         tools:layout="@layout/fragment_playlist_edit">
         <action
@@ -119,7 +119,7 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_playlist_view"
-        android:name="com.zectan.soundroid.fragments.PlaylistViewFragment"
+        android:name="com.zectan.soundroid.Fragments.PlaylistViewFragment"
         android:label="fragment_playlist_view"
         tools:layout="@layout/fragment_playlist_view">
         <action
@@ -146,10 +146,10 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_edit_song"
-        android:name="com.zectan.soundroid.fragments.SongEditFragment"
+        android:name="com.zectan.soundroid.Fragments.SongEditFragment"
         android:label="fragment_edit_song" />
     <fragment
         android:id="@+id/fragment_playlist_import"
-        android:name="com.zectan.soundroid.fragments.PlaylistImportFragment"
+        android:name="com.zectan.soundroid.Fragments.PlaylistImportFragment"
         android:label="fragment_playlist_import" />
 </navigation>

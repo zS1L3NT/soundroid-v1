@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.zectan.soundroid.classes.PreferenceCategory app:title="Playing">
+    <com.zectan.soundroid.Classes.PreferenceCategory app:title="Playing">
 
         <SwitchPreferenceCompat
             app:key="open_playing_screen"
             app:summary="Open the playing screen whenever you click on a song"
             app:title="Open Playing Screen" />
 
-    </com.zectan.soundroid.classes.PreferenceCategory>
+    </com.zectan.soundroid.Classes.PreferenceCategory>
 
-    <com.zectan.soundroid.classes.PreferenceCategory app:title="Audio Quality">
+    <com.zectan.soundroid.Classes.PreferenceCategory app:title="Audio Quality">
 
         <SwitchPreferenceCompat
             app:key="high_download_quality"
@@ -22,9 +22,9 @@
             app:summary="High song stream quality, uses more bandwidth"
             app:title="High Stream Quality" />
 
-    </com.zectan.soundroid.classes.PreferenceCategory>
+    </com.zectan.soundroid.Classes.PreferenceCategory>
 
-    <com.zectan.soundroid.classes.PreferenceCategory app:title="Others">
+    <com.zectan.soundroid.Classes.PreferenceCategory app:title="Others">
 
         <Preference
             app:key="clear_all_downloads"
@@ -36,6 +36,6 @@
             app:summary="Show an error so that you will be taken to the error preview screen"
             app:title="Show an error" />
 
-    </com.zectan.soundroid.classes.PreferenceCategory>
+    </com.zectan.soundroid.Classes.PreferenceCategory>
 
 </PreferenceScreen>

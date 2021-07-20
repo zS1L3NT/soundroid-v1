@@ -10,7 +10,6 @@ import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -25,9 +24,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.zectan.soundroid.classes.CrashDebugApplication;
+import com.zectan.soundroid.Classes.CrashDebugApplication;
+import com.zectan.soundroid.Models.User;
 import com.zectan.soundroid.databinding.ActivityAuthBinding;
-import com.zectan.soundroid.models.User;
 
 public class AuthActivity extends CrashDebugApplication {
     private static final String TAG = "(SounDroid) AuthActivity";

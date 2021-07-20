@@ -8,7 +8,7 @@
     android:background="?attr/backgroundColor"
     android:clickable="true"
     android:fitsSystemWindows="true"
-    tools:context=".fragments.SearchFragment">
+    tools:context=".Fragments.SearchFragment">
 
     <RelativeLayout
         android:id="@+id/header"

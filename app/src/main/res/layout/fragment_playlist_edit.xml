@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     app:layoutDescription="@xml/fragment_playlist_edit_scene"
-    tools:context=".fragments.PlaylistEditFragment">
+    tools:context=".Fragments.PlaylistEditFragment">
 
     <View
         android:id="@+id/toolbar_background"
