@@ -109,6 +109,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         playingVM.queue.observe(this, mPlayingAdapter::updateSongs);
         playingVM.currentSong.observe(this, this::onCurrentSongChange);
         playingVM.time.observe(this, this::onTimeChange);
+        playingVM.buffered.observe(this, B.seekbar::setSecondaryProgress);
         playingVM.progress.observe(this, B.seekbar::setProgress);
         playingVM.duration.observe(this, this::onDurationChange);
         playingVM.isBuffering.observe(this, this::onIsBufferingChange);

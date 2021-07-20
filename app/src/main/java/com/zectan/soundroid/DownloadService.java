@@ -139,8 +139,10 @@ public class DownloadService extends Service {
 
             @Override
             public void cancelTimeHandler() {
-                mTimeHandler.cancel();
-                mTimeHandler = null;
+                if (mTimeHandler != null) {
+                    mTimeHandler.cancel();
+                    mTimeHandler = null;
+                }
             }
 
             @Override

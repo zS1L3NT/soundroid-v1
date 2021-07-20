@@ -51,6 +51,7 @@ public class PlayingViewModel extends ViewModel {
     public final StrictLiveData<Playlist> playlist = new StrictLiveData<>(Playlist.getEmpty());
     public final StrictLiveData<Song> currentSong = new StrictLiveData<>(Song.getEmpty());
     public final StrictLiveData<Integer> time = new StrictLiveData<>(0);
+    public final StrictLiveData<Integer> buffered = new StrictLiveData<>(0);
     public final StrictLiveData<Integer> progress = new StrictLiveData<>(0);
     public final StrictLiveData<Integer> duration = new StrictLiveData<>(0);
     public final StrictLiveData<Boolean> isBuffering = new StrictLiveData<>(false);
@@ -322,6 +323,7 @@ public class PlayingViewModel extends ViewModel {
         @Override
         public void handleMessage(@NonNull Message msg) {
             if (!mCancelled) {
+                buffered.setValue((int) ((mPlayer.getBufferedPosition() * 1000) / mPlayer.getDuration()));
                 if (!touchingSeekbar)
                     progress.setValue((int) ((mPlayer.getCurrentPosition() * 1000) / mPlayer.getDuration()));
                 sendEmptyMessageDelayed(0, mPlayer.getDuration() / 1000);

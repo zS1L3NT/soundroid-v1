@@ -159,8 +159,9 @@
         android:max="1000"
         android:maxHeight="10dp"
         android:minHeight="10dp"
-        android:progressBackgroundTint="@color/playing_buffered"
+        android:progressBackgroundTint="@color/playing_inactive"
         android:progressTint="@color/white"
+        android:secondaryProgressTint="@color/playing_buffered"
         android:thumbTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent" />
 
