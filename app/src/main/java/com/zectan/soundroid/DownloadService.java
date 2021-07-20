@@ -72,7 +72,7 @@ public class DownloadService extends Service {
             return;
         }
 
-        if ((mPlaylistIndex + 1) == playlist.size()) {
+        if (mPlaylistIndex == playlist.size()) {
             downloadsDone();
             return;
         }
