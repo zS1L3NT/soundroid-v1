@@ -112,14 +112,10 @@ public class MenuBuilder {
             } else {
                 // If playlists is being downloaded
                 DownloadService.DownloadBinder downloadBinder = activity.mainVM.downloadBinder.getValue();
-                if (downloadBinder != null) {
-                    if (downloadBinder.isDownloading(playlist.getInfo().getId())) {
-                        items.stopDownloads();
-                    } else {
-                        items.startDownloads();
-                    }
+                if (downloadBinder != null && downloadBinder.isDownloading(playlist.getInfo().getId())) {
+                    items.stopDownloads();
                 } else {
-                    activity.snack("Download service isn't running!");
+                    items.startDownloads();
                 }
 
                 if (playlist.hasDownloaded(activity)) {

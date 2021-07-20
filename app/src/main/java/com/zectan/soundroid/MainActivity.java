@@ -139,13 +139,6 @@ public class MainActivity extends CrashDebugApplication {
         mainVM.watch(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        playingVM.cleanup();
-//        stopService(new Intent(this, DownloadService.class));
-    }
-
     public void showKeyboard() {
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
@@ -200,7 +193,7 @@ public class MainActivity extends CrashDebugApplication {
             .show();
     }
 
-    public void getDownloadBinder(DownloadServiceCallback callback) {
+    public void startDownloadService(DownloadServiceCallback callback) {
         if (mainVM.downloadBinder.getValue() != null) {
             callback.onStart(mainVM.downloadBinder.getValue());
         } else {

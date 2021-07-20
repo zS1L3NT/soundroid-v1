@@ -40,11 +40,12 @@ public class MainViewModel extends ViewModel {
 
     }
 
-    public ServiceConnection getDownloadConnection() {
+    public ServiceConnection getDownloadConnection(MainActivity.DownloadServiceCallback callback) {
         return new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder binder) {
                 MainViewModel.this.downloadBinder.postValue((DownloadService.DownloadBinder) binder);
+                callback.onStart((DownloadService.DownloadBinder) binder);
             }
 
             @Override

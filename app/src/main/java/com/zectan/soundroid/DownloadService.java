@@ -203,6 +203,8 @@ public class DownloadService extends Service {
 
         if (mPlaylists.size() > 0) {
             downloadFirstPlaylist();
+        } else {
+            stopSelf();
         }
     }
 
