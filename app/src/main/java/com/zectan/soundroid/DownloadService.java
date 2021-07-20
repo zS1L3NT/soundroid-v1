@@ -6,8 +6,12 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
@@ -18,6 +22,7 @@ import com.zectan.soundroid.models.Song;
 import com.zectan.soundroid.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class DownloadService extends Service {
@@ -34,11 +39,20 @@ public class DownloadService extends Service {
     private boolean mDestroyed;
     private boolean mFailed;
 
+    private TimeHandler mTimeHandler;
+    private Date mStartTime;
+
     @Override
     public void onCreate() {
         super.onCreate();
         mNotificationManager = getSystemService(NotificationManager.class);
         mDestroyed = false;
+    }
+
+    @Override
+    public void onDestroy() {
+        cancelDownloads(false);
+        super.onDestroy();
     }
 
     @Override
@@ -88,12 +102,16 @@ public class DownloadService extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID);
         builder
             .setContentTitle(String.format("%s (%s/%s)", song.getTitle(), mDownloadIndex, mDownloadCount))
-            .setContentText("Converting...")
+            .setContentText("Converting... (0m 0s)")
             .setSmallIcon(R.drawable.ic_download)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setGroup(playlist.getInfo().getId())
             .setSilent(true);
         startForeground(NOTIFICATION_ID, builder.build());
+
+        mTimeHandler = new TimeHandler(getMainLooper(), builder);
+        mTimeHandler.sendEmptyMessage(0);
+        mStartTime = new Date();
 
         downloadOnePing(playlist, song, builder, NOTIFICATION_ID);
     }
@@ -117,6 +135,12 @@ public class DownloadService extends Service {
                 mPlaylistIndex++;
                 mDownloadIndex++;
                 downloadSong(playlist);
+            }
+
+            @Override
+            public void cancelTimeHandler() {
+                mTimeHandler.cancel();
+                mTimeHandler = null;
             }
 
             @Override
@@ -195,6 +219,11 @@ public class DownloadService extends Service {
         mNotificationManager.cancel(this.NOTIFICATION_ID);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
 
+        if (mTimeHandler != null) {
+            mTimeHandler.cancel();
+            mTimeHandler = null;
+        }
+
         if (continue_) {
             mPlaylists.remove(0);
         } else {
@@ -219,6 +248,35 @@ public class DownloadService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
+    }
+
+    private class TimeHandler extends Handler {
+        private final NotificationCompat.Builder mBuilder;
+        private boolean mCancelled;
+
+        public TimeHandler(@NonNull Looper looper, NotificationCompat.Builder builder) {
+            super(looper);
+            mBuilder = builder;
+            mCancelled = false;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            Date nowTime = new Date();
+
+            int time = (int) (nowTime.getTime() - mStartTime.getTime()) / 1000;
+            int seconds = time % 60;
+            int minutes = time / 60;
+
+            mBuilder.setContentText(String.format("Converting... (%sm %ss)", minutes, seconds));
+            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+            if (!mCancelled) sendEmptyMessageDelayed(0, 1000);
+        }
+
+        public void cancel() {
+            mCancelled = true;
+        }
+
     }
 
     public class DownloadBinder extends Binder {
@@ -246,11 +304,5 @@ public class DownloadService extends Service {
             return mPlaylists.stream().anyMatch(p -> p.getInfo().getId().equals(playlistId));
         }
 
-    }
-
-    @Override
-    public void onDestroy() {
-        cancelDownloads(false);
-        super.onDestroy();
     }
 }

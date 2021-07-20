@@ -1,9 +1,9 @@
 package com.zectan.soundroid.classes;
 
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,10 +11,10 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 public abstract class Request {
-    private final OkHttpClient mClient;
     private final Callback mCallback;
     private final MediaType mJSON;
     private final String mURL;
+    private OkHttpClient mClient;
     private JSONObject mObject;
 
     public Request(String URL, Callback callback) {
@@ -37,8 +37,12 @@ public abstract class Request {
         mObject = object;
     }
 
+    protected void replaceClient(OkHttpClient client) {
+        mClient = client;
+    }
+
     protected void sendRequest(RequestType requestType) {
-        com.squareup.okhttp.Request.Builder builder = new com.squareup.okhttp.Request.Builder().url(mURL);
+        okhttp3.Request.Builder builder = new okhttp3.Request.Builder().url(mURL);
         RequestBody body = RequestBody.create(mJSON, mObject.toString());
 
         switch (requestType) {
@@ -56,15 +60,16 @@ public abstract class Request {
                 break;
         }
 
-        com.squareup.okhttp.Request request = builder.build();
+        okhttp3.Request request = builder.build();
 
         new Thread(() -> {
             try {
                 Response response = mClient.newCall(request).execute();
+                String res = response.body() != null ? response.body().string() : "";
                 if (response.code() == 200) {
-                    mCallback.onComplete(response.body().string());
+                    mCallback.onComplete(res);
                 } else {
-                    mCallback.onError(response.body().string());
+                    mCallback.onError(res);
                 }
             } catch (IOException e) {
                 mCallback.onError(e.getMessage());
