@@ -32,7 +32,7 @@ public class DownloadService extends Service {
     private boolean mHighDownloadQuality = true;
 
     private Playlist mCurrent;
-    private int NOTIFICATION_ID;
+    private int mNotificationID;
     private int mPlaylistIndex;
     private int mDownloadIndex;
     private int mDownloadCount;
@@ -46,13 +46,17 @@ public class DownloadService extends Service {
     public void onCreate() {
         super.onCreate();
         mNotificationManager = getSystemService(NotificationManager.class);
+        mNotificationID = Utils.getRandomInt();
         mDestroyed = false;
     }
 
     @Override
     public void onDestroy() {
-        cancelDownloads(false);
         super.onDestroy();
+        mNotificationManager.cancel(mNotificationID);
+        if (mTimeHandler != null) {
+            mTimeHandler.cancel();
+        }
     }
 
     @Override
@@ -71,6 +75,14 @@ public class DownloadService extends Service {
             .stream()
             .filter(s -> !s.isDownloaded(getApplicationContext()))
             .count();
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
+            .setContentTitle("Downloading Playlist")
+            .setContentText(mCurrent.getInfo().getName())
+            .setSmallIcon(R.drawable.ic_download)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setSilent(true);
+        startForeground(mNotificationID, builder.build());
 
         downloadSong(mCurrent);
     }
@@ -98,38 +110,36 @@ public class DownloadService extends Service {
             return;
         }
 
-        NOTIFICATION_ID = Utils.getRandomInt();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID);
-        builder
+        mNotificationManager.cancel(mNotificationID);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
             .setContentTitle(String.format("%s (%s/%s)", song.getTitle(), mDownloadIndex, mDownloadCount))
             .setContentText("Converting... (0m 0s)")
             .setSmallIcon(R.drawable.ic_download)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setGroup(playlist.getInfo().getId())
             .setSilent(true);
-        startForeground(NOTIFICATION_ID, builder.build());
+        mNotificationManager.notify(mNotificationID, builder.build());
 
+        if (mTimeHandler != null) mTimeHandler.cancel();
         mTimeHandler = new TimeHandler(getMainLooper(), builder);
         mTimeHandler.sendEmptyMessage(0);
         mStartTime = new Date();
 
-        downloadOnePing(playlist, song, builder, NOTIFICATION_ID);
+        downloadOnePing(playlist, song, builder);
     }
 
-    private void downloadOnePing(Playlist playlist, Song song, NotificationCompat.Builder builder, int NOTIFICATION_ID) {
+    private void downloadOnePing(Playlist playlist, Song song, NotificationCompat.Builder builder) {
         new PingSongRequest(song.getSongId(), mHighDownloadQuality, new PingSongRequest.Callback() {
             @Override
             public void onCallback() {
                 builder
                     .setContentText("0%")
                     .setProgress(100, 0, false);
-                startForeground(NOTIFICATION_ID, builder.build());
-                downloadOneStart(playlist, song, builder, NOTIFICATION_ID);
+                mNotificationManager.notify(mNotificationID, builder.build());
+                downloadOneStart(playlist, song, builder);
             }
 
             @Override
             public void onError(String message) {
-                stopForeground(NOTIFICATION_ID);
                 song.deleteLocally(getApplicationContext());
                 mFailed = true;
                 mPlaylistIndex++;
@@ -139,10 +149,7 @@ public class DownloadService extends Service {
 
             @Override
             public void cancelTimeHandler() {
-                if (mTimeHandler != null) {
-                    mTimeHandler.cancel();
-                    mTimeHandler = null;
-                }
+                if (mTimeHandler != null) mTimeHandler.cancel();
             }
 
             @Override
@@ -152,12 +159,10 @@ public class DownloadService extends Service {
         });
     }
 
-    private void downloadOneStart(Playlist playlist, Song song, NotificationCompat.Builder builder, int NOTIFICATION_ID) {
+    private void downloadOneStart(Playlist playlist, Song song, NotificationCompat.Builder builder) {
         new DownloadRequest(getApplicationContext(), song, mHighDownloadQuality, new DownloadRequest.Callback() {
             @Override
             public void onFinish() {
-                stopForeground(NOTIFICATION_ID);
-                mNotificationManager.cancel(NOTIFICATION_ID);
                 mPlaylistIndex++;
                 mDownloadIndex++;
                 downloadSong(playlist);
@@ -168,12 +173,11 @@ public class DownloadService extends Service {
                 builder
                     .setContentText(String.format("%s%s", progress, "%"))
                     .setProgress(100, progress, false);
-                mNotificationManager.notify(NOTIFICATION_ID, builder.build());
+                mNotificationManager.notify(mNotificationID, builder.build());
             }
 
             @Override
             public void onError(String message) {
-                stopForeground(NOTIFICATION_ID);
                 song.deleteLocally(getApplicationContext());
                 mFailed = true;
                 mPlaylistIndex++;
@@ -189,15 +193,15 @@ public class DownloadService extends Service {
     }
 
     private void downloadsDone() {
+        mNotificationManager.cancel(mNotificationID);
+        stopForeground(mNotificationID);
+
         int NOTIFICATION_ID = Utils.getRandomInt();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID);
-        builder
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
             .setContentTitle(mFailed ? "Downloads Incomplete" : "Downloading Finished")
             .setContentText(mPlaylists.get(0).getInfo().getName())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSmallIcon(R.drawable.ic_launcher);
-        stopForeground(this.NOTIFICATION_ID);
-        mNotificationManager.cancel(this.NOTIFICATION_ID);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
 
         mPlaylists.remove(0);
@@ -210,21 +214,18 @@ public class DownloadService extends Service {
 
     private void cancelDownloads(boolean continue_) {
         mCurrent = null;
+        mNotificationManager.cancel(mNotificationID);
+        stopForeground(mNotificationID);
+
         int NOTIFICATION_ID = Utils.getRandomInt();
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID);
-        builder
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
             .setContentTitle("Downloads Cancelled")
             .setContentText(mPlaylists.get(0).getInfo().getName())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSmallIcon(R.drawable.ic_close);
-        stopForeground(this.NOTIFICATION_ID);
-        mNotificationManager.cancel(this.NOTIFICATION_ID);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
 
-        if (mTimeHandler != null) {
-            mTimeHandler.cancel();
-            mTimeHandler = null;
-        }
+        if (mTimeHandler != null) mTimeHandler.cancel();
 
         if (continue_) {
             mPlaylists.remove(0);
@@ -264,6 +265,7 @@ public class DownloadService extends Service {
 
         @Override
         public void handleMessage(@NonNull Message msg) {
+            if (mCancelled) return;
             Date nowTime = new Date();
 
             int time = (int) (nowTime.getTime() - mStartTime.getTime()) / 1000;
@@ -271,12 +273,13 @@ public class DownloadService extends Service {
             int minutes = time / 60;
 
             mBuilder.setContentText(String.format("Converting... (%sm %ss)", minutes, seconds));
-            mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-            if (!mCancelled) sendEmptyMessageDelayed(0, 1000);
+            mNotificationManager.notify(mNotificationID, mBuilder.build());
+            sendEmptyMessageDelayed(0, 1000);
         }
 
         public void cancel() {
             mCancelled = true;
+            mTimeHandler = null;
         }
 
     }
