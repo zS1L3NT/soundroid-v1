@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 
 public class DownloadService extends Service {
+    private static final int RETRY_COUNT = 3;
     private final IBinder mBinder = new DownloadBinder();
     private NotificationManager mNotificationManager;
     private List<Playlist> mPlaylists;
@@ -36,6 +37,7 @@ public class DownloadService extends Service {
     private int mPlaylistIndex;
     private int mDownloadIndex;
     private int mDownloadCount;
+    private int mAttemptIndex;
     private boolean mDestroyed;
     private boolean mFailed;
 
@@ -70,6 +72,7 @@ public class DownloadService extends Service {
         mFailed = false;
         mPlaylistIndex = 0;
         mDownloadIndex = 1;
+        mAttemptIndex = 1;
         mDownloadCount = (int) mCurrent
             .getSongs()
             .stream()
@@ -79,7 +82,7 @@ public class DownloadService extends Service {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
             .setContentTitle("Downloading Playlist")
             .setContentText(mCurrent.getInfo().getName())
-            .setSmallIcon(R.drawable.ic_download)
+            .setSmallIcon(android.R.drawable.stat_sys_download)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setSilent(true);
         startForeground(mNotificationID, builder.build());
@@ -112,9 +115,12 @@ public class DownloadService extends Service {
 
         mNotificationManager.cancel(mNotificationID);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
-            .setContentTitle(String.format("%s (%s/%s)", song.getTitle(), mDownloadIndex, mDownloadCount))
+            .setContentTitle(song.getTitle())
             .setContentText("Converting... (0m 0s)")
-            .setSmallIcon(R.drawable.ic_download)
+            .setStyle(new NotificationCompat.BigTextStyle()
+                .setSummaryText(String.format("Downloading %s/%s", mDownloadIndex, mDownloadCount))
+                .bigText(String.format("Converting... (0m 0s)\nAttempt %s/%s", mAttemptIndex, RETRY_COUNT)))
+            .setSmallIcon(android.R.drawable.stat_sys_download)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setSilent(true);
         mNotificationManager.notify(mNotificationID, builder.build());
@@ -133,6 +139,9 @@ public class DownloadService extends Service {
             public void onCallback() {
                 builder
                     .setContentText("0%")
+                    .setStyle(new NotificationCompat.BigTextStyle()
+                        .setSummaryText(String.format("Downloading %s/%s", mDownloadIndex, mDownloadCount))
+                        .bigText(String.format("Percent: 0%%\nAttempt: %s/%s", mAttemptIndex, RETRY_COUNT)))
                     .setProgress(100, 0, false);
                 mNotificationManager.notify(mNotificationID, builder.build());
                 downloadOneStart(playlist, song, builder);
@@ -141,9 +150,12 @@ public class DownloadService extends Service {
             @Override
             public void onError(String message) {
                 song.deleteLocally(getApplicationContext());
-                mFailed = true;
-                mPlaylistIndex++;
-                mDownloadIndex++;
+                if (mAttemptIndex++ > RETRY_COUNT) {
+                    mFailed = true;
+                    mPlaylistIndex++;
+                    mDownloadIndex++;
+                    mAttemptIndex = 1;
+                }
                 downloadSong(playlist);
             }
 
@@ -171,7 +183,10 @@ public class DownloadService extends Service {
             @Override
             public void onProgress(int progress) {
                 builder
-                    .setContentText(String.format("%s%s", progress, "%"))
+                    .setContentText(String.format("%s%%", progress))
+                    .setStyle(new NotificationCompat.BigTextStyle()
+                        .setSummaryText(String.format("Downloading %s/%s", mDownloadIndex, mDownloadCount))
+                        .bigText(String.format("Percent: %s%%\nAttempt: %s/%s", progress, mAttemptIndex, RETRY_COUNT)))
                     .setProgress(100, progress, false);
                 mNotificationManager.notify(mNotificationID, builder.build());
             }
@@ -179,9 +194,12 @@ public class DownloadService extends Service {
             @Override
             public void onError(String message) {
                 song.deleteLocally(getApplicationContext());
-                mFailed = true;
-                mPlaylistIndex++;
-                mDownloadIndex++;
+                if (mAttemptIndex++ > RETRY_COUNT) {
+                    mFailed = true;
+                    mPlaylistIndex++;
+                    mDownloadIndex++;
+                    mAttemptIndex = 1;
+                }
                 downloadSong(playlist);
             }
 
@@ -201,7 +219,7 @@ public class DownloadService extends Service {
             .setContentTitle(mFailed ? "Downloads Incomplete" : "Downloading Finished")
             .setContentText(mPlaylists.get(0).getInfo().getName())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setSmallIcon(R.drawable.ic_launcher);
+            .setSmallIcon(android.R.drawable.stat_sys_download_done);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
 
         mPlaylists.remove(0);
@@ -272,7 +290,11 @@ public class DownloadService extends Service {
             int seconds = time % 60;
             int minutes = time / 60;
 
-            mBuilder.setContentText(String.format("Converting... (%sm %ss)", minutes, seconds));
+            mBuilder
+                .setContentText(String.format("Converting... (%sm %ss)", minutes, seconds))
+                .setStyle(new NotificationCompat.BigTextStyle()
+                    .setSummaryText(String.format("Downloading %s/%s", mDownloadIndex, mDownloadCount))
+                    .bigText(String.format("Converting... (%sm %ss)\nAttempt: %s/%s", minutes, seconds, mAttemptIndex, RETRY_COUNT)));
             mNotificationManager.notify(mNotificationID, mBuilder.build());
             sendEmptyMessageDelayed(0, 1000);
         }
