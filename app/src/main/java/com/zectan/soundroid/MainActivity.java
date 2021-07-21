@@ -142,7 +142,6 @@ public class MainActivity extends CrashDebugApplication {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        playingVM.cleanup();
         stopService(new Intent(this, DownloadService.class));
     }
 
