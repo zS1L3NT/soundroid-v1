@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
@@ -119,7 +120,8 @@ public class DownloadService extends Service {
             public void onFinish() {
                 mPlaylistIndex++;
                 mDownloadIndex++;
-                downloadSong(playlist);
+
+                new Handler(getMainLooper()).post(() -> downloadSong(playlist));
             }
 
             private String getSummaryText() {
