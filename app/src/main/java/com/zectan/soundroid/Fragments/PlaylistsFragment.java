@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.zectan.soundroid.Adapters.PlaylistsAdapter;
 import com.zectan.soundroid.Classes.Fragment;
 import com.zectan.soundroid.Models.Info;
+import com.zectan.soundroid.R;
 import com.zectan.soundroid.Utils.MenuBuilder;
 import com.zectan.soundroid.databinding.FragmentPlaylistsBinding;
 
@@ -31,7 +32,7 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
 
         @Override
         public boolean onMenuItemClicked(Info info, MenuItem item) {
-            return activity.handleMenuItemClick(info, null, item, () -> navController.navigate(PlaylistsFragmentDirections.openEditPlaylist()));
+            return activity.handleMenuItemClick(info, null, item, menuItemRunnable(item));
         }
     };
     private PlaylistsAdapter playlistsAdapter;
@@ -67,7 +68,20 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
         items.addPlaylist();
         items.importPlaylist();
 
-        MenuBuilder.createMenu(view, items, null, (object, item) -> activity.handleMenuItemClick(null, null, item, () -> navController.navigate(PlaylistsFragmentDirections.openImportPlaylist())));
+        MenuBuilder.createMenu(view, items, null, (object, item) -> activity.handleMenuItemClick(null, null, item, menuItemRunnable(item)));
+    }
+
+    private Runnable menuItemRunnable(MenuItem item) {
+        return () -> {
+            switch (item.getItemId()) {
+                case MenuBuilder.ADD_PLAYLIST:
+                    navController.navigate(PlaylistsFragmentDirections.openEditPlaylist());
+                    break;
+                case MenuBuilder.IMPORT_PLAYLIST:
+                    navController.navigate(PlaylistsFragmentDirections.openImportPlaylist());
+                    break;
+            }
+        };
     }
 
 }

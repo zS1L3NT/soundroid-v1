@@ -243,8 +243,25 @@ public class MenuEvents {
     }
 
     private void addPlaylist() {
-        mActivity.playlistsVM.createPlaylist(mActivity.mainVM.userId)
-            .addOnSuccessListener(__ -> mActivity.snack("Created Playlist"))
+        String id = db.collection("playlists").document().getId();
+        Info info = new Info(
+            id,
+            "New Playlist",
+            "https://firebasestorage.googleapis.com/v0/b/android-soundroid.appspot.com/o/playing_cover_default.png?alt=media&token=e8980e80-ab5d-4f21-8ed4-6bc6e7e06ef7",
+            "#7b828b",
+            mActivity.mainVM.userId,
+            new ArrayList<>(),
+            Utils.getQueries("New Playlist")
+        );
+
+        db.collection("playlists")
+            .document(id)
+            .set(info.toMap())
+            .addOnSuccessListener(snap -> {
+                mActivity.snack("Created Playlist");
+                mActivity.playlistEditVM.playlistId.setValue(id);
+                mRunnable.run();
+            })
             .addOnFailureListener(mActivity::handleError);
     }
 
