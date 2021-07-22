@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -89,7 +90,6 @@ public class MainActivity extends CrashDebugApplication {
 
         // Live Observers
         mainVM.error.observe(this, this::handleError);
-        mainVM.showUpdateDialog.observe(this, this::onShowUpdateDialogChange);
         searchVM.watch(this);
 
         // Navigation
@@ -123,7 +123,7 @@ public class MainActivity extends CrashDebugApplication {
             @Override
             public void onComplete(String version) {
                 if (!Utils.versionAtLeast(BuildConfig.VERSION_NAME, version)) {
-                    mainVM.showUpdateDialog.postValue(true);
+                    new Handler(getMainLooper()).post(MainActivity.this::showUpdateDialog);
                 }
             }
 
@@ -244,22 +244,20 @@ public class MainActivity extends CrashDebugApplication {
         }
     }
 
-    private void onShowUpdateDialogChange(Boolean showUpdateDialog) {
-        if (showUpdateDialog) {
-            new MaterialAlertDialogBuilder(MainActivity.this)
-                .setTitle("Update SounDroid")
-                .setMessage("A new version of SounDroid exists, so this version won't work anymore")
-                .setPositiveButton("Update", (dialog, which) -> {
-                    Intent browserIntent = new Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("http://soundroid.zectan.com")
-                    );
-                    startActivity(browserIntent);
-                    onShowUpdateDialogChange(true);
-                })
-                .setCancelable(false)
-                .show();
-        }
+    private void showUpdateDialog() {
+        new MaterialAlertDialogBuilder(MainActivity.this)
+            .setTitle("Update SounDroid")
+            .setMessage("A new version of SounDroid exists, so this version won't work anymore")
+            .setPositiveButton("Update", (dialog, which) -> {
+                Intent browserIntent = new Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("http://soundroid.zectan.com")
+                );
+                startActivity(browserIntent);
+                showUpdateDialog();
+            })
+            .setCancelable(false)
+            .show();
     }
 
     public interface DownloadServiceCallback {

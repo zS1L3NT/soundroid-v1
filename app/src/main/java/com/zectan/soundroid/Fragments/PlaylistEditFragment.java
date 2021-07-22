@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,7 +91,6 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         mItemTouchHelper.attachToRecyclerView(B.recyclerView);
 
         // Live Observers
-        mPlaylistEditVM.navigateNow.observe(this, this::onNavigateNowChange);
         mPlaylistEditVM.saving.observe(this, this::onSavingChange);
 
         B.backImage.setOnClickListener(__ -> mNavController.navigateUp());
@@ -188,8 +189,8 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
                     .filter(song -> removed.contains(song.getSongId()))
                     .forEach(song -> song.deleteIfNotUsed(mActivity, mMainVM.mySongs.getValue()));
 
-                mPlaylistEditVM.navigateNow.postValue(1);
                 mPlaylistEditVM.saving.postValue(false);
+                new Handler(Looper.getMainLooper()).post(mActivity::onBackPressed);
             }
 
             @Override
@@ -209,11 +210,5 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
             B.saveImage.setAlpha(1f);
             B.loadingCircle.setAlpha(0f);
         }
-    }
-
-    private void onNavigateNowChange(Integer i) {
-        if (i == 0) return;
-        mPlaylistEditVM.navigateNow.postValue(0);
-        mActivity.onBackPressed();
     }
 }

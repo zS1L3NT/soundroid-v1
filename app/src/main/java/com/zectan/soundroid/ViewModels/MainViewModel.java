@@ -27,12 +27,11 @@ import java.util.stream.Collectors;
 
 public class MainViewModel extends ViewModel {
     private static final String TAG = "(SounDroid) MainViewModel";
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     public final MutableLiveData<Exception> error = new MutableLiveData<>();
     public final StrictLiveData<User> myUser = new StrictLiveData<>(User.getEmpty());
     public final StrictLiveData<List<Info>> myInfos = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<List<Song>> mySongs = new StrictLiveData<>(new ArrayList<>());
-    public final StrictLiveData<Boolean> showUpdateDialog = new StrictLiveData<>(false);
     public final MutableLiveData<DownloadService.DownloadBinder> downloadBinder = new MutableLiveData<>();
     public String userId;
 
@@ -58,7 +57,7 @@ public class MainViewModel extends ViewModel {
     public void watch(MainActivity activity) {
         Log.d(TAG, "STARTED WATCHING FIREBASE VALUES");
 
-        db.collection("users")
+        mDb.collection("users")
             .document(userId)
             .addSnapshotListener(activity, (snap, error) -> {
                 if (error != null) {
@@ -69,7 +68,7 @@ public class MainViewModel extends ViewModel {
                 myUser.postValue(Objects.requireNonNull(snap.toObject(User.class)));
             });
 
-        db.collection("playlists")
+        mDb.collection("playlists")
             .whereEqualTo("userId", userId)
             .addSnapshotListener(activity, (snaps, error) -> {
                 if (error != null) {
@@ -80,7 +79,7 @@ public class MainViewModel extends ViewModel {
                 myInfos.postValue(snaps.toObjects(Info.class));
             });
 
-        db.collection("songs")
+        mDb.collection("songs")
             .whereEqualTo("userId", userId)
             .addSnapshotListener(activity, (snaps, error) -> {
                 if (error != null) {

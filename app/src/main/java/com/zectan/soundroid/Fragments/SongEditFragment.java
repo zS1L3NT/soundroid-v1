@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,7 +66,6 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Observers
-        mPlaylistEditVM.navigateNow.observe(this, this::onNavigateNowChange);
         mPlaylistEditVM.saving.observe(this, this::onSavingChange);
 
         B.backImage.setOnClickListener(__ -> mNavController.navigateUp());
@@ -153,8 +154,8 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
         new SongEditRequest(song, new SongEditRequest.Callback() {
             @Override
             public void onComplete() {
-                mPlaylistEditVM.navigateNow.postValue(1);
                 mPlaylistEditVM.saving.postValue(false);
+                new Handler(Looper.getMainLooper()).post(mActivity::onBackPressed);
             }
 
             @Override
@@ -174,12 +175,6 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
             B.saveImage.setAlpha(1f);
             B.loadingCircle.setAlpha(0f);
         }
-    }
-
-    private void onNavigateNowChange(Integer i) {
-        if (i == 0) return;
-        mPlaylistEditVM.navigateNow.postValue(0);
-        mActivity.onBackPressed();
     }
 
 }
