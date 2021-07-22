@@ -49,6 +49,11 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         public boolean onMenuItemClicked(Song song, MenuItem item) {
             return activity.handleMenuItemClick(playlistViewVM.info.getValue(), song, item, () -> navController.navigate(PlaylistViewFragmentDirections.openEditSong()));
         }
+
+        @Override
+        public boolean isLocal() {
+            return isLocal;
+        }
     };
     private PlaylistViewAdapter playlistViewAdapter;
 
@@ -119,9 +124,16 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         List<Song> songs = activity.mainVM.getSongsFromPlaylist(info.getId());
         Playlist playlist = new Playlist(info, songs);
 
+        MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
+        if (isLocal) {
+            items = MenuBuilder.MenuItems.forPlaylist(playlist, activity);
+        } else {
+            items.savePlaylist();
+        }
+
         MenuBuilder.createMenu(
             view,
-            MenuBuilder.MenuItems.forPlaylist(playlist, activity),
+            items,
             playlistViewVM.info.getValue(),
             (info_, item) -> activity.handleMenuItemClick(info_, null, item, () -> navController.navigate(PlaylistViewFragmentDirections.openEditPlaylist()))
         );

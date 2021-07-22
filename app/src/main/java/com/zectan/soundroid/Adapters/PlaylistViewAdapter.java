@@ -79,6 +79,8 @@ public class PlaylistViewAdapter extends RecyclerView.Adapter<PlaylistViewViewHo
 
     public interface Callback extends MenuBuilder.MenuItemCallback<Song> {
         void onSongClicked(String songId);
+
+        boolean isLocal();
     }
 }
 
@@ -124,7 +126,16 @@ class PlaylistViewViewHolder extends RecyclerView.ViewHolder {
         }
 
         B.parent.setOnClickListener(__ -> mCallback.onSongClicked(id));
+        B.menuClickable.setOnClickListener(v -> {
+            MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
+            if (mCallback.isLocal()) {
+                items = MenuBuilder.MenuItems.forSong(song, activity, true);
+            } else {
+                items.addToQueue();
+                items.addToPlaylist();
+            }
 
-        B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forSong(song, activity, true), song, mCallback));
+            MenuBuilder.createMenu(v, items, song, mCallback);
+        });
     }
 }
