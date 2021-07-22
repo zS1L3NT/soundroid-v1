@@ -6,27 +6,20 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
-import com.zectan.soundroid.Connections.DownloadRequest;
-import com.zectan.soundroid.Connections.PingSongRequest;
 import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.Song;
+import com.zectan.soundroid.Utils.DownloadProcess;
 import com.zectan.soundroid.Utils.Utils;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class DownloadService extends Service {
-    private static final int RETRY_COUNT = 3;
     private final IBinder mBinder = new DownloadBinder();
     private NotificationManager mNotificationManager;
     private List<Playlist> mPlaylists;
@@ -37,12 +30,8 @@ public class DownloadService extends Service {
     private int mPlaylistIndex;
     private int mDownloadIndex;
     private int mDownloadCount;
-    private int mAttemptIndex;
     private boolean mDestroyed;
     private boolean mFailed;
-
-    private TimeHandler mTimeHandler;
-    private Date mStartTime;
 
     @Override
     public void onCreate() {
@@ -55,10 +44,8 @@ public class DownloadService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mDestroyed = true;
         mNotificationManager.cancel(mNotificationID);
-        if (mTimeHandler != null) {
-            mTimeHandler.cancel();
-        }
     }
 
     @Override
@@ -72,7 +59,6 @@ public class DownloadService extends Service {
         mFailed = false;
         mPlaylistIndex = 0;
         mDownloadIndex = 1;
-        mAttemptIndex = 1;
         mDownloadCount = (int) mCurrent
             .getSongs()
             .stream()
@@ -91,11 +77,6 @@ public class DownloadService extends Service {
     }
 
     private void downloadSong(Playlist playlist) {
-        if (!playlist.equals(mCurrent)) {
-            mFailed = true;
-            return;
-        }
-
         if (isOffline() || mDestroyed) {
             cancelDownloads(false);
             return;
@@ -113,66 +94,27 @@ public class DownloadService extends Service {
             return;
         }
 
+        // Is Cancelled
+        if (!playlist.equals(mCurrent)) {
+            mFailed = true;
+            return;
+        }
+
         mNotificationManager.cancel(mNotificationID);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat
+            .Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
             .setContentTitle(song.getTitle())
-            .setContentText("Converting... (0m 0s)")
-            .setStyle(new NotificationCompat.BigTextStyle()
-                .setSummaryText(String.format("Downloading %s/%s", mDownloadIndex, mDownloadCount))
-                .bigText(String.format("Converting... (0m 0s)\nAttempt %s/%s", mAttemptIndex, RETRY_COUNT)))
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setSilent(true);
         mNotificationManager.notify(mNotificationID, builder.build());
 
-        if (mTimeHandler != null) mTimeHandler.cancel();
-        mTimeHandler = new TimeHandler(getMainLooper(), builder);
-        mTimeHandler.sendEmptyMessage(0);
-        mStartTime = new Date();
-
-        downloadOnePing(playlist, song, builder);
-    }
-
-    private void downloadOnePing(Playlist playlist, Song song, NotificationCompat.Builder builder) {
-        new PingSongRequest(song.getSongId(), mHighDownloadQuality, new PingSongRequest.Callback() {
+        new DownloadProcess(getApplicationContext(), song, mHighDownloadQuality, new DownloadProcess.Callback() {
             @Override
-            public void onCallback() {
-                builder
-                    .setContentText("0%")
-                    .setStyle(new NotificationCompat.BigTextStyle()
-                        .setSummaryText(String.format("Downloading %s/%s", mDownloadIndex, mDownloadCount))
-                        .bigText(String.format("Percent: 0%%\nAttempt: %s/%s", mAttemptIndex, RETRY_COUNT)))
-                    .setProgress(100, 0, false);
-                mNotificationManager.notify(mNotificationID, builder.build());
-                downloadOneStart(playlist, song, builder);
+            public boolean isCancelled() {
+                return !playlist.equals(mCurrent) || mDestroyed;
             }
 
-            @Override
-            public void onError(String message) {
-                song.deleteLocally(getApplicationContext());
-                if (mAttemptIndex++ > RETRY_COUNT) {
-                    mFailed = true;
-                    mPlaylistIndex++;
-                    mDownloadIndex++;
-                    mAttemptIndex = 1;
-                }
-                downloadSong(playlist);
-            }
-
-            @Override
-            public void cancelTimeHandler() {
-                if (mTimeHandler != null) mTimeHandler.cancel();
-            }
-
-            @Override
-            public boolean isContinued() {
-                return playlist.equals(mCurrent) && !mDestroyed;
-            }
-        });
-    }
-
-    private void downloadOneStart(Playlist playlist, Song song, NotificationCompat.Builder builder) {
-        new DownloadRequest(getApplicationContext(), song, mHighDownloadQuality, new DownloadRequest.Callback() {
             @Override
             public void onFinish() {
                 mPlaylistIndex++;
@@ -180,32 +122,60 @@ public class DownloadService extends Service {
                 downloadSong(playlist);
             }
 
+            private String getSummaryText() {
+                return String.format("Downloading %s/%s", mDownloadIndex, mDownloadCount);
+            }
+
             @Override
-            public void onProgress(int progress) {
+            public void showCheckingTime(int minutes, int seconds) {
+                String string = "Pinging server...\n" +
+                    String.format("Elapsed Time: %sm %ss", minutes, seconds);
+
                 builder
-                    .setContentText(String.format("%s%%", progress))
+                    .setContentText("Pinging server...")
                     .setStyle(new NotificationCompat.BigTextStyle()
-                        .setSummaryText(String.format("Downloading %s/%s", mDownloadIndex, mDownloadCount))
-                        .bigText(String.format("Percent: %s%%\nAttempt: %s/%s", progress, mAttemptIndex, RETRY_COUNT)))
-                    .setProgress(100, progress, false);
-                mNotificationManager.notify(mNotificationID, builder.build());
+                        .setSummaryText(getSummaryText())
+                        .bigText(string));
+
+                if (!isCancelled()) mNotificationManager.notify(mNotificationID, builder.build());
             }
 
             @Override
-            public void onError(String message) {
-                song.deleteLocally(getApplicationContext());
-                if (mAttemptIndex++ > RETRY_COUNT) {
-                    mFailed = true;
-                    mPlaylistIndex++;
-                    mDownloadIndex++;
-                    mAttemptIndex = 1;
-                }
+            public void showConvertingTime(int attemptIndex, int minutes, int seconds) {
+                String string = "Converting...\n" +
+                    String.format("Attempt: %s/%s\n", attemptIndex, DownloadProcess.RETRY_COUNT) +
+                    String.format("Elapsed Time: %sm %ss", minutes, seconds);
+
+                builder
+                    .setContentText("Converting...")
+                    .setStyle(new NotificationCompat.BigTextStyle()
+                        .setSummaryText(getSummaryText())
+                        .bigText(string));
+
+                if (!isCancelled()) mNotificationManager.notify(mNotificationID, builder.build());
+            }
+
+            @Override
+            public void showDownloadProgress(int attemptIndex, int progress) {
+                String string = String.format("Progress: %s%%", progress) +
+                    String.format("Attempt: %s/%s\n", attemptIndex, DownloadProcess.RETRY_COUNT);
+
+                builder
+                    .setContentText(progress + "%")
+                    .setProgress(100, progress, false)
+                    .setStyle(new NotificationCompat.BigTextStyle()
+                        .setSummaryText(getSummaryText())
+                        .bigText(string));
+
+                if (!isCancelled()) mNotificationManager.notify(mNotificationID, builder.build());
+            }
+
+            @Override
+            public void onError() {
+                mFailed = true;
+                mPlaylistIndex++;
+                mDownloadIndex++;
                 downloadSong(playlist);
-            }
-
-            @Override
-            public boolean isCancelled() {
-                return !playlist.equals(mCurrent) || mDestroyed;
             }
         });
     }
@@ -243,8 +213,6 @@ public class DownloadService extends Service {
             .setSmallIcon(R.drawable.ic_close);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
 
-        if (mTimeHandler != null) mTimeHandler.cancel();
-
         if (continue_) {
             mPlaylists.remove(0);
         } else {
@@ -269,41 +237,6 @@ public class DownloadService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
-    }
-
-    private class TimeHandler extends Handler {
-        private final NotificationCompat.Builder mBuilder;
-        private boolean mCancelled;
-
-        public TimeHandler(@NonNull Looper looper, NotificationCompat.Builder builder) {
-            super(looper);
-            mBuilder = builder;
-            mCancelled = false;
-        }
-
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            if (mCancelled) return;
-            Date nowTime = new Date();
-
-            int time = (int) (nowTime.getTime() - mStartTime.getTime()) / 1000;
-            int seconds = time % 60;
-            int minutes = time / 60;
-
-            mBuilder
-                .setContentText(String.format("Converting... (%sm %ss)", minutes, seconds))
-                .setStyle(new NotificationCompat.BigTextStyle()
-                    .setSummaryText(String.format("Downloading %s/%s", mDownloadIndex, mDownloadCount))
-                    .bigText(String.format("Converting... (%sm %ss)\nAttempt: %s/%s", minutes, seconds, mAttemptIndex, RETRY_COUNT)));
-            mNotificationManager.notify(mNotificationID, mBuilder.build());
-            sendEmptyMessageDelayed(0, 1000);
-        }
-
-        public void cancel() {
-            mCancelled = true;
-            mTimeHandler = null;
-        }
-
     }
 
     public class DownloadBinder extends Binder {
