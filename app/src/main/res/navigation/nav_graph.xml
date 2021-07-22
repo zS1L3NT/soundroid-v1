@@ -26,15 +26,8 @@
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
         <action
-            android:id="@+id/open_downloaded_song"
+            android:id="@+id/open_playing"
             app:destination="@id/fragment_playing"
-            app:enterAnim="@anim/fade_in"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/fade_in"
-            app:popExitAnim="@anim/fade_out" />
-        <action
-            android:id="@+id/open_options_menu"
-            app:destination="@id/parent"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -61,7 +54,7 @@
             app:popExitAnim="@anim/fade_out"
             app:popUpTo="@id/fragment_playlists" />
         <action
-            android:id="@+id/open_edit_playlist"
+            android:id="@+id/open_playlist_edit"
             app:destination="@id/fragment_playlist_edit"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
@@ -69,7 +62,7 @@
             app:popExitAnim="@anim/fade_out"
             app:popUpTo="@id/fragment_playlists" />
         <action
-            android:id="@+id/open_import_playlist"
+            android:id="@+id/open_playlist_import"
             app:destination="@id/fragment_playlist_import"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
@@ -89,7 +82,7 @@
         android:label="fragment_search"
         tools:layout="@layout/fragment_search">
         <action
-            android:id="@+id/open_search_song"
+            android:id="@+id/open_playing"
             app:destination="@id/fragment_playing"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
@@ -113,9 +106,6 @@
         android:name="com.zectan.soundroid.Fragments.PlaylistEditFragment"
         android:label="fragment_playlist_edit"
         tools:layout="@layout/fragment_playlist_edit">
-        <action
-            android:id="@+id/back_to_playlist_view"
-            app:destination="@id/fragment_playlist_view" />
     </fragment>
     <fragment
         android:id="@+id/fragment_playlist_view"
@@ -123,14 +113,14 @@
         android:label="fragment_playlist_view"
         tools:layout="@layout/fragment_playlist_view">
         <action
-            android:id="@+id/open_edit_playlist"
+            android:id="@+id/open_playlist_edit"
             app:destination="@id/fragment_playlist_edit"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
         <action
-            android:id="@+id/open_playlist_song"
+            android:id="@+id/open_playing"
             app:destination="@id/fragment_playing"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"

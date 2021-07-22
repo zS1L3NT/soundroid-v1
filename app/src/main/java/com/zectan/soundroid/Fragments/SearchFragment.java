@@ -42,7 +42,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
             playingVM.startPlaylist(activity, playlist, song.getSongId(), mainVM.myUser.getValue().getHighStreamQuality());
 
             if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
-                navController.navigate(SearchFragmentDirections.openSearchSong());
+                navController.navigate(SearchFragmentDirections.openPlaying());
             }
         }
 

@@ -75,10 +75,10 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
         return () -> {
             switch (item.getItemId()) {
                 case MenuBuilder.ADD_PLAYLIST:
-                    navController.navigate(PlaylistsFragmentDirections.openEditPlaylist());
+                    navController.navigate(PlaylistsFragmentDirections.openPlaylistEdit());
                     break;
                 case MenuBuilder.IMPORT_PLAYLIST:
-                    navController.navigate(PlaylistsFragmentDirections.openImportPlaylist());
+                    navController.navigate(PlaylistsFragmentDirections.openPlaylistImport());
                     break;
             }
         };

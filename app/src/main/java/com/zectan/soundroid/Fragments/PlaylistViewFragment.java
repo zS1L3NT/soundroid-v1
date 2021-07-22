@@ -41,7 +41,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             playingVM.startPlaylist(activity, playlist, songId, mainVM.myUser.getValue().getHighStreamQuality());
 
             if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
-                navController.navigate(PlaylistViewFragmentDirections.openPlaylistSong());
+                navController.navigate(PlaylistViewFragmentDirections.openPlaying());
             }
         }
 
@@ -135,7 +135,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             view,
             items,
             playlistViewVM.info.getValue(),
-            (info_, item) -> activity.handleMenuItemClick(info_, null, item, () -> navController.navigate(PlaylistViewFragmentDirections.openEditPlaylist()))
+            (info_, item) -> activity.handleMenuItemClick(info_, null, item, () -> navController.navigate(PlaylistViewFragmentDirections.openPlaylistEdit()))
         );
     }
 

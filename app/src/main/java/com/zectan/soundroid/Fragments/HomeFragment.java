@@ -37,7 +37,7 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
             playingVM.startPlaylist(activity, playlist, songId, mainVM.myUser.getValue().getHighStreamQuality());
 
             if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
-                navController.navigate(HomeFragmentDirections.openDownloadedSong());
+                navController.navigate(HomeFragmentDirections.openPlaying());
             }
         }
 
