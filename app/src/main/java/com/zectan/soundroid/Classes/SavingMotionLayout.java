@@ -26,11 +26,6 @@ public class SavingMotionLayout extends MotionLayout {
         super(context, attrs, defStyleAttr);
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-    }
-
     @Nullable
     @Override
     protected Parcelable onSaveInstanceState() {

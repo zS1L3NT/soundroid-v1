@@ -11,7 +11,7 @@ import com.zectan.soundroid.ErrorActivity;
 import java.util.ArrayList;
 
 public abstract class CrashDebugApplication extends AppCompatActivity {
-    private final FirebaseAuth auth = FirebaseAuth.getInstance();
+    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +23,7 @@ public abstract class CrashDebugApplication extends AppCompatActivity {
 
             String message = e.getMessage();
             String class_ = e.getClass().getName();
-            String userId = auth.getUid();
+            String userId = mAuth.getUid();
 
             Intent intent = new Intent(CrashDebugApplication.this, ErrorActivity.class);
             intent.putExtra("stack", stack);

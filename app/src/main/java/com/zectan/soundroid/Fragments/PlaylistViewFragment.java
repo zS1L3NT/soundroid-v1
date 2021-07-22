@@ -37,17 +37,17 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
 
         @Override
         public void onSongClicked(String songId) {
-            Playlist playlist = new Playlist(playlistViewVM.info.getValue(), playlistViewVM.songs.getValue());
-            playingVM.startPlaylist(activity, playlist, songId, mainVM.myUser.getValue().getHighStreamQuality());
+            Playlist playlist = new Playlist(mPlaylistViewVM.info.getValue(), mPlaylistViewVM.songs.getValue());
+            mPlayingVM.startPlaylist(mActivity, playlist, songId, mMainVM.myUser.getValue().getHighStreamQuality());
 
-            if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
-                navController.navigate(PlaylistViewFragmentDirections.openPlaying());
+            if (mMainVM.myUser.getValue().getOpenPlayingScreen()) {
+                mNavController.navigate(PlaylistViewFragmentDirections.openPlaying());
             }
         }
 
         @Override
         public boolean onMenuItemClicked(Song song, MenuItem item) {
-            return activity.handleMenuItemClick(playlistViewVM.info.getValue(), song, item, () -> navController.navigate(PlaylistViewFragmentDirections.openEditSong()));
+            return mActivity.handleMenuItemClick(mPlaylistViewVM.info.getValue(), song, item, () -> mNavController.navigate(PlaylistViewFragmentDirections.openEditSong()));
         }
 
         @Override
@@ -63,23 +63,23 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Recycler View
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mActivity);
         playlistViewAdapter = new PlaylistViewAdapter(callback);
         B.recyclerView.setAdapter(playlistViewAdapter);
         B.recyclerView.setLayoutManager(layoutManager);
 
         // Live Observers
-        playlistViewVM.info.observe(this, this::onInfoChange);
-        playlistViewVM.songs.observe(this, this::onSongsChange);
-        playlistViewVM.loading.observe(this, B.swipeRefresh::setRefreshing);
-        playingVM.currentSong.observe(this, playlistViewAdapter::updateCurrentSong);
+        mPlaylistViewVM.info.observe(this, this::onInfoChange);
+        mPlaylistViewVM.songs.observe(this, this::onSongsChange);
+        mPlaylistViewVM.loading.observe(this, B.swipeRefresh::setRefreshing);
+        mPlayingVM.currentSong.observe(this, playlistViewAdapter::updateCurrentSong);
 
-        mainVM.watchInfoFromPlaylist(this, playlistViewVM.playlistId.getValue(), playlistViewVM.info::setValue);
-        mainVM.watchSongsFromPlaylist(this, playlistViewVM.playlistId.getValue(), playlistViewVM.songs::setValue);
-        B.backImage.setOnClickListener(__ -> navController.navigateUp());
+        mMainVM.watchInfoFromPlaylist(this, mPlaylistViewVM.playlistId.getValue(), mPlaylistViewVM.info::setValue);
+        mMainVM.watchSongsFromPlaylist(this, mPlaylistViewVM.playlistId.getValue(), mPlaylistViewVM.songs::setValue);
+        B.backImage.setOnClickListener(__ -> mNavController.navigateUp());
         B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.swipeRefresh.setOnRefreshListener(this::onReload);
-        B.parent.setTransitionListener(activity.getTransitionListener());
+        B.parent.setTransitionListener(mActivity.getTransitionListener());
 
         onReload();
 
@@ -87,33 +87,33 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
     }
 
     public void onReload() {
-        String playlistId = playlistViewVM.playlistId.getValue();
-        playlistViewVM.loading.setValue(true);
+        String playlistId = mPlaylistViewVM.playlistId.getValue();
+        mPlaylistViewVM.loading.setValue(true);
 
-        Info info = mainVM.getInfoFromPlaylist(playlistId);
+        Info info = mMainVM.getInfoFromPlaylist(playlistId);
         isLocal = info != null;
         if (info == null) {
             fetchFromServer();
         } else {
-            playlistViewVM.info.setValue(info);
-            playlistViewVM.loading.setValue(false);
-            playlistViewVM.songs.setValue(mainVM.getSongsFromPlaylist(playlistId));
+            mPlaylistViewVM.info.setValue(info);
+            mPlaylistViewVM.loading.setValue(false);
+            mPlaylistViewVM.songs.setValue(mMainVM.getSongsFromPlaylist(playlistId));
             B.recyclerView.scrollToPosition(0);
         }
     }
 
     public void fetchFromServer() {
-        new PlaylistSongsRequest(playlistViewVM.playlistId.getValue(), new PlaylistSongsRequest.Callback() {
+        new PlaylistSongsRequest(mPlaylistViewVM.playlistId.getValue(), new PlaylistSongsRequest.Callback() {
             @Override
             public void onComplete(List<Song> songs) {
-                playlistViewVM.loading.postValue(false);
-                playlistViewVM.songs.postValue(songs);
+                mPlaylistViewVM.loading.postValue(false);
+                mPlaylistViewVM.songs.postValue(songs);
             }
 
             @Override
             public void onError(String message) {
-                playlistViewVM.loading.postValue(false);
-                mainVM.error.postValue(new Exception(message));
+                mPlaylistViewVM.loading.postValue(false);
+                mMainVM.error.postValue(new Exception(message));
             }
         });
     }
@@ -121,13 +121,13 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
     public void onMoreImageClicked(View view) {
         if (isLocal == null) return;
 
-        Info info = playlistViewVM.info.getValue();
-        List<Song> songs = activity.mainVM.getSongsFromPlaylist(info.getId());
+        Info info = mPlaylistViewVM.info.getValue();
+        List<Song> songs = mActivity.mainVM.getSongsFromPlaylist(info.getId());
         Playlist playlist = new Playlist(info, songs);
 
         MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
         if (isLocal) {
-            items = MenuBuilder.MenuItems.forPlaylist(playlist, activity);
+            items = MenuBuilder.MenuItems.forPlaylist(playlist, mActivity);
         } else {
             items.savePlaylist();
         }
@@ -135,19 +135,19 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         MenuBuilder.createMenu(
             view,
             items,
-            playlistViewVM.info.getValue(),
-            (info_, item) -> activity.handleMenuItemClick(info_, null, item, () -> navController.navigate(PlaylistViewFragmentDirections.openPlaylistEdit()))
+            mPlaylistViewVM.info.getValue(),
+            (info_, item) -> mActivity.handleMenuItemClick(info_, null, item, () -> mNavController.navigate(PlaylistViewFragmentDirections.openPlaylistEdit()))
         );
     }
 
     private void onSongsChange(List<Song> songs) {
-        playlistViewAdapter.updateSongs(ListArrayUtils.sortSongs(songs, playlistViewVM.info.getValue().getOrder()));
+        playlistViewAdapter.updateSongs(ListArrayUtils.sortSongs(songs, mPlaylistViewVM.info.getValue().getOrder()));
     }
 
     private void onInfoChange(Info info) {
         B.nameText.setText(info.getName());
         Glide
-            .with(activity)
+            .with(mActivity)
             .load(info.getCover())
             .placeholder(R.drawable.playing_cover_loading)
             .error(R.drawable.playing_cover_failed)
@@ -156,7 +156,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             .into(B.coverImage);
 
         Drawable oldGD = B.background.getBackground();
-        int[] colors = {Color.parseColor(info.getColorHex()), activity.getAttributeResource(R.attr.backgroundColor)};
+        int[] colors = {Color.parseColor(info.getColorHex()), mActivity.getAttributeResource(R.attr.backgroundColor)};
         GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
 
         Drawable[] layers = {oldGD, newGD};

@@ -61,9 +61,9 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
             if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
                 newFilePath = result.getData().getData();
                 try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), newFilePath);
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(mActivity.getContentResolver(), newFilePath);
                     Glide
-                        .with(activity)
+                        .with(mActivity)
                         .load(bitmap)
                         .transition(new DrawableTransitionOptions().crossFade())
                         .centerCrop()
@@ -81,7 +81,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Recycler Views
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mActivity);
         playlistEditAdapter = new PlaylistEditAdapter(callback);
         mItemTouchHelper = new ItemTouchHelper(new PlaylistEditAdapter.PlaylistEditItemTouchHelper(playlistEditAdapter));
         B.recyclerView.setAdapter(playlistEditAdapter);
@@ -89,30 +89,30 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         mItemTouchHelper.attachToRecyclerView(B.recyclerView);
 
         // Live Observers
-        playlistEditVM.navigateNow.observe(this, this::onNavigateNowChange);
-        playlistEditVM.saving.observe(this, this::onSavingChange);
+        mPlaylistEditVM.navigateNow.observe(this, this::onNavigateNowChange);
+        mPlaylistEditVM.saving.observe(this, this::onSavingChange);
 
-        B.backImage.setOnClickListener(__ -> navController.navigateUp());
+        B.backImage.setOnClickListener(__ -> mNavController.navigateUp());
         B.saveImage.setOnClickListener(this::onSaveClicked);
         B.coverImage.setOnClickListener(this::onCoverClicked);
-        B.parent.setTransitionListener(activity.getTransitionListener());
+        B.parent.setTransitionListener(mActivity.getTransitionListener());
 
-        Info info = mainVM.getInfoFromPlaylist(playlistEditVM.playlistId.getValue());
-        List<Song> songs = mainVM.getSongsFromPlaylist(playlistEditVM.playlistId.getValue());
+        Info info = mMainVM.getInfoFromPlaylist(mPlaylistEditVM.playlistId.getValue());
+        List<Song> songs = mMainVM.getSongsFromPlaylist(mPlaylistEditVM.playlistId.getValue());
         assert info != null;
-        playlistEditVM.info.setValue(info);
-        playlistEditVM.songs.setValue(songs);
+        mPlaylistEditVM.info.setValue(info);
+        mPlaylistEditVM.songs.setValue(songs);
 
         B.nameTextInput.setText(info.getName());
         Glide
-            .with(activity)
+            .with(mActivity)
             .load(info.getCover())
             .placeholder(R.drawable.playing_cover_loading)
             .error(R.drawable.playing_cover_failed)
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
-        playlistEditAdapter.updateSongs(ListArrayUtils.sortSongs(songs, playlistEditVM.info.getValue().getOrder()));
+        playlistEditAdapter.updateSongs(ListArrayUtils.sortSongs(songs, mPlaylistEditVM.info.getValue().getOrder()));
         removed.clear();
 
         return B.getRoot();
@@ -121,7 +121,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
     @Override
     public void onStop() {
         super.onStop();
-        activity.hideKeyboard(requireView());
+        mActivity.hideKeyboard(requireView());
     }
 
     private void onCoverClicked(View view) {
@@ -132,8 +132,8 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
     }
 
     private void onSaveClicked(View view) {
-        playlistEditVM.saving.setValue(true);
-        Info info = playlistEditVM.info.getValue();
+        mPlaylistEditVM.saving.setValue(true);
+        Info info = mPlaylistEditVM.info.getValue();
         List<String> order = playlistEditAdapter
             .getSongs()
             .stream()
@@ -166,12 +166,12 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
                         sendEditPlaylistRequest(newInfo);
                     })
                     .addOnFailureListener(error -> {
-                        playlistEditVM.saving.postValue(false);
-                        mainVM.error.postValue(error);
+                        mPlaylistEditVM.saving.postValue(false);
+                        mMainVM.error.postValue(error);
                     }))
                 .addOnFailureListener(error -> {
-                    playlistEditVM.saving.postValue(false);
-                    mainVM.error.postValue(error);
+                    mPlaylistEditVM.saving.postValue(false);
+                    mMainVM.error.postValue(error);
                 });
         } else {
             sendEditPlaylistRequest(newInfo);
@@ -182,20 +182,20 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         new EditPlaylistRequest(info, removed, new EditPlaylistRequest.Callback() {
             @Override
             public void onComplete() {
-                playlistEditVM.songs
+                mPlaylistEditVM.songs
                     .getValue()
                     .stream()
                     .filter(song -> removed.contains(song.getSongId()))
-                    .forEach(song -> song.deleteIfNotUsed(activity, mainVM.mySongs.getValue()));
+                    .forEach(song -> song.deleteIfNotUsed(mActivity, mMainVM.mySongs.getValue()));
 
-                playlistEditVM.navigateNow.postValue(1);
-                playlistEditVM.saving.postValue(false);
+                mPlaylistEditVM.navigateNow.postValue(1);
+                mPlaylistEditVM.saving.postValue(false);
             }
 
             @Override
             public void onError(String message) {
-                mainVM.error.postValue(new Exception(message));
-                playlistEditVM.saving.postValue(false);
+                mMainVM.error.postValue(new Exception(message));
+                mPlaylistEditVM.saving.postValue(false);
             }
         });
     }
@@ -213,7 +213,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
 
     private void onNavigateNowChange(Integer i) {
         if (i == 0) return;
-        playlistEditVM.navigateNow.postValue(0);
-        activity.onBackPressed();
+        mPlaylistEditVM.navigateNow.postValue(0);
+        mActivity.onBackPressed();
     }
 }

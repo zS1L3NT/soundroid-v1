@@ -39,24 +39,24 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         public void onSongClicked(Song song) {
             Info info = new Info(song.getSongId(), "Search Result", Collections.singletonList(song.getSongId()));
             Playlist playlist = new Playlist(info, Collections.singletonList(song));
-            playingVM.startPlaylist(activity, playlist, song.getSongId(), mainVM.myUser.getValue().getHighStreamQuality());
+            mPlayingVM.startPlaylist(mActivity, playlist, song.getSongId(), mMainVM.myUser.getValue().getHighStreamQuality());
 
-            if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
-                navController.navigate(SearchFragmentDirections.openPlaying());
+            if (mMainVM.myUser.getValue().getOpenPlayingScreen()) {
+                mNavController.navigate(SearchFragmentDirections.openPlaying());
             }
         }
 
         @Override
         public void onPlaylistClicked(Info info) {
-            playlistViewVM.playlistId.setValue(info.getId());
-            playlistViewVM.info.postValue(info);
+            mPlaylistViewVM.playlistId.setValue(info.getId());
+            mPlaylistViewVM.info.postValue(info);
 
-            navController.navigate(SearchFragmentDirections.openPlaylistView());
+            mNavController.navigate(SearchFragmentDirections.openPlaylistView());
         }
 
         @Override
         public boolean onMenuItemClicked(SearchResult result, MenuItem item) {
-            return activity.handleMenuItemClick(result.getPlaylistInfo(), result.getSong(), item);
+            return mActivity.handleMenuItemClick(result.getPlaylistInfo(), result.getSong(), item);
         }
     };
     private SearchAdapter searchAdapter;
@@ -74,26 +74,26 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Recycler View
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mActivity);
         searchAdapter = new SearchAdapter(callback);
         B.recyclerView.setLayoutManager(layoutManager);
         B.recyclerView.setAdapter(searchAdapter);
         B.recyclerView.setHasFixedSize(true);
 
         // Observers
-        searchVM.results.observe(this, this::onResultsChange);
-        searchVM.loading.observe(this, this::onLoadingChange);
-        searchVM.message.observe(this, this::onMessageChange);
-        searchVM.error.observe(this, this::onErrorChange);
+        mSearchVM.results.observe(this, this::onResultsChange);
+        mSearchVM.loading.observe(this, this::onLoadingChange);
+        mSearchVM.message.observe(this, this::onMessageChange);
+        mSearchVM.error.observe(this, this::onErrorChange);
         B.headerBackImage.setOnClickListener(this::onBackPressed);
-        playingVM.currentSong.observe(this, searchAdapter::updateCurrentSong);
+        mPlayingVM.currentSong.observe(this, searchAdapter::updateCurrentSong);
 
         RxTextView
             .textChanges(B.headerTextEditor)
             .debounce(250, TimeUnit.MILLISECONDS)
             .map(CharSequence::toString)
             .subscribe(this::afterSearchDebounce);
-        activity.showKeyboard();
+        mActivity.showKeyboard();
 
         return B.getRoot();
     }
@@ -101,23 +101,23 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
     @Override
     public void onStop() {
         super.onStop();
-        activity.hideKeyboard(requireView());
+        mActivity.hideKeyboard(requireView());
     }
 
     private void onBackPressed(View view) {
-        activity.onBackPressed();
+        mActivity.onBackPressed();
     }
 
     private void afterSearchDebounce(String text) {
-        String search = searchVM.query.getValue();
+        String search = mSearchVM.query.getValue();
         if (!search.equals(text)) {
-            searchVM.query.postValue(text);
-            searchVM.search(text, mainVM);
+            mSearchVM.query.postValue(text);
+            mSearchVM.search(text, mMainVM);
         }
     }
 
     private void onResultsChange(List<SearchResult> results) {
-        boolean loading = searchVM.loading.getValue();
+        boolean loading = mSearchVM.loading.getValue();
         searchAdapter.updateResults(results);
         updateVisuals(results, loading);
         // Delayed so items can reorder first
@@ -125,7 +125,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
     }
 
     private void onLoadingChange(Boolean loading) {
-        List<SearchResult> results = searchVM.results.getValue();
+        List<SearchResult> results = mSearchVM.results.getValue();
         updateVisuals(results, loading);
         B.headerLoadingCircle.setVisibility(loading ? View.VISIBLE : View.INVISIBLE);
     }
@@ -138,11 +138,11 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
             } else {
                 B.responseLayout.animate().setDuration(1000).alpha(1f).start();
                 if (B.headerTextEditor.getText().toString().isEmpty()) {
-                    B.responseImage.setImageDrawable(activity.getDrawable(R.drawable.ic_search));
+                    B.responseImage.setImageDrawable(mActivity.getDrawable(R.drawable.ic_search));
                     B.responseHeaderText.setText(R.string.search);
                     B.responseMessageText.setText(R.string.searchbar_placeholder);
                 } else {
-                    B.responseImage.setImageDrawable(activity.getDrawable(R.drawable.ic_search_no_results));
+                    B.responseImage.setImageDrawable(mActivity.getDrawable(R.drawable.ic_search_no_results));
                     B.responseHeaderText.setText(R.string.no_results);
                     B.responseMessageText.setText(R.string.no_song_match_found);
                 }

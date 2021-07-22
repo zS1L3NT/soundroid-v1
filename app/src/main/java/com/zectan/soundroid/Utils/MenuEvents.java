@@ -27,7 +27,7 @@ public class MenuEvents {
     private final Info mInfo;
     private final Song mSong;
     private final MenuItem mItem;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     private Runnable mRunnable;
 
     public MenuEvents(MainActivity activity, Info info, Song song, MenuItem item) {
@@ -124,11 +124,11 @@ public class MenuEvents {
             } else {
                 mSong.setPlaylistId(info.getId());
                 mSong.setUserId(mActivity.mainVM.userId);
-                db.collection("songs")
+                mDb.collection("songs")
                     .add(mSong.toMap())
                     .addOnSuccessListener(onSuccessListener)
                     .addOnFailureListener(mActivity::handleError);
-                db.collection("playlists")
+                mDb.collection("playlists")
                     .document(info.getId())
                     .update("order", FieldValue.arrayUnion(mSong.getSongId()))
                     .addOnSuccessListener(onSuccessListener)
@@ -258,7 +258,7 @@ public class MenuEvents {
     }
 
     private void addPlaylist() {
-        String id = db.collection("playlists").document().getId();
+        String id = mDb.collection("playlists").document().getId();
         Info info = new Info(
             id,
             "New Playlist",
@@ -269,7 +269,7 @@ public class MenuEvents {
             Utils.getQueries("New Playlist")
         );
 
-        db.collection("playlists")
+        mDb.collection("playlists")
             .document(id)
             .set(info.toMap())
             .addOnSuccessListener(snap -> {

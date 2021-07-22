@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.zectan.soundroid.Adapters.PlaylistsAdapter;
 import com.zectan.soundroid.Classes.Fragment;
 import com.zectan.soundroid.Models.Info;
-import com.zectan.soundroid.R;
 import com.zectan.soundroid.Utils.MenuBuilder;
 import com.zectan.soundroid.databinding.FragmentPlaylistsBinding;
 
@@ -25,14 +24,14 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
     private final PlaylistsAdapter.Callback callback = new PlaylistsAdapter.Callback() {
         @Override
         public void onPlaylistClicked(Info info) {
-            playlistViewVM.playlistId.setValue(info.getId());
-            playlistViewVM.songs.setValue(new ArrayList<>());
-            navController.navigate(PlaylistsFragmentDirections.openPlaylistView());
+            mPlaylistViewVM.playlistId.setValue(info.getId());
+            mPlaylistViewVM.songs.setValue(new ArrayList<>());
+            mNavController.navigate(PlaylistsFragmentDirections.openPlaylistView());
         }
 
         @Override
         public boolean onMenuItemClicked(Info info, MenuItem item) {
-            return activity.handleMenuItemClick(info, null, item, menuItemRunnable(item));
+            return mActivity.handleMenuItemClick(info, null, item, menuItemRunnable(item));
         }
     };
     private PlaylistsAdapter playlistsAdapter;
@@ -43,14 +42,14 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Recycler View
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mActivity);
         playlistsAdapter = new PlaylistsAdapter(callback);
         B.recyclerView.setAdapter(playlistsAdapter);
         B.recyclerView.setLayoutManager(layoutManager);
 
         // Observers
-        playlistsVM.loading.observe(this, B.swipeRefresh::setRefreshing);
-        mainVM.myInfos.observe(this, playlistsAdapter::updateInfos);
+        mPlaylistsVM.loading.observe(this, B.swipeRefresh::setRefreshing);
+        mMainVM.myInfos.observe(this, playlistsAdapter::updateInfos);
 
         B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.swipeRefresh.setOnRefreshListener(this::onReload);
@@ -59,8 +58,8 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
     }
 
     private void onReload() {
-        playlistsAdapter.updateInfos(mainVM.myInfos.getValue());
-        playlistsVM.loading.postValue(false);
+        playlistsAdapter.updateInfos(mMainVM.myInfos.getValue());
+        mPlaylistsVM.loading.postValue(false);
     }
 
     private void onMoreImageClicked(View view) {
@@ -68,17 +67,17 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
         items.addPlaylist();
         items.importPlaylist();
 
-        MenuBuilder.createMenu(view, items, null, (object, item) -> activity.handleMenuItemClick(null, null, item, menuItemRunnable(item)));
+        MenuBuilder.createMenu(view, items, null, (object, item) -> mActivity.handleMenuItemClick(null, null, item, menuItemRunnable(item)));
     }
 
     private Runnable menuItemRunnable(MenuItem item) {
         return () -> {
             switch (item.getItemId()) {
                 case MenuBuilder.ADD_PLAYLIST:
-                    navController.navigate(PlaylistsFragmentDirections.openPlaylistEdit());
+                    mNavController.navigate(PlaylistsFragmentDirections.openPlaylistEdit());
                     break;
                 case MenuBuilder.IMPORT_PLAYLIST:
-                    navController.navigate(PlaylistsFragmentDirections.openPlaylistImport());
+                    mNavController.navigate(PlaylistsFragmentDirections.openPlaylistImport());
                     break;
             }
         };

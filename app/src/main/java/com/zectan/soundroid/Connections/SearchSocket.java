@@ -18,54 +18,54 @@ import io.socket.client.Socket;
 public class SearchSocket {
     private static final String TAG = "(SounDroid) SearchSocket";
     private static final String SocketURL = "http://soundroid.zectan.com/";
-    private final Callback callback;
-    private final Socket socket;
+    private final Callback mCallback;
+    private final Socket mSocket;
 
     public SearchSocket(String query, Callback callback) {
-        this.callback = callback;
+        mCallback = callback;
         IO.Options options = IO.Options.builder().setTimeout(60_000).build();
-        socket = IO.socket(URI.create(SocketURL), options).connect();
+        mSocket = IO.socket(URI.create(SocketURL), options).connect();
 
         Log.d(TAG, "Search: " + query);
-        socket.emit("search", query);
-        socket.on("search_result_" + query, this::onResult);
-        socket.on("search_message_" + query, this::onMessage);
-        socket.on("search_done_" + query, this::onDone);
-        socket.on(Socket.EVENT_CONNECT, this::onConnect);
-        socket.on("error_" + query, this::onError);
-        socket.on(Socket.EVENT_DISCONNECT, this::onDisconnect);
-        socket.on(Socket.EVENT_CONNECT_ERROR, this::onConnectError);
+        mSocket.emit("search", query);
+        mSocket.on("search_result_" + query, this::onResult);
+        mSocket.on("search_message_" + query, this::onMessage);
+        mSocket.on("search_done_" + query, this::onDone);
+        mSocket.on(Socket.EVENT_CONNECT, this::onConnect);
+        mSocket.on("error_" + query, this::onError);
+        mSocket.on(Socket.EVENT_DISCONNECT, this::onDisconnect);
+        mSocket.on(Socket.EVENT_CONNECT_ERROR, this::onConnectError);
     }
 
     private void onResult(Object... args) {
-        if (callback.isInactive()) {
-            socket.close();
+        if (mCallback.isInactive()) {
+            mSocket.close();
             Log.i(TAG, "(SOCKET) <close>");
             return;
         }
 
         try {
             JSONObject object = new JSONObject(args[0].toString());
-            callback.onResult(new SearchResult(object));
+            mCallback.onResult(new SearchResult(object));
         } catch (JSONException e) {
-            callback.onError("Could not parse server response");
+            mCallback.onError("Could not parse server response");
             e.printStackTrace();
         }
     }
 
     private void onMessage(Object... args) {
-        if (callback.isInactive()) {
-            socket.close();
+        if (mCallback.isInactive()) {
+            mSocket.close();
             Log.i(TAG, "(SOCKET) <close>");
             return;
         }
 
-        callback.onMessage(args[0].toString());
+        mCallback.onMessage(args[0].toString());
     }
 
     private void onDone(Object... args) {
-        if (callback.isInactive()) {
-            socket.close();
+        if (mCallback.isInactive()) {
+            mSocket.close();
             Log.i(TAG, "(SOCKET) <close>");
             return;
         }
@@ -77,18 +77,18 @@ public class SearchSocket {
                 JSONObject object = objects.getJSONObject(i);
                 results.add(new SearchResult(object));
             }
-            callback.onDone(results);
-            callback.onMessage("");
+            mCallback.onDone(results);
+            mCallback.onMessage("");
         } catch (JSONException e) {
-            callback.onError("Could not parse server response");
+            mCallback.onError("Could not parse server response");
             e.printStackTrace();
         }
-        socket.close();
+        mSocket.close();
     }
 
     private void onConnect(Object... args) {
-        if (callback.isInactive()) {
-            socket.close();
+        if (mCallback.isInactive()) {
+            mSocket.close();
             Log.i(TAG, "(SOCKET) <close>");
             return;
         }
@@ -96,20 +96,20 @@ public class SearchSocket {
     }
 
     private void onError(Object... args) {
-        if (callback.isInactive()) {
-            socket.close();
+        if (mCallback.isInactive()) {
+            mSocket.close();
             Log.i(TAG, "(SOCKET) <close>");
             return;
         }
         String message = (String) args[0];
         Log.e(TAG, "(SOCKET) Error: " + message);
-        callback.onError(message);
-        callback.onMessage("");
+        mCallback.onError(message);
+        mCallback.onMessage("");
     }
 
     private void onDisconnect(Object... args) {
-        if (callback.isInactive()) {
-            socket.close();
+        if (mCallback.isInactive()) {
+            mSocket.close();
             Log.i(TAG, "(SOCKET) <close>");
             return;
         }
@@ -118,14 +118,14 @@ public class SearchSocket {
     }
 
     private void onConnectError(Object... args) {
-        if (callback.isInactive()) {
-            socket.close();
+        if (mCallback.isInactive()) {
+            mSocket.close();
             Log.i(TAG, "(SOCKET) <close>");
             return;
         }
         Log.e(TAG, "(SOCKET) Connect error");
-        callback.onError("Could not connect to Server");
-        socket.close();
+        mCallback.onError("Could not connect to Server");
+        mSocket.close();
     }
 
     public interface Callback {

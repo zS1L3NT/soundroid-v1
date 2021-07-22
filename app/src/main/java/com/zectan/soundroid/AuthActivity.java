@@ -30,8 +30,8 @@ import com.zectan.soundroid.databinding.ActivityAuthBinding;
 
 public class AuthActivity extends CrashDebugApplication {
     private static final String TAG = "(SounDroid) AuthActivity";
-    private final FirebaseAuth auth = FirebaseAuth.getInstance();
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    private final FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     private ActivityAuthBinding B;
     private GoogleSignInClient mGoogleSignInClient;
     private final ActivityResultLauncher<Intent> signInWithGoogleLauncher = registerForActivityResult(
@@ -78,7 +78,7 @@ public class AuthActivity extends CrashDebugApplication {
 
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        auth
+        mAuth
             .signInWithCredential(credential)
             .addOnCompleteListener(this, task -> {
                 if (task.isSuccessful()) {
@@ -92,9 +92,9 @@ public class AuthActivity extends CrashDebugApplication {
     }
 
     private void addToFirestore() {
-        FirebaseUser firebaseUser = auth.getCurrentUser();
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
         assert firebaseUser != null;
-        DocumentReference userRef = db.collection("users").document(firebaseUser.getUid());
+        DocumentReference userRef = mDb.collection("users").document(firebaseUser.getUid());
 
         userRef.get()
             .addOnSuccessListener(snap -> {

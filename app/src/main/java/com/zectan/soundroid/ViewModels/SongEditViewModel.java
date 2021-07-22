@@ -7,7 +7,6 @@ import com.zectan.soundroid.Models.Song;
 
 public class SongEditViewModel extends ViewModel {
     public final StrictLiveData<Song> song = new StrictLiveData<>(Song.getEmpty());
-    public final StrictLiveData<Integer> navigateNow = new StrictLiveData<>(0);
     public final StrictLiveData<Boolean> saving = new StrictLiveData<>(false);
 
     public SongEditViewModel() {

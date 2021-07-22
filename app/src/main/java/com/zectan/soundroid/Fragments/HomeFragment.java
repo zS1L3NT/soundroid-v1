@@ -34,16 +34,16 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
     private final HomeAdapter.Callback callback = new HomeAdapter.Callback() {
         @Override
         public void onSongClicked(Playlist playlist, String songId) {
-            playingVM.startPlaylist(activity, playlist, songId, mainVM.myUser.getValue().getHighStreamQuality());
+            mPlayingVM.startPlaylist(mActivity, playlist, songId, mMainVM.myUser.getValue().getHighStreamQuality());
 
-            if (mainVM.myUser.getValue().getOpenPlayingScreen()) {
-                navController.navigate(HomeFragmentDirections.openPlaying());
+            if (mMainVM.myUser.getValue().getOpenPlayingScreen()) {
+                mNavController.navigate(HomeFragmentDirections.openPlaying());
             }
         }
 
         @Override
         public boolean onMenuItemClicked(Song song, MenuItem item) {
-            return activity.handleMenuItemClick(null, song, item, () -> navController.navigate(HomeFragmentDirections.openEditSong()));
+            return mActivity.handleMenuItemClick(null, song, item, () -> mNavController.navigate(HomeFragmentDirections.openEditSong()));
         }
     };
 
@@ -53,41 +53,41 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Recycler View
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mActivity);
         HomeAdapter homeAdapter = new HomeAdapter(callback);
         B.recyclerView.setLayoutManager(layoutManager);
         B.recyclerView.setAdapter(homeAdapter);
 
         // Live Observers
-        homeVM.songs.observe(this, homeAdapter::updateSongs);
-        homeVM.loading.observe(this, B.swipeRefresh::setRefreshing);
-        playingVM.currentSong.observe(this, homeAdapter::updateCurrentSong);
+        mHomeVM.songs.observe(this, homeAdapter::updateSongs);
+        mHomeVM.loading.observe(this, B.swipeRefresh::setRefreshing);
+        mPlayingVM.currentSong.observe(this, homeAdapter::updateCurrentSong);
 
-        mainVM.mySongs.observe(this, homeVM.songs::setValue);
+        mMainVM.mySongs.observe(this, mHomeVM.songs::setValue);
         B.searchbar.setOnClickListener(this::onSearchbarClicked);
         B.swipeRefresh.setOnRefreshListener(this::onReload);
         B.settingsImage.setOnClickListener(this::onSettingsClicked);
-        B.parent.setTransitionListener(activity.getTransitionListener());
+        B.parent.setTransitionListener(mActivity.getTransitionListener());
 
         return B.getRoot();
     }
 
     private void onSettingsClicked(View view) {
         NavDirections action = HomeFragmentDirections.openSettings();
-        navController.navigate(action);
+        mNavController.navigate(action);
     }
 
     private void onSearchbarClicked(View view) {
         FragmentNavigator.Extras extras = Utils.makeExtras(B.searchbar, getString(R.string.TRANSITION_searchbar));
         NavDirections action = HomeFragmentDirections.openSearch();
-        navController.navigate(action, extras);
-        searchVM.results.postValue(new ArrayList<>());
+        mNavController.navigate(action, extras);
+        mSearchVM.results.postValue(new ArrayList<>());
     }
 
     private void onReload() {
-        List<Song> songs = mainVM.mySongs.getValue();
-        homeVM.songs.postValue(songs);
-        homeVM.loading.postValue(false);
+        List<Song> songs = mMainVM.mySongs.getValue();
+        mHomeVM.songs.postValue(songs);
+        mHomeVM.loading.postValue(false);
         B.recyclerView.scrollToPosition(0);
     }
 }

@@ -43,10 +43,10 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
         settingsPreference = new SettingsPreference();
 
         // Observers
-        mainVM.myUser.observe(this, this::onMyUserChange);
+        mMainVM.myUser.observe(this, this::onMyUserChange);
         B.logoutButton.setOnClickListener(this::logout);
 
-        activity
+        mActivity
             .getSupportFragmentManager()
             .beginTransaction()
             .replace(R.id.settings_view, settingsPreference)
@@ -59,7 +59,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
         settingsPreference.updatePreferences(user);
         B.usnmText.setText(user.getUsnm());
         Glide
-            .with(activity)
+            .with(mActivity)
             .load(user.getProfilePicture())
             .placeholder(R.drawable.playing_cover_loading)
             .error(R.drawable.playing_cover_failed)
@@ -69,21 +69,21 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
     }
 
     private void logout(View view) {
-        new MaterialAlertDialogBuilder(activity)
+        new MaterialAlertDialogBuilder(mActivity)
             .setTitle("Are you sure?")
             .setMessage("All downloaded songs will be deleted")
             .setNegativeButton("Cancel", (dialog, which) -> {
             })
             .setPositiveButton("Sign Out", (dialog, which) -> {
-                List<Song> songs = activity.mainVM.mySongs.getValue();
+                List<Song> songs = mActivity.mainVM.mySongs.getValue();
                 for (Song song : songs) {
-                    song.deleteLocally(activity);
+                    song.deleteLocally(mActivity);
                 }
-                playingVM.clearQueue(activity);
+                mPlayingVM.clearQueue(mActivity);
                 FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(activity, AuthActivity.class);
+                Intent intent = new Intent(mActivity, AuthActivity.class);
                 startActivity(intent);
-                activity.finish();
+                mActivity.finish();
             })
             .show();
     }

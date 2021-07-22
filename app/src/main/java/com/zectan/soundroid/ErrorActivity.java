@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class ErrorActivity extends AppCompatActivity {
     private static final String TAG = "(SounDroid) ErrorActivity";
-    public final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    public final FirebaseFirestore mDb = FirebaseFirestore.getInstance();
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -84,7 +84,7 @@ public class ErrorActivity extends AppCompatActivity {
                 error.put("class", class_);
                 error.put("stack", stack);
 
-                db.collection("users")
+                mDb.collection("users")
                     .document(userId)
                     .collection("errors")
                     .add(error)

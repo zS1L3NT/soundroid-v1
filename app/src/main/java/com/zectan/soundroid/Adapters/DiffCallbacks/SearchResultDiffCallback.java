@@ -8,40 +8,39 @@ import com.zectan.soundroid.Models.Song;
 import java.util.List;
 
 public class SearchResultDiffCallback extends DiffUtil.Callback {
-
-    private final List<SearchResult> oldResults, newResults;
-    private final Song currentSong, previousSong;
+    private final List<SearchResult> mOldResults, mNewResults;
+    private final Song mCurrentSong, mPreviousSong;
 
     public SearchResultDiffCallback(List<SearchResult> oldResults, List<SearchResult> newResults, Song currentSong, Song previousSong) {
-        this.oldResults = oldResults;
-        this.newResults = newResults;
-        this.currentSong = currentSong;
-        this.previousSong = previousSong;
+        mOldResults = oldResults;
+        mNewResults = newResults;
+        mCurrentSong = currentSong;
+        mPreviousSong = previousSong;
     }
 
     @Override
     public int getOldListSize() {
-        return oldResults.size();
+        return mOldResults.size();
     }
 
     @Override
     public int getNewListSize() {
-        return newResults.size();
+        return mNewResults.size();
     }
 
     @Override
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        SearchResult oldResult = oldResults.get(oldItemPosition);
-        SearchResult newResult = newResults.get(newItemPosition);
+        SearchResult oldResult = mOldResults.get(oldItemPosition);
+        SearchResult newResult = mNewResults.get(newItemPosition);
         return oldResult.getId().equals(newResult.getId());
     }
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        SearchResult oldResult = oldResults.get(oldItemPosition);
-        SearchResult newResult = newResults.get(newItemPosition);
+        SearchResult oldResult = mOldResults.get(oldItemPosition);
+        SearchResult newResult = mNewResults.get(newItemPosition);
         return oldResult.equals(newResult)
-            && (currentSong == null || !currentSong.getSongId().equals(oldResult.getId()))
-            && (previousSong == null || !previousSong.getSongId().equals(oldResult.getId()));
+            && (mCurrentSong == null || !mCurrentSong.getSongId().equals(oldResult.getId()))
+            && (mPreviousSong == null || !mPreviousSong.getSongId().equals(oldResult.getId()));
     }
 }

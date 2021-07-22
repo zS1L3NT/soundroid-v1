@@ -52,7 +52,7 @@ import java.util.Map;
 public class MainActivity extends CrashDebugApplication {
     private static final String TAG = "(SounDroid) MainActivity";
     public static final String DOWNLOAD_CHANNEL_ID = "Downloads";
-    public final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    public final FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     public ActivityMainBinding B;
     public NavController navController;
     public NotificationManager notificationManager;
@@ -173,7 +173,7 @@ public class MainActivity extends CrashDebugApplication {
         error.put("message", e.getMessage());
         error.put("class", e.getClass().getName());
 
-        db.collection("users")
+        mDb.collection("users")
             .document(mainVM.userId)
             .collection("errors")
             .add(error)

@@ -7,35 +7,34 @@ import com.zectan.soundroid.Models.Info;
 import java.util.List;
 
 public class InfoDiffCallback extends DiffUtil.Callback {
-
-    private final List<Info> oldInfos, newInfos;
+    private final List<Info> mOldInfos, mNewInfos;
 
     public InfoDiffCallback(List<Info> oldInfos, List<Info> newInfos) {
-        this.oldInfos = oldInfos;
-        this.newInfos = newInfos;
+        mOldInfos = oldInfos;
+        mNewInfos = newInfos;
     }
 
     @Override
     public int getOldListSize() {
-        return oldInfos.size();
+        return mOldInfos.size();
     }
 
     @Override
     public int getNewListSize() {
-        return newInfos.size();
+        return mNewInfos.size();
     }
 
     @Override
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        Info oldInfo = oldInfos.get(oldItemPosition);
-        Info newInfo = newInfos.get(newItemPosition);
+        Info oldInfo = mOldInfos.get(oldItemPosition);
+        Info newInfo = mNewInfos.get(newItemPosition);
         return oldInfo.getId().equals(newInfo.getId());
     }
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        Info oldInfo = oldInfos.get(oldItemPosition);
-        Info newInfo = newInfos.get(newItemPosition);
+        Info oldInfo = mOldInfos.get(oldItemPosition);
+        Info newInfo = mNewInfos.get(newItemPosition);
         return oldInfo.equals(newInfo);
     }
 }

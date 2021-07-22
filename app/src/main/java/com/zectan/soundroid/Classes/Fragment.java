@@ -26,19 +26,19 @@ import com.zectan.soundroid.ViewModels.SongEditViewModel;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragment {
-    protected NavController navController;
-    protected MainActivity activity;
+    protected NavController mNavController;
+    protected MainActivity mActivity;
     protected T B;
 
-    protected MainViewModel mainVM;
-    protected HomeViewModel homeVM;
-    protected PlayingViewModel playingVM;
-    protected PlaylistEditViewModel playlistEditVM;
-    protected PlaylistsViewModel playlistsVM;
-    protected PlaylistViewViewModel playlistViewVM;
-    protected SearchViewModel searchVM;
-    protected SongEditViewModel songEditVM;
-    protected PlaylistImportViewModel playlistImportVM;
+    protected MainViewModel mMainVM;
+    protected HomeViewModel mHomeVM;
+    protected PlayingViewModel mPlayingVM;
+    protected PlaylistEditViewModel mPlaylistEditVM;
+    protected PlaylistsViewModel mPlaylistsVM;
+    protected PlaylistViewViewModel mPlaylistViewVM;
+    protected SearchViewModel mSearchVM;
+    protected SongEditViewModel mSongEditVM;
+    protected PlaylistImportViewModel mPlaylistImportVM;
 
     public Fragment() {
     }
@@ -47,21 +47,21 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
     @org.jetbrains.annotations.Nullable
     @Override
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        activity = (MainActivity) getActivity();
-        assert activity != null;
-        navController = activity.navController;
+        mActivity = (MainActivity) getActivity();
+        assert mActivity != null;
+        mNavController = mActivity.navController;
 
-        mainVM = new ViewModelProvider(activity).get(MainViewModel.class);
-        homeVM = new ViewModelProvider(activity).get(HomeViewModel.class);
-        playingVM = new ViewModelProvider(activity).get(PlayingViewModel.class);
-        playlistEditVM = new ViewModelProvider(activity).get(PlaylistEditViewModel.class);
-        playlistsVM = new ViewModelProvider(activity).get(PlaylistsViewModel.class);
-        playlistViewVM = new ViewModelProvider(activity).get(PlaylistViewViewModel.class);
-        searchVM = new ViewModelProvider(activity).get(SearchViewModel.class);
-        songEditVM = new ViewModelProvider(activity).get(SongEditViewModel.class);
-        playlistImportVM = new ViewModelProvider(activity).get(PlaylistImportViewModel.class);
-        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        activity.hideKeyboard(B.getRoot());
+        mMainVM = new ViewModelProvider(mActivity).get(MainViewModel.class);
+        mHomeVM = new ViewModelProvider(mActivity).get(HomeViewModel.class);
+        mPlayingVM = new ViewModelProvider(mActivity).get(PlayingViewModel.class);
+        mPlaylistEditVM = new ViewModelProvider(mActivity).get(PlaylistEditViewModel.class);
+        mPlaylistsVM = new ViewModelProvider(mActivity).get(PlaylistsViewModel.class);
+        mPlaylistViewVM = new ViewModelProvider(mActivity).get(PlaylistViewViewModel.class);
+        mSearchVM = new ViewModelProvider(mActivity).get(SearchViewModel.class);
+        mSongEditVM = new ViewModelProvider(mActivity).get(SongEditViewModel.class);
+        mPlaylistImportVM = new ViewModelProvider(mActivity).get(PlaylistImportViewModel.class);
+        mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        mActivity.hideKeyboard(B.getRoot());
 
         return B.getRoot();
     }

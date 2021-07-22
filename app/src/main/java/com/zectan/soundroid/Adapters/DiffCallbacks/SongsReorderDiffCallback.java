@@ -7,35 +7,34 @@ import com.zectan.soundroid.Models.Song;
 import java.util.List;
 
 public class SongsReorderDiffCallback extends DiffUtil.Callback {
-
-    private final List<Song> oldSongs, newSongs;
+    private final List<Song> mOldSongs, mNewSongs;
 
     public SongsReorderDiffCallback(List<Song> oldSongs, List<Song> newSongs) {
-        this.oldSongs = oldSongs;
-        this.newSongs = newSongs;
+        mOldSongs = oldSongs;
+        mNewSongs = newSongs;
     }
 
     @Override
     public int getOldListSize() {
-        return oldSongs.size();
+        return mOldSongs.size();
     }
 
     @Override
     public int getNewListSize() {
-        return newSongs.size();
+        return mNewSongs.size();
     }
 
     @Override
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        Song oldSong = oldSongs.get(oldItemPosition);
-        Song newSong = newSongs.get(newItemPosition);
+        Song oldSong = mOldSongs.get(oldItemPosition);
+        Song newSong = mNewSongs.get(newItemPosition);
         return oldSong.getSongId().equals(newSong.getSongId());
     }
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        Song oldSong = oldSongs.get(oldItemPosition);
-        Song newSong = newSongs.get(newItemPosition);
+        Song oldSong = mOldSongs.get(oldItemPosition);
+        Song newSong = mNewSongs.get(newItemPosition);
         return oldSong.equals(newSong);
     }
 }

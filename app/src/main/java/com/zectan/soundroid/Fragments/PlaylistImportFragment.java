@@ -26,8 +26,8 @@ public class PlaylistImportFragment extends Fragment<FragmentPlaylistImportBindi
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Observers
-        playlistImportVM.text.observe(this, B.urlTextInput::setText);
-        playlistImportVM.loading.observe(this, this::onLoadingChange);
+        mPlaylistImportVM.text.observe(this, B.urlTextInput::setText);
+        mPlaylistImportVM.loading.observe(this, this::onLoadingChange);
 
         B.importButton.setOnClickListener(this::onImportButtonClicked);
 
@@ -35,30 +35,30 @@ public class PlaylistImportFragment extends Fragment<FragmentPlaylistImportBindi
     }
 
     private void onImportButtonClicked(View view) {
-        playlistImportVM.loading.setValue(true);
+        mPlaylistImportVM.loading.setValue(true);
         Editable editable = B.urlTextInput.getText();
         if (editable == null) return;
-        activity.hideKeyboard(B.getRoot());
+        mActivity.hideKeyboard(B.getRoot());
 
         String url = editable.toString();
         try {
             new URL(url);
         } catch (MalformedURLException e) {
-            activity.snack("Invalid URL");
+            mActivity.snack("Invalid URL");
         }
 
-        new ImportPlaylistRequest(url, mainVM.userId, new ImportPlaylistRequest.Callback() {
+        new ImportPlaylistRequest(url, mMainVM.userId, new ImportPlaylistRequest.Callback() {
             @Override
             public void onComplete() {
-                activity.snack("Adding songs to playlist...");
-                playlistImportVM.text.postValue("");
-                playlistImportVM.loading.postValue(false);
+                mActivity.snack("Adding songs to playlist...");
+                mPlaylistImportVM.text.postValue("");
+                mPlaylistImportVM.loading.postValue(false);
             }
 
             @Override
             public void onError(String message) {
-                activity.handleError(new Exception(message));
-                playlistImportVM.loading.postValue(false);
+                mActivity.handleError(new Exception(message));
+                mPlaylistImportVM.loading.postValue(false);
             }
         });
     }

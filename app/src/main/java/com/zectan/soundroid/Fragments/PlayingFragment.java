@@ -43,17 +43,17 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     private final PlayingAdapter.Callback callback = new PlayingAdapter.Callback() {
         @Override
         public void onSongClicked(Song song) {
-            playingVM.changeSong(song.getSongId());
+            mPlayingVM.changeSong(song.getSongId());
         }
 
         @Override
         public void onMove(int oldPosition, int newPosition) {
-            playingVM.onMoveSong(oldPosition + 1, newPosition + 1);
+            mPlayingVM.onMoveSong(oldPosition + 1, newPosition + 1);
         }
 
         @Override
         public void onRemove(String songId) {
-            playingVM.onRemoveSong(songId);
+            mPlayingVM.onRemoveSong(songId);
         }
 
         @Override
@@ -69,7 +69,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
                 mFinalTouch = progress;
 
                 double percent = (double) progress / 1000;
-                double duration = (double) playingVM.duration.getValue();
+                double duration = (double) mPlayingVM.duration.getValue();
                 int selectedTime = (int) (percent * duration);
                 B.timeText.setText(Utils.formatDuration(selectedTime));
             }
@@ -77,13 +77,13 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
 
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
-            playingVM.touchingSeekbar = true;
+            mPlayingVM.touchingSeekbar = true;
         }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-            playingVM.seekTo(mFinalTouch);
-            playingVM.touchingSeekbar = false;
+            mPlayingVM.seekTo(mFinalTouch);
+            mPlayingVM.touchingSeekbar = false;
         }
     };
     private PlayingAdapter mPlayingAdapter;
@@ -95,10 +95,10 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         B = FragmentPlayingBinding.inflate(inflater, container, false);
         super.onCreateView(inflater, container, savedInstanceState);
-        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
         // Recycler Views
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(activity);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mActivity);
         mPlayingAdapter = new PlayingAdapter(callback);
         mItemTouchHelper = new ItemTouchHelper(new PlayingAdapter.PlayingItemTouchHelper(mPlayingAdapter));
         B.recyclerView.setAdapter(mPlayingAdapter);
@@ -106,37 +106,37 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         mItemTouchHelper.attachToRecyclerView(B.recyclerView);
 
         // Live Observers
-        playingVM.queue.observe(this, mPlayingAdapter::updateSongs);
-        playingVM.currentSong.observe(this, this::onCurrentSongChange);
-        playingVM.time.observe(this, this::onTimeChange);
-        playingVM.buffered.observe(this, B.seekbar::setSecondaryProgress);
-        playingVM.progress.observe(this, B.seekbar::setProgress);
-        playingVM.duration.observe(this, this::onDurationChange);
-        playingVM.isBuffering.observe(this, this::onIsBufferingChange);
-        playingVM.isPlaying.observe(this, this::onIsPlayingChange);
-        playingVM.isShuffling.observe(this, this::onIsShufflingChange);
-        playingVM.isLooping.observe(this, this::onIsLoopingChange);
-        playingVM.error.observe(this, this::onErrorChange);
+        mPlayingVM.queue.observe(this, mPlayingAdapter::updateSongs);
+        mPlayingVM.currentSong.observe(this, this::onCurrentSongChange);
+        mPlayingVM.time.observe(this, this::onTimeChange);
+        mPlayingVM.buffered.observe(this, B.seekbar::setSecondaryProgress);
+        mPlayingVM.progress.observe(this, B.seekbar::setProgress);
+        mPlayingVM.duration.observe(this, this::onDurationChange);
+        mPlayingVM.isBuffering.observe(this, this::onIsBufferingChange);
+        mPlayingVM.isPlaying.observe(this, this::onIsPlayingChange);
+        mPlayingVM.isShuffling.observe(this, this::onIsShufflingChange);
+        mPlayingVM.isLooping.observe(this, this::onIsLoopingChange);
+        mPlayingVM.error.observe(this, this::onErrorChange);
 
-        B.backNavigateImage.setOnClickListener(__ -> activity.onBackPressed());
+        B.backNavigateImage.setOnClickListener(__ -> mActivity.onBackPressed());
         B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.playPauseImage.setOnClickListener(this::playPauseSong);
         B.playPauseImage.setOnTouchListener(Animations::animationSmallSqueeze);
         B.playPauseMiniImage.setOnClickListener(this::playPauseSong);
         B.playPauseMiniImage.setOnTouchListener(Animations::animationMediumSqueeze);
-        B.shuffleImage.setOnClickListener(__ -> playingVM.toggleShuffle());
+        B.shuffleImage.setOnClickListener(__ -> mPlayingVM.toggleShuffle());
         B.shuffleImage.setOnTouchListener(Animations::animationMediumSqueeze);
-        B.backImage.setOnClickListener(__ -> playingVM.playPreviousSong());
+        B.backImage.setOnClickListener(__ -> mPlayingVM.playPreviousSong());
         B.backImage.setOnTouchListener(Animations::animationMediumSqueeze);
-        B.nextImage.setOnClickListener(__ -> playingVM.playNextSong());
+        B.nextImage.setOnClickListener(__ -> mPlayingVM.playNextSong());
         B.nextImage.setOnTouchListener(Animations::animationMediumSqueeze);
-        B.loopImage.setOnClickListener(__ -> playingVM.toggleLoop());
+        B.loopImage.setOnClickListener(__ -> mPlayingVM.toggleLoop());
         B.loopImage.setOnTouchListener(Animations::animationMediumSqueeze);
         B.seekbar.setOnSeekBarChangeListener(onSeekBarChangeListener);
-        B.parent.setTransitionListener(activity.getTransitionListener());
+        B.parent.setTransitionListener(mActivity.getTransitionListener());
 
-        B.parent.setBackground(playingVM.background.getValue());
-        playingVM.error.setValue("");
+        B.parent.setBackground(mPlayingVM.background.getValue());
+        mPlayingVM.error.setValue("");
         mFinalTouch = 0;
 
         return B.getRoot();
@@ -147,26 +147,26 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         items.addToPlaylist();
         items.openQueue();
         items.clearQueue();
-        MenuBuilder.createMenu(view, items, playingVM.currentSong.getValue(), (song, item) -> activity.handleMenuItemClick(null, song, item, B.parent::transitionToEnd));
+        MenuBuilder.createMenu(view, items, mPlayingVM.currentSong.getValue(), (song, item) -> mActivity.handleMenuItemClick(null, song, item, B.parent::transitionToEnd));
     }
 
     public void playPauseSong(View v) {
-        if (playingVM.isBuffering.getValue()) return;
-        if (playingVM.isPlaying.getValue()) {
-            playingVM.pause();
+        if (mPlayingVM.isBuffering.getValue()) return;
+        if (mPlayingVM.isPlaying.getValue()) {
+            mPlayingVM.pause();
         } else {
-            playingVM.play();
+            mPlayingVM.play();
         }
     }
 
     private void onCurrentSongChange(Song song) {
         String colorHex;
-        playingVM.onCurrentSongChanged(Looper.getMainLooper(), song);
+        mPlayingVM.onCurrentSongChanged(Looper.getMainLooper(), song);
 
         if (song == null) {
             mPlayingAdapter.updateSongs(new ArrayList<>());
             B.playlistNameText.setText("-");
-            B.coverImage.setImageDrawable(activity.getDrawable(R.drawable.playing_cover_loading));
+            B.coverImage.setImageDrawable(mActivity.getDrawable(R.drawable.playing_cover_loading));
             B.titleText.setText("-");
             B.descriptionText.setText("-");
             colorHex = "#7b828b";
@@ -176,11 +176,11 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             String cover = song.getCover();
             colorHex = song.getColorHex();
 
-            B.playlistNameText.setText(playingVM.playlist.getValue().getInfo().getName());
+            B.playlistNameText.setText(mPlayingVM.playlist.getValue().getInfo().getName());
             B.titleText.setText(title);
             B.descriptionText.setText(artiste);
             Glide
-                .with(activity)
+                .with(mActivity)
                 .load(cover)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .error(R.drawable.playing_cover_failed)
@@ -188,14 +188,14 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
                 .into(B.coverImage);
         }
 
-        GradientDrawable oldGD = playingVM.background.getValue();
-        int[] colors = {Color.parseColor(colorHex), activity.getAttributeResource(R.attr.colorSecondary)};
+        GradientDrawable oldGD = mPlayingVM.background.getValue();
+        int[] colors = {Color.parseColor(colorHex), mActivity.getAttributeResource(R.attr.colorSecondary)};
         GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
 
         Drawable[] layers = {oldGD, newGD};
         TransitionDrawable transition = new TransitionDrawable(layers);
         B.parent.setBackground(transition);
-        playingVM.background.setValue(newGD);
+        mPlayingVM.background.setValue(newGD);
         transition.startTransition(500);
     }
 
@@ -209,9 +209,9 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
 
     private void onIsPlayingChange(boolean isPlaying) {
         B.playPauseImage.setImageDrawable(
-            activity.getDrawable(isPlaying ? R.drawable.controls_pause_filled : R.drawable.controls_play_filled));
+            mActivity.getDrawable(isPlaying ? R.drawable.controls_pause_filled : R.drawable.controls_play_filled));
         B.playPauseMiniImage
-            .setImageDrawable(activity.getDrawable(isPlaying ? R.drawable.controls_pause : R.drawable.controls_play));
+            .setImageDrawable(mActivity.getDrawable(isPlaying ? R.drawable.controls_pause : R.drawable.controls_play));
     }
 
     private void onIsBufferingChange(boolean loading) {
@@ -221,14 +221,14 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
 
     private void onIsShufflingChange(boolean isShuffling) {
         B.shuffleImage.setColorFilter(
-            ContextCompat.getColor(activity,
+            ContextCompat.getColor(mActivity,
                 isShuffling ? R.color.white : R.color.playing_inactive),
             android.graphics.PorterDuff.Mode.MULTIPLY);
     }
 
     private void onIsLoopingChange(boolean isLooping) {
         B.loopImage.setColorFilter(
-            ContextCompat.getColor(activity,
+            ContextCompat.getColor(mActivity,
                 isLooping ? R.color.white : R.color.playing_inactive),
             android.graphics.PorterDuff.Mode.MULTIPLY);
     }
@@ -237,7 +237,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         if (!error.equals("")) {
             B.errorText.setText(error);
             ValueAnimator darkenAnimation = ValueAnimator
-                .ofArgb(activity.getColor(R.color.white), activity.getColor(R.color.playing_inactive))
+                .ofArgb(mActivity.getColor(R.color.white), mActivity.getColor(R.color.playing_inactive))
                 .setDuration(1000);
             darkenAnimation.addUpdateListener(animation -> B.coverImage.setColorFilter(
                 (int) animation.getAnimatedValue(),
@@ -246,8 +246,8 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             B.errorText.animate().alpha(1).setDuration(500).setStartDelay(500).start();
             B.retryText.animate().alpha(1).setDuration(500).setStartDelay(500).start();
             new Handler().postDelayed(() -> B.coverImage.setOnClickListener(__ -> {
-                playingVM.retry();
-                playingVM.error.setValue("");
+                mPlayingVM.retry();
+                mPlayingVM.error.setValue("");
             }), 1000);
         } else {
             B.coverImage.setOnClickListener(__ -> {

@@ -39,9 +39,9 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
             if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
                 newFilePath = result.getData().getData();
                 try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), newFilePath);
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(mActivity.getContentResolver(), newFilePath);
                     Glide
-                        .with(activity)
+                        .with(mActivity)
                         .load(bitmap)
                         .transition(new DrawableTransitionOptions().crossFade())
                         .centerCrop()
@@ -64,18 +64,18 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Observers
-        playlistEditVM.navigateNow.observe(this, this::onNavigateNowChange);
-        playlistEditVM.saving.observe(this, this::onSavingChange);
+        mPlaylistEditVM.navigateNow.observe(this, this::onNavigateNowChange);
+        mPlaylistEditVM.saving.observe(this, this::onSavingChange);
 
-        B.backImage.setOnClickListener(__ -> navController.navigateUp());
+        B.backImage.setOnClickListener(__ -> mNavController.navigateUp());
         B.saveImage.setOnClickListener(this::onSaveClicked);
         B.coverImage.setOnClickListener(this::onCoverClicked);
 
-        Song song = songEditVM.song.getValue();
+        Song song = mSongEditVM.song.getValue();
         B.titleTextInput.setText(song.getTitle());
         B.artisteTextInput.setText(song.getArtiste());
         Glide
-            .with(activity)
+            .with(mActivity)
             .load(song.getCover())
             .placeholder(R.drawable.playing_cover_loading)
             .error(R.drawable.playing_cover_failed)
@@ -89,7 +89,7 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
     @Override
     public void onStop() {
         super.onStop();
-        activity.hideKeyboard(requireView());
+        mActivity.hideKeyboard(requireView());
     }
 
     private void onCoverClicked(View view) {
@@ -100,8 +100,8 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
     }
 
     private void onSaveClicked(View view) {
-        playlistEditVM.saving.setValue(true);
-        Song song = songEditVM.song.getValue();
+        mPlaylistEditVM.saving.setValue(true);
+        Song song = mSongEditVM.song.getValue();
 
         String newTitle;
         if (B.titleTextInput.getText() == null) {
@@ -137,12 +137,12 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
                         sendColorHexRequest(newSong);
                     })
                     .addOnFailureListener(error -> {
-                        playlistEditVM.saving.postValue(false);
-                        mainVM.error.postValue(error);
+                        mPlaylistEditVM.saving.postValue(false);
+                        mMainVM.error.postValue(error);
                     }))
                 .addOnFailureListener(error -> {
-                    playlistEditVM.saving.postValue(false);
-                    mainVM.error.postValue(error);
+                    mPlaylistEditVM.saving.postValue(false);
+                    mMainVM.error.postValue(error);
                 });
         } else {
             sendColorHexRequest(newSong);
@@ -153,14 +153,14 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
         new SongEditRequest(song, new SongEditRequest.Callback() {
             @Override
             public void onComplete() {
-                playlistEditVM.navigateNow.postValue(1);
-                playlistEditVM.saving.postValue(false);
+                mPlaylistEditVM.navigateNow.postValue(1);
+                mPlaylistEditVM.saving.postValue(false);
             }
 
             @Override
             public void onError(String message) {
-                mainVM.error.postValue(new Exception(message));
-                playlistEditVM.saving.postValue(false);
+                mMainVM.error.postValue(new Exception(message));
+                mPlaylistEditVM.saving.postValue(false);
             }
         });
     }
@@ -178,8 +178,8 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
 
     private void onNavigateNowChange(Integer i) {
         if (i == 0) return;
-        playlistEditVM.navigateNow.postValue(0);
-        activity.onBackPressed();
+        mPlaylistEditVM.navigateNow.postValue(0);
+        mActivity.onBackPressed();
     }
 
 }
