@@ -61,6 +61,8 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
         mSearchVM = new ViewModelProvider(mActivity).get(SearchViewModel.class);
         mSongEditVM = new ViewModelProvider(mActivity).get(SongEditViewModel.class);
         mPlaylistImportVM = new ViewModelProvider(mActivity).get(PlaylistImportViewModel.class);
+
+        mActivity.updateNavigator(1);
         mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         mActivity.getWindow().setStatusBarColor(mActivity.getAttributeResource(R.attr.statusBarBackground));
         mActivity.hideKeyboard(B.getRoot());

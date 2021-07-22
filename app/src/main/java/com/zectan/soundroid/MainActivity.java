@@ -146,6 +146,12 @@ public class MainActivity extends CrashDebugApplication {
         stopService(new Intent(this, DownloadService.class));
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        updateNavigator(1);
+    }
+
     public void showKeyboard() {
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
