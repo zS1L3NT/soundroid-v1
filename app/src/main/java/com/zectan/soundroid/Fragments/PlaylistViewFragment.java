@@ -145,6 +145,8 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
     }
 
     private void onInfoChange(Info info) {
+        mActivity.getWindow().setStatusBarColor(Color.parseColor(info.getColorHex()));
+        B.toolbarBackground.setBackgroundColor(Color.parseColor(info.getColorHex()));
         B.nameText.setText(info.getName());
         Glide
             .with(mActivity)

@@ -13,6 +13,7 @@ import androidx.navigation.NavController;
 import androidx.viewbinding.ViewBinding;
 
 import com.zectan.soundroid.MainActivity;
+import com.zectan.soundroid.R;
 import com.zectan.soundroid.ViewModels.HomeViewModel;
 import com.zectan.soundroid.ViewModels.MainViewModel;
 import com.zectan.soundroid.ViewModels.PlayingViewModel;
@@ -61,6 +62,7 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
         mSongEditVM = new ViewModelProvider(mActivity).get(SongEditViewModel.class);
         mPlaylistImportVM = new ViewModelProvider(mActivity).get(PlaylistImportViewModel.class);
         mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        mActivity.getWindow().setStatusBarColor(mActivity.getAttributeResource(R.attr.statusBarBackground));
         mActivity.hideKeyboard(B.getRoot());
 
         return B.getRoot();
