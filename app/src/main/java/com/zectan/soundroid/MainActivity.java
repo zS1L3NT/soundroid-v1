@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -153,6 +154,11 @@ public class MainActivity extends CrashDebugApplication {
         imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
     }
 
+    public void updateNavigator(float alpha) {
+        B.bottomNavigator.setVisibility(alpha == 0 ? View.GONE : View.VISIBLE);
+        B.bottomNavigator.setAlpha(alpha);
+    }
+
     public void handleError(Exception e) {
         String message = e.getMessage() != null ? e.getMessage() : "Unknown error occurred";
         snack(message);
@@ -197,6 +203,29 @@ public class MainActivity extends CrashDebugApplication {
             .setAction(R.string.done, __ -> {
             })
             .show();
+    }
+
+    public MotionLayout.TransitionListener getTransitionListener() {
+        return new MotionLayout.TransitionListener() {
+            @Override
+            public void onTransitionStarted(MotionLayout motionLayout, int i, int i1) {
+                updateNavigator(1f - motionLayout.getProgress());
+            }
+
+            @Override
+            public void onTransitionChange(MotionLayout motionLayout, int i, int i1, float v) {
+                updateNavigator(1f - v);
+            }
+
+            @Override
+            public void onTransitionCompleted(MotionLayout motionLayout, int i) {
+                updateNavigator(1f - motionLayout.getProgress());
+            }
+
+            @Override
+            public void onTransitionTrigger(MotionLayout motionLayout, int i, boolean b, float v) {
+            }
+        };
     }
 
     public void getDownloadBinder(DownloadServiceCallback callback) {

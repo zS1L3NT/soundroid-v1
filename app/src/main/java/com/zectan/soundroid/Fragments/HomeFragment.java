@@ -67,6 +67,7 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
         B.searchbar.setOnClickListener(this::onSearchbarClicked);
         B.swipeRefresh.setOnRefreshListener(this::onReload);
         B.settingsImage.setOnClickListener(this::onSettingsClicked);
+        B.parent.setTransitionListener(activity.getTransitionListener());
 
         return B.getRoot();
     }

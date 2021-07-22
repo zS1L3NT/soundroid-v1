@@ -79,6 +79,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         B.backImage.setOnClickListener(__ -> navController.navigateUp());
         B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.swipeRefresh.setOnRefreshListener(this::onReload);
+        B.parent.setTransitionListener(activity.getTransitionListener());
 
         onReload();
 

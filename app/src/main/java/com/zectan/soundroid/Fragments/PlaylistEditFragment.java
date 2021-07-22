@@ -95,6 +95,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         B.backImage.setOnClickListener(__ -> navController.navigateUp());
         B.saveImage.setOnClickListener(this::onSaveClicked);
         B.coverImage.setOnClickListener(this::onCoverClicked);
+        B.parent.setTransitionListener(activity.getTransitionListener());
 
         Info info = mainVM.getInfoFromPlaylist(playlistEditVM.playlistId.getValue());
         List<Song> songs = mainVM.getSongsFromPlaylist(playlistEditVM.playlistId.getValue());

@@ -133,6 +133,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         B.loopImage.setOnClickListener(__ -> playingVM.toggleLoop());
         B.loopImage.setOnTouchListener(Animations::animationMediumSqueeze);
         B.seekbar.setOnSeekBarChangeListener(onSeekBarChangeListener);
+        B.parent.setTransitionListener(activity.getTransitionListener());
 
         B.parent.setBackground(playingVM.background.getValue());
         playingVM.error.setValue("");
