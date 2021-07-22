@@ -72,6 +72,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         B = FragmentSearchBinding.inflate(inflater, container, false);
         super.onCreateView(inflater, container, savedInstanceState);
+        mActivity.updateNavigator(0);
 
         // Recycler View
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mActivity);
