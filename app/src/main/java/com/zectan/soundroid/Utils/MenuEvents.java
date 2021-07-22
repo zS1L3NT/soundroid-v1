@@ -186,11 +186,20 @@ public class MenuEvents {
     }
 
     private void clearDownloads() {
-        for (Song song : mActivity.mainVM.getSongsFromPlaylist(mInfo.getId())) {
-            song.deleteIfNotUsed(mActivity, mActivity.mainVM.mySongs.getValue());
-        }
+        new MaterialAlertDialogBuilder(mActivity)
+            .setTitle("Delete Downloads?")
+            .setMessage("This will delete locally downloaded songs from the playlist!")
+            .setNegativeButton("Cancel", (dialog, which) -> {
+            })
+            .setPositiveButton("Delete", (dialog, which) -> {
+                for (Song song : mActivity.mainVM.getSongsFromPlaylist(mInfo.getId())) {
+                    song.deleteIfNotUsed(mActivity, mActivity.mainVM.mySongs.getValue());
+                }
 
-        mActivity.snack("Songs deleted");
+                mActivity.snack("Songs deleted");
+            })
+            .show();
+
     }
 
     private void removeDownload() {
@@ -229,17 +238,23 @@ public class MenuEvents {
     }
 
     private void deletePlaylist() {
-        new DeletePlaylistRequest(mInfo.getId(), new DeletePlaylistRequest.Callback() {
-            @Override
-            public void onComplete() {
-                mActivity.snack("Playlist deleted");
-            }
+        new MaterialAlertDialogBuilder(mActivity)
+            .setTitle("Delete Playlist?")
+            .setMessage("This will delete the entire playlists at once!")
+            .setNegativeButton("Cancel", (dialog, which) -> {
+            })
+            .setPositiveButton("Delete", (dialog, which) -> new DeletePlaylistRequest(mInfo.getId(), new DeletePlaylistRequest.Callback() {
+                @Override
+                public void onComplete() {
+                    mActivity.snack("Playlist deleted");
+                }
 
-            @Override
-            public void onError(String message) {
-                mActivity.handleError(new Exception(message));
-            }
-        });
+                @Override
+                public void onError(String message) {
+                    mActivity.handleError(new Exception(message));
+                }
+            }))
+            .show();
     }
 
     private void addPlaylist() {
