@@ -157,8 +157,8 @@ public class DownloadService extends Service {
 
             @Override
             public void showDownloadProgress(int attemptIndex, int progress) {
-                String string = String.format("Progress: %s%%", progress) +
-                    String.format("Attempt: %s/%s\n", attemptIndex, DownloadProcess.RETRY_COUNT);
+                String string = String.format("Progress: %s%%\n", progress) +
+                    String.format("Attempt: %s/%s", attemptIndex, DownloadProcess.RETRY_COUNT);
 
                 builder
                     .setContentText(progress + "%")
