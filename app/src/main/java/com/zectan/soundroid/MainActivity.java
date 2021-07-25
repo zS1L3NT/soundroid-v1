@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -105,13 +106,15 @@ public class MainActivity extends CrashDebugApplication {
         playingVM.setPlayer(this, player);
 
         // Notification Channels
-        NotificationChannel downloadChannel = new NotificationChannel(
-            MainActivity.DOWNLOAD_CHANNEL_ID,
-            MainActivity.DOWNLOAD_CHANNEL_ID,
-            NotificationManager.IMPORTANCE_DEFAULT
-        );
-        downloadChannel.setDescription("Download songs for offline listening");
-        notificationManager.createNotificationChannel(downloadChannel);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
+            NotificationChannel downloadChannel = new NotificationChannel(
+                MainActivity.DOWNLOAD_CHANNEL_ID,
+                MainActivity.DOWNLOAD_CHANNEL_ID,
+                NotificationManager.IMPORTANCE_DEFAULT
+            );
+            downloadChannel.setDescription("Download songs for offline listening");
+            notificationManager.createNotificationChannel(downloadChannel);
+        }
 
         // Playing Screen background
         int[] colors = {getColor(R.color.default_cover_color), getAttributeResource(R.attr.colorSecondary)};
