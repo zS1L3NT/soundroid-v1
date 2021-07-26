@@ -25,6 +25,8 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.Classes.CrashDebugApplication;
+import com.zectan.soundroid.Classes.Request;
+import com.zectan.soundroid.Connections.DefaultPlaylistsRequest;
 import com.zectan.soundroid.Models.User;
 import com.zectan.soundroid.databinding.ActivityAuthBinding;
 
@@ -119,23 +121,37 @@ public class AuthActivity extends CrashDebugApplication {
                 );
 
                 userRef.set(user.toMap())
-                    .addOnSuccessListener(__ -> {
-                        Intent intent = new Intent(this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                        restoreButton();
-                    })
+                    .addOnSuccessListener(__ -> new DefaultPlaylistsRequest(user.getId(), new Request.Callback() {
+                        @Override
+                        public void onComplete(String response) {
+                            new Handler(getMainLooper()).post(AuthActivity.this::changeScreen);
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            new Handler(getMainLooper()).post(AuthActivity.this::changeScreen);
+                        }
+                    }))
                     .addOnFailureListener(error -> {
                         Snackbar.make(B.getRoot(), "Error creating user in database", Snackbar.LENGTH_SHORT).show();
                         error.printStackTrace();
                         restoreButton();
+                        mAuth.signOut();
                     });
             })
             .addOnFailureListener(error -> {
                 Snackbar.make(B.getRoot(), "Error finding user in database", Snackbar.LENGTH_SHORT).show();
                 error.printStackTrace();
                 restoreButton();
+                mAuth.signOut();
             });
+    }
+
+    private void changeScreen() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+        restoreButton();
     }
 
     private void restoreButton() {
