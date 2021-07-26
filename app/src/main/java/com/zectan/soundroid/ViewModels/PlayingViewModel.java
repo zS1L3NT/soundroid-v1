@@ -201,10 +201,19 @@ public class PlayingViewModel extends ViewModel {
 
             @Override
             public void onPlayerError(@NotNull ExoPlaybackException err) {
-                if (Objects.equals(err.getMessage(), "Source error")) {
-                    PlayingViewModel.this.error.postValue("Could not fetch song from server");
+                List<String> NotConvertedYetErrors = new ArrayList<>();
+                NotConvertedYetErrors.add("java.io.EOFException");
+                NotConvertedYetErrors.add("com.google.android.exoplayer2.ParserException");
+
+                Throwable cause = err.getCause();
+                if (cause != null && NotConvertedYetErrors.contains(cause.getClass().getName())) {
+                    retry();
                 } else {
-                    PlayingViewModel.this.error.postValue(Objects.requireNonNull(err.getMessage()));
+                    if (Objects.equals(err.getMessage(), "Source error")) {
+                        PlayingViewModel.this.error.postValue("Could not fetch song from server");
+                    } else {
+                        PlayingViewModel.this.error.postValue(Objects.requireNonNull(err.getMessage()));
+                    }
                 }
             }
         });
