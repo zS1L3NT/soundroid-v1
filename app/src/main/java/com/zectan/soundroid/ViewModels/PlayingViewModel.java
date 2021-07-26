@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -206,11 +207,13 @@ public class PlayingViewModel extends ViewModel {
 
         // Audio Focus
         am = activity.getSystemService(AudioManager.class);
-        afr = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-            .setAcceptsDelayedFocusGain(true)
-            .setWillPauseWhenDucked(true)
-            .setOnAudioFocusChangeListener(this::onAudioFocusChange)
-            .build();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            afr = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setAcceptsDelayedFocusGain(true)
+                .setWillPauseWhenDucked(true)
+                .setOnAudioFocusChangeListener(this::onAudioFocusChange)
+                .build();
+        }
 
         mQueueManager = new QueueManager(
             activity,
@@ -265,8 +268,16 @@ public class PlayingViewModel extends ViewModel {
     }
 
     private void requestAudioFocus() {
-        if (am == null || afr == null) return;
-        am.requestAudioFocus(afr);
+        if (am == null) return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            am.requestAudioFocus(afr);
+        } else {
+            am.requestAudioFocus(
+                this::onAudioFocusChange,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN
+            );
+        }
     }
 
     private void onAudioFocusChange(int focusChange) {
@@ -278,7 +289,11 @@ public class PlayingViewModel extends ViewModel {
                 play();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
-                am.abandonAudioFocusRequest(afr);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    am.abandonAudioFocusRequest(afr);
+                } else {
+                    am.abandonAudioFocus(this::onAudioFocusChange);
+                }
                 pause();
                 break;
         }
