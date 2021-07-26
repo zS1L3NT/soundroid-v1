@@ -62,22 +62,40 @@
         <OnSwipe app:touchAnchorId="@+id/recycler_view" />
         <KeyFrameSet>
             <KeyPosition
+                app:framePosition="30"
+                app:motionTarget="@id/cover_image"
+                app:percentHeight="0.4"
+                app:percentWidth="0.4"
+                app:percentX="0"
+                app:percentY="0.25" />
+            <KeyAttribute
+                android:alpha="1"
+                app:framePosition="30"
+                app:motionTarget="@id/cover_image" />
+
+            <KeyPosition
                 app:framePosition="50"
                 app:motionTarget="@id/name_text"
                 app:percentX="0"
                 app:percentY="0.75" />
+
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="60"
+                app:motionTarget="@id/cover_image" />
+
             <KeyAttribute
                 android:alpha="0"
                 app:framePosition="75"
                 app:motionTarget="@id/break_line" />
+
             <KeyPosition
-                app:framePosition="75"
+                app:framePosition="99"
                 app:motionTarget="@id/cover_image"
-                app:sizePercent="1" />
-            <KeyAttribute
-                android:alpha="0"
-                app:framePosition="50"
-                app:motionTarget="@id/cover_image" />
+                app:percentHeight="0.4"
+                app:percentWidth="0.4"
+                app:percentX="0"
+                app:percentY="1" />
         </KeyFrameSet>
     </Transition>
 </MotionScene>

@@ -102,10 +102,10 @@
             <Layout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
             <Transform
                 android:scaleX="0"
                 android:scaleY="0" />
@@ -214,9 +214,119 @@
             app:touchAnchorId="@+id/queue_pill" />
         <KeyFrameSet>
             <KeyPosition
-                app:framePosition="50"
-                app:motionTarget="@id/playing_from_text"
+                app:framePosition="15"
+                app:motionTarget="@id/cover_image"
+                app:percentHeight="0"
+                app:percentWidth="0"
+                app:percentX="0"
                 app:percentY="0" />
+            <KeyPosition
+                app:framePosition="15"
+                app:motionTarget="@id/title_text"
+                app:percentHeight="0"
+                app:percentWidth="0"
+                app:percentX="0"
+                app:percentY="0" />
+            <KeyPosition
+                app:framePosition="15"
+                app:motionTarget="@id/description_text"
+                app:percentHeight="0"
+                app:percentWidth="0"
+                app:percentX="0"
+                app:percentY="0" />
+            <KeyPosition
+                app:framePosition="15"
+                app:motionTarget="@id/loading_circle"
+                app:percentHeight="0"
+                app:percentWidth="0"
+                app:percentX="0"
+                app:percentY="0" />
+            <KeyPosition
+                app:framePosition="15"
+                app:motionTarget="@id/play_pause_mini_image"
+                app:percentHeight="0"
+                app:percentWidth="0"
+                app:percentX="0"
+                app:percentY="0" />
+
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/seekbar" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/time_text" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/duration_text" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/shuffle_image" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/back_image" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/play_pause_image" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/next_image" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/loop_image" />
+
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="25"
+                app:motionTarget="@id/playing_from_text" />
+            <KeyPosition
+                app:framePosition="25"
+                app:motionTarget="@id/playing_from_text"
+                app:percentHeight="1"
+                app:percentWidth="1"
+                app:percentX="1"
+                app:percentY="1" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="25"
+                app:motionTarget="@id/playlist_name_text" />
+            <KeyPosition
+                app:framePosition="25"
+                app:motionTarget="@id/playlist_name_text"
+                app:percentHeight="1"
+                app:percentWidth="1"
+                app:percentX="1"
+                app:percentY="1" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="25"
+                app:motionTarget="@id/back_navigate_image" />
+            <KeyPosition
+                app:framePosition="25"
+                app:motionTarget="@id/back_navigate_image"
+                app:percentHeight="1"
+                app:percentWidth="1"
+                app:percentX="1"
+                app:percentY="1" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="25"
+                app:motionTarget="@id/more_image" />
+            <KeyPosition
+                app:framePosition="25"
+                app:motionTarget="@id/more_image"
+                app:percentHeight="1"
+                app:percentWidth="1"
+                app:percentX="1"
+                app:percentY="1" />
+
             <KeyPosition
                 app:framePosition="50"
                 app:motionTarget="@id/cover_image"
@@ -232,6 +342,10 @@
                 app:motionTarget="@id/description_text"
                 app:percentX="0"
                 app:percentY="0.8" />
+            <KeyPosition
+                app:framePosition="50"
+                app:motionTarget="@id/loading_circle"
+                app:percentX="1.5" />
             <KeyPosition
                 app:framePosition="50"
                 app:motionTarget="@id/play_pause_mini_image"
