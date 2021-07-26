@@ -44,6 +44,11 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         @Override
         public void onSongClicked(Song song) {
             mPlayingVM.changeSong(song.getSongId());
+            B.recyclerView.scrollToPosition(0);
+
+            if (mMainVM.myUser.getValue().getOpenPlayingScreen()) {
+                B.parent.transitionToStart();
+            }
         }
 
         @Override
