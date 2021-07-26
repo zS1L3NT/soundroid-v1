@@ -123,6 +123,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             case MenuBuilder.EDIT_PLAYLIST:
                 mNavController.navigate(PlaylistViewFragmentDirections.openPlaylistEdit());
                 break;
+            case MenuBuilder.DELETE_PLAYLIST:
             case MenuBuilder.SAVE_PLAYLIST:
                 mNavController.navigate(PlaylistViewFragmentDirections.openPlaylists());
                 break;

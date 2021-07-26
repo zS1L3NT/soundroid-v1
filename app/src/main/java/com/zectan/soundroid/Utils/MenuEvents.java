@@ -250,6 +250,7 @@ public class MenuEvents {
                 @Override
                 public void onComplete() {
                     mActivity.snack("Playlist deleted");
+                    new Handler(Looper.getMainLooper()).post(mRunnable);
                 }
 
                 @Override
