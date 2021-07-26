@@ -6,26 +6,10 @@ import com.zectan.soundroid.Models.Info;
 public class SavePlaylistRequest extends Request {
 
     public SavePlaylistRequest(Info info, Callback callback) {
-        super("http://soundroid.zectan.com/playlist/save", new Request.Callback() {
-            @Override
-            public void onComplete(String response) {
-                callback.onComplete(response);
-            }
-
-            @Override
-            public void onError(String message) {
-                callback.onError(message);
-            }
-        });
+        super("/playlist/save", callback);
 
         replaceData(info.toJSON());
         sendRequest(RequestType.PUT);
-    }
-
-    public interface Callback {
-        void onComplete(String playlistId);
-
-        void onError(String message);
     }
 
 }

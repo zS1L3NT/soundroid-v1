@@ -49,7 +49,7 @@ public class PlaylistImportFragment extends Fragment<FragmentPlaylistImportBindi
 
         new ImportPlaylistRequest(url, mMainVM.userId, new ImportPlaylistRequest.Callback() {
             @Override
-            public void onComplete() {
+            public void onComplete(String response) {
                 mActivity.snack("Adding songs to playlist...");
                 mPlaylistImportVM.text.postValue("");
                 mPlaylistImportVM.loading.postValue(false);

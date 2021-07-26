@@ -182,7 +182,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
     private void sendEditPlaylistRequest(Info info) {
         new EditPlaylistRequest(info, removed, new EditPlaylistRequest.Callback() {
             @Override
-            public void onComplete() {
+            public void onComplete(String response) {
                 mPlaylistEditVM.songs
                     .getValue()
                     .stream()

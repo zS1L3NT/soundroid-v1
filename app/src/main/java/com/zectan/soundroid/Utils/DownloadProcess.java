@@ -125,14 +125,14 @@ public class DownloadProcess {
 
     private class PingRequest extends Request {
         public PingRequest(Callback callback) {
-            super(String.format("http://soundroid.zectan.com/ping/%s/%s.mp3", mHighDownloadQuality ? "highest" : "lowest", mSong.getSongId()), callback);
+            super(String.format("/ping/%s/%s.mp3", mHighDownloadQuality ? "highest" : "lowest", mSong.getSongId()), callback);
             sendRequest(RequestType.GET);
         }
     }
 
     private class SongRequest extends Request {
         public SongRequest(Callback callback) {
-            super(String.format("http://soundroid.zectan.com/song/%s/%s.mp3", mHighDownloadQuality ? "highest" : "lowest", mSong.getSongId()), callback);
+            super(String.format("/song/%s/%s.mp3", mHighDownloadQuality ? "highest" : "lowest", mSong.getSongId()), callback);
             replaceClient(
                 new OkHttpClient.Builder()
                     .connectTimeout(5, TimeUnit.MINUTES)

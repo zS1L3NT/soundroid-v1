@@ -153,7 +153,7 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
     private void sendColorHexRequest(Song song) {
         new SongEditRequest(song, new SongEditRequest.Callback() {
             @Override
-            public void onComplete() {
+            public void onComplete(String response) {
                 mPlaylistEditVM.saving.postValue(false);
                 new Handler(Looper.getMainLooper()).post(mActivity::onBackPressed);
             }

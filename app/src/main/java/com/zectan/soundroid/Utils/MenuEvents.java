@@ -248,7 +248,7 @@ public class MenuEvents {
             })
             .setPositiveButton("Delete", (dialog, which) -> new DeletePlaylistRequest(mInfo.getId(), new DeletePlaylistRequest.Callback() {
                 @Override
-                public void onComplete() {
+                public void onComplete(String response) {
                     mActivity.snack("Playlist deleted");
                     new Handler(Looper.getMainLooper()).post(mRunnable);
                 }

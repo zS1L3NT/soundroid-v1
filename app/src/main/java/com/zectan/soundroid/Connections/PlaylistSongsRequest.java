@@ -11,7 +11,7 @@ import java.util.List;
 
 public class PlaylistSongsRequest extends Request {
     public PlaylistSongsRequest(String playlistId, Callback callback) {
-        super(String.format("http://soundroid.zectan.com/playlist/songs?playlistId=%s", playlistId), new Request.Callback() {
+        super("/playlist/songs?playlistId=" + playlistId, new Request.Callback() {
             @Override
             public void onComplete(String response) {
                 try {

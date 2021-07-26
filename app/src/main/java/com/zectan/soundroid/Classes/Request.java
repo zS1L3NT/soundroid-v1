@@ -18,7 +18,7 @@ public abstract class Request {
     private JSONObject mObject;
 
     public Request(String URL, Callback callback) {
-        mURL = URL;
+        mURL = "http://soundroid.zectan.com" + URL;
         mJSON =  MediaType.parse("application/json; charset=utf-8");
         mObject = new JSONObject();
         mClient = new OkHttpClient();
