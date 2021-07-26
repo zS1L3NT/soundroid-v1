@@ -121,14 +121,16 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         boolean loading = mSearchVM.loading.getValue();
         searchAdapter.updateResults(results);
         updateVisuals(results, loading);
-        // Delayed so items can reorder first
-        new Handler().postDelayed(() -> B.recyclerView.smoothScrollToPosition(0), 600);
     }
 
     private void onLoadingChange(Boolean loading) {
         List<SearchResult> results = mSearchVM.results.getValue();
         updateVisuals(results, loading);
         B.headerLoadingCircle.setVisibility(loading ? View.VISIBLE : View.INVISIBLE);
+        // Delayed so items can reorder first
+        if (!loading) {
+            new Handler().postDelayed(() -> B.recyclerView.smoothScrollToPosition(0), 600);
+        }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
