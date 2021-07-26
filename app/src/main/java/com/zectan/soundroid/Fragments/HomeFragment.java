@@ -81,7 +81,6 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
         FragmentNavigator.Extras extras = Utils.makeExtras(B.searchbar, getString(R.string.TRANSITION_searchbar));
         NavDirections action = HomeFragmentDirections.openSearch();
         mNavController.navigate(action, extras);
-        mSearchVM.results.postValue(new ArrayList<>());
     }
 
     private void onReload() {

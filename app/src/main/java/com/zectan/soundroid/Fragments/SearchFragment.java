@@ -89,6 +89,8 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         B.headerBackImage.setOnClickListener(this::onBackPressed);
         mPlayingVM.currentSong.observe(this, searchAdapter::updateCurrentSong);
 
+        B.headerTextEditor.setText(mSearchVM.query.getValue());
+
         RxTextView
             .textChanges(B.headerTextEditor)
             .debounce(250, TimeUnit.MILLISECONDS)
