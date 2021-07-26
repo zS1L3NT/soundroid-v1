@@ -285,7 +285,7 @@ public class PlayingViewModel extends ViewModel {
     }
 
     public void cleanup() {
-        mPlayer.release();
+        mPlayer.stop();
     }
 
     private class TimeHandler extends Handler {

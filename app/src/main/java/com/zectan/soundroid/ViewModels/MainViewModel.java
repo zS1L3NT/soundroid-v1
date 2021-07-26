@@ -32,7 +32,7 @@ public class MainViewModel extends ViewModel {
     public final StrictLiveData<User> myUser = new StrictLiveData<>(User.getEmpty());
     public final StrictLiveData<List<Info>> myInfos = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<List<Song>> mySongs = new StrictLiveData<>(new ArrayList<>());
-    public final MutableLiveData<DownloadService.DownloadBinder> downloadBinder = new MutableLiveData<>();
+    public final MutableLiveData<DownloadService> downloadService = new MutableLiveData<>();
     public String userId;
 
     public MainViewModel() {
@@ -43,13 +43,14 @@ public class MainViewModel extends ViewModel {
         return new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder binder) {
-                MainViewModel.this.downloadBinder.postValue((DownloadService.DownloadBinder) binder);
-                callback.onStart((DownloadService.DownloadBinder) binder);
+                DownloadService.DownloadBinder downloadBinder = (DownloadService.DownloadBinder) binder;
+                MainViewModel.this.downloadService.postValue(downloadBinder.getService());
+                callback.onStart(downloadBinder.getService());
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
-                downloadBinder.postValue(null);
+                downloadService.postValue(null);
             }
         };
     }

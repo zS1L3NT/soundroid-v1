@@ -39,6 +39,7 @@ public class DownloadService extends Service {
         super.onCreate();
         mNotificationManager = getSystemService(NotificationManager.class);
         mNotificationID = Utils.getRandomInt();
+        mPlaylists = new ArrayList<>();
         mDestroyed = false;
     }
 
@@ -47,12 +48,6 @@ public class DownloadService extends Service {
         super.onDestroy();
         mDestroyed = true;
         mNotificationManager.cancel(mNotificationID);
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        mPlaylists = new ArrayList<>();
-        return START_NOT_STICKY;
     }
 
     private void downloadFirstPlaylist() {
@@ -235,6 +230,29 @@ public class DownloadService extends Service {
         return !networkInfo.isConnected();
     }
 
+    public boolean startDownload(Playlist playlist, boolean highDownloadQuality) {
+        mHighDownloadQuality = highDownloadQuality;
+
+        if (isDownloading(playlist.getInfo().getId())) {
+            return false;
+        }
+        mPlaylists.add(playlist);
+        if (mPlaylists.size() == 1) downloadFirstPlaylist();
+        return true;
+    }
+
+    public void stopDownload(Playlist playlist) {
+        if (mPlaylists.get(0).equals(playlist)) {
+            cancelDownloads(true);
+        } else {
+            mPlaylists.remove(playlist);
+        }
+    }
+
+    public boolean isDownloading(String playlistId) {
+        return mPlaylists.stream().anyMatch(p -> p.getInfo().getId().equals(playlistId));
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -242,29 +260,8 @@ public class DownloadService extends Service {
     }
 
     public class DownloadBinder extends Binder {
-
-        public boolean startDownload(Playlist playlist, boolean highDownloadQuality) {
-            mHighDownloadQuality = highDownloadQuality;
-
-            if (isDownloading(playlist.getInfo().getId())) {
-                return false;
-            }
-            mPlaylists.add(playlist);
-            if (mPlaylists.size() == 1) downloadFirstPlaylist();
-            return true;
+        public DownloadService getService() {
+            return DownloadService.this;
         }
-
-        public void stopDownload(Playlist playlist) {
-            if (mPlaylists.get(0).equals(playlist)) {
-                cancelDownloads(true);
-            } else {
-                mPlaylists.remove(playlist);
-            }
-        }
-
-        public boolean isDownloading(String playlistId) {
-            return mPlaylists.stream().anyMatch(p -> p.getInfo().getId().equals(playlistId));
-        }
-
     }
 }

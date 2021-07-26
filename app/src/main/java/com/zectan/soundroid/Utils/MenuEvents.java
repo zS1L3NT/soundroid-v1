@@ -161,7 +161,7 @@ public class MenuEvents {
     }
 
     private void startDownloads() {
-        mActivity.getDownloadBinder(binder -> {
+        mActivity.getDownloadService(binder -> {
             Playlist playlist = new Playlist(mInfo, mActivity.mainVM.getSongsFromPlaylist(mInfo.getId()));
 
             User user = mActivity.mainVM.myUser.getValue();
@@ -175,7 +175,7 @@ public class MenuEvents {
 
     private void stopDownloads() {
         Playlist playlist = new Playlist(mInfo, mActivity.mainVM.getSongsFromPlaylist(mInfo.getId()));
-        mActivity.getDownloadBinder(binder -> {
+        mActivity.getDownloadService(binder -> {
             if (binder.isDownloading(playlist.getInfo().getId())) {
                 binder.stopDownload(playlist);
                 mActivity.snack("Download stopped");

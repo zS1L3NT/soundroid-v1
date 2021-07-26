@@ -135,6 +135,8 @@ public class MainActivity extends CrashDebugApplication {
                 handleError(new Exception("Could not check for latest version"));
             }
         });
+
+        getDownloadService(service -> {});
     }
 
     @Override
@@ -146,7 +148,7 @@ public class MainActivity extends CrashDebugApplication {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopService(new Intent(this, DownloadService.class));
+        playingVM.cleanup();
     }
 
     @Override
@@ -237,9 +239,9 @@ public class MainActivity extends CrashDebugApplication {
         };
     }
 
-    public void getDownloadBinder(DownloadServiceCallback callback) {
-        if (mainVM.downloadBinder.getValue() != null) {
-            callback.onStart(mainVM.downloadBinder.getValue());
+    public void getDownloadService(DownloadServiceCallback callback) {
+        if (mainVM.downloadService.getValue() != null) {
+            callback.onStart(mainVM.downloadService.getValue());
         } else {
             Intent downloadIntent = new Intent(this, DownloadService.class);
             startService(downloadIntent);
@@ -264,7 +266,7 @@ public class MainActivity extends CrashDebugApplication {
     }
 
     public interface DownloadServiceCallback {
-        void onStart(DownloadService.DownloadBinder binder);
+        void onStart(DownloadService service);
     }
 
 }

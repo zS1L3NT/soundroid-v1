@@ -111,8 +111,8 @@ public class MenuBuilder {
                 items.clearDownloads();
             } else {
                 // If playlists is being downloaded
-                DownloadService.DownloadBinder downloadBinder = activity.mainVM.downloadBinder.getValue();
-                if (downloadBinder != null && downloadBinder.isDownloading(playlist.getInfo().getId())) {
+                DownloadService downloadService = activity.mainVM.downloadService.getValue();
+                if (downloadService != null && downloadService.isDownloading(playlist.getInfo().getId())) {
                     items.stopDownloads();
                 } else {
                     items.startDownloads();
