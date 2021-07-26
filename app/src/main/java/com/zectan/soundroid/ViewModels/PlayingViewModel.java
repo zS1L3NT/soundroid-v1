@@ -168,6 +168,10 @@ public class PlayingViewModel extends ViewModel {
         mPlayer.pause();
     }
 
+    public void stop() {
+        mPlayer.stop();
+    }
+
     /**
      * THIS METHOD SHOULD ONLY BE RUN ONCE
      *
@@ -294,7 +298,7 @@ public class PlayingViewModel extends ViewModel {
                 } else {
                     am.abandonAudioFocus(this::onAudioFocusChange);
                 }
-                pause();
+                stop();
                 break;
         }
     }
