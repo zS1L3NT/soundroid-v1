@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.databinding.ActivityErrorBinding;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +77,11 @@ public class ErrorActivity extends AppCompatActivity {
                 }
             });
 
-            if (!message.equals("A Runtime Exception was thrown!")) {
+            List<String> IgnoredErrors = new ArrayList<>();
+            IgnoredErrors.add("Could not check for latest version");
+            IgnoredErrors.add("A Runtime Exception was thrown!");
+
+            if (!IgnoredErrors.contains(message)) {
                 Map<String, Object> error = new HashMap<>();
                 error.put("type", "Uncaught");
                 error.put("date", Calendar.getInstance().getTime().toString());
