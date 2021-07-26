@@ -9,7 +9,7 @@ public class SavePlaylistRequest extends Request {
         super("http://soundroid.zectan.com/playlist/save", new Request.Callback() {
             @Override
             public void onComplete(String response) {
-                callback.onComplete();
+                callback.onComplete(response);
             }
 
             @Override
@@ -23,7 +23,7 @@ public class SavePlaylistRequest extends Request {
     }
 
     public interface Callback {
-        void onComplete();
+        void onComplete(String playlistId);
 
         void onError(String message);
     }

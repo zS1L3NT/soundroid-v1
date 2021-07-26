@@ -2,6 +2,8 @@ package com.zectan.soundroid.Utils;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.MenuItem;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -211,8 +213,9 @@ public class MenuEvents {
         mInfo.setUserId(mActivity.mainVM.userId);
         new SavePlaylistRequest(mInfo, new SavePlaylistRequest.Callback() {
             @Override
-            public void onComplete() {
+            public void onComplete(String playlistId) {
                 mActivity.snack("Saved playlist");
+                new Handler(Looper.getMainLooper()).post(mRunnable);
             }
 
             @Override

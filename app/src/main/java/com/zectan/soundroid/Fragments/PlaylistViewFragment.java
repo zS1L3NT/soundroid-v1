@@ -118,6 +118,17 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         });
     }
 
+    public void menuItemClicked(MenuItem item) {
+        switch (item.getItemId()) {
+            case MenuBuilder.EDIT_PLAYLIST:
+                mNavController.navigate(PlaylistViewFragmentDirections.openPlaylistEdit());
+                break;
+            case MenuBuilder.SAVE_PLAYLIST:
+                mNavController.navigate(PlaylistViewFragmentDirections.openPlaylists());
+                break;
+        }
+    }
+
     public void onMoreImageClicked(View view) {
         if (isLocal == null) return;
 
@@ -136,7 +147,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             view,
             items,
             mPlaylistViewVM.info.getValue(),
-            (info_, item) -> mActivity.handleMenuItemClick(info_, null, item, () -> mNavController.navigate(PlaylistViewFragmentDirections.openPlaylistEdit()))
+            (info_, item) -> mActivity.handleMenuItemClick(info_, null, item, () -> menuItemClicked(item))
         );
     }
 
