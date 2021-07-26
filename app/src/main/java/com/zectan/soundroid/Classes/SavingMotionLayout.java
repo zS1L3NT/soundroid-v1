@@ -10,20 +10,35 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 
+import com.zectan.soundroid.MainActivity;
+
 import org.jetbrains.annotations.NotNull;
 
 public class SavingMotionLayout extends MotionLayout {
+    private MainActivity mActivity;
 
     public SavingMotionLayout(@NonNull @NotNull Context context) {
         super(context);
+        try {
+            mActivity = (MainActivity) context;
+        } catch (Exception ignored) {
+        }
     }
 
     public SavingMotionLayout(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs) {
         super(context, attrs);
+        try {
+            mActivity = (MainActivity) context;
+        } catch (Exception ignored) {
+        }
     }
 
     public SavingMotionLayout(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        try {
+            mActivity = (MainActivity) context;
+        } catch (Exception ignored) {
+        }
     }
 
     @Nullable
@@ -42,10 +57,12 @@ public class SavingMotionLayout extends MotionLayout {
         if (parcelable == null) return;
         if (parcelable instanceof State) {
             State state = (State) parcelable;
-            Log.d("STATES_EQUAL", String.valueOf(state.progress));
             super.onRestoreInstanceState(state.superParcel);
             setTransition(state.startState, state.endState);
             setProgress(state.progress);
+            if (mActivity != null) {
+                mActivity.updateNavigator(1f - state.progress);
+            }
         }
     }
 
