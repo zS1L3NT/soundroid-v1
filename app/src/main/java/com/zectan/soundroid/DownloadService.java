@@ -204,8 +204,8 @@ public class DownloadService extends Service {
 
     private void cancelDownloads(boolean continue_) {
         mCurrent = null;
-        mNotificationManager.cancel(mNotificationID);
         stopForeground(mNotificationID);
+        mNotificationManager.cancel(mNotificationID);
 
         int NOTIFICATION_ID = Utils.getRandomInt();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
