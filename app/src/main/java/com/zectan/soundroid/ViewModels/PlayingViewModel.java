@@ -204,6 +204,7 @@ public class PlayingViewModel extends ViewModel {
                 List<String> NotConvertedYetErrors = new ArrayList<>();
                 NotConvertedYetErrors.add("java.io.EOFException");
                 NotConvertedYetErrors.add("com.google.android.exoplayer2.ParserException");
+                NotConvertedYetErrors.add("com.google.android.exoplayer2.source.UnrecognizedInputFormatException");
 
                 Throwable cause = err.getCause();
                 if (cause != null && NotConvertedYetErrors.contains(cause.getClass().getName())) {
