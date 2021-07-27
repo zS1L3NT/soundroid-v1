@@ -379,6 +379,7 @@ public class PlayingService extends Service {
                 Glide
                     .with(this)
                     .asBitmap()
+                    .centerCrop()
                     .load(song.getCover())
                     .into(new CustomTarget<Bitmap>() {
                         @Override
