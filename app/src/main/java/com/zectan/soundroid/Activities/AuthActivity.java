@@ -1,4 +1,4 @@
-package com.zectan.soundroid;
+package com.zectan.soundroid.Activities;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -27,7 +27,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.Classes.CrashDebugApplication;
 import com.zectan.soundroid.Classes.Request;
 import com.zectan.soundroid.Connections.DefaultPlaylistsRequest;
+import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.User;
+import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.ActivityAuthBinding;
 
 public class AuthActivity extends CrashDebugApplication {

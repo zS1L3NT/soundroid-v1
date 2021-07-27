@@ -16,7 +16,6 @@ import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.ViewModels.HomeViewModel;
 import com.zectan.soundroid.ViewModels.MainViewModel;
-import com.zectan.soundroid.ViewModels.PlayingViewModel;
 import com.zectan.soundroid.ViewModels.PlaylistEditViewModel;
 import com.zectan.soundroid.ViewModels.PlaylistImportViewModel;
 import com.zectan.soundroid.ViewModels.PlaylistViewViewModel;
@@ -33,7 +32,6 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
 
     protected MainViewModel mMainVM;
     protected HomeViewModel mHomeVM;
-    protected PlayingViewModel mPlayingVM;
     protected PlaylistEditViewModel mPlaylistEditVM;
     protected PlaylistsViewModel mPlaylistsVM;
     protected PlaylistViewViewModel mPlaylistViewVM;
@@ -50,11 +48,10 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         mActivity = (MainActivity) getActivity();
         assert mActivity != null;
-        mNavController = mActivity.navController;
+        mNavController = mActivity.mNavController;
 
         mMainVM = new ViewModelProvider(mActivity).get(MainViewModel.class);
         mHomeVM = new ViewModelProvider(mActivity).get(HomeViewModel.class);
-        mPlayingVM = new ViewModelProvider(mActivity).get(PlayingViewModel.class);
         mPlaylistEditVM = new ViewModelProvider(mActivity).get(PlaylistEditViewModel.class);
         mPlaylistsVM = new ViewModelProvider(mActivity).get(PlaylistsViewModel.class);
         mPlaylistViewVM = new ViewModelProvider(mActivity).get(PlaylistViewViewModel.class);

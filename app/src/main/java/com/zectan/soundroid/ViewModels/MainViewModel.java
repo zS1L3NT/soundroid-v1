@@ -11,12 +11,13 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.Classes.StrictLiveData;
-import com.zectan.soundroid.DownloadService;
+import com.zectan.soundroid.Services.DownloadService;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.Info;
 import com.zectan.soundroid.Models.SearchResult;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.Models.User;
+import com.zectan.soundroid.Services.PlayingService;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +33,10 @@ public class MainViewModel extends ViewModel {
     public final StrictLiveData<User> myUser = new StrictLiveData<>(User.getEmpty());
     public final StrictLiveData<List<Info>> myInfos = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<List<Song>> mySongs = new StrictLiveData<>(new ArrayList<>());
+
     public final MutableLiveData<DownloadService> downloadService = new MutableLiveData<>();
+    public final MutableLiveData<PlayingService> playingService = new MutableLiveData<>();
+
     public String userId;
 
     public MainViewModel() {
@@ -44,13 +48,29 @@ public class MainViewModel extends ViewModel {
             @Override
             public void onServiceConnected(ComponentName name, IBinder binder) {
                 DownloadService.DownloadBinder downloadBinder = (DownloadService.DownloadBinder) binder;
-                MainViewModel.this.downloadService.postValue(downloadBinder.getService());
+                downloadService.postValue(downloadBinder.getService());
                 callback.onStart(downloadBinder.getService());
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
                 downloadService.postValue(null);
+            }
+        };
+    }
+
+    public ServiceConnection getPlayingConnection(MainActivity.PlayingServiceCallback callback) {
+        return new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder binder) {
+                PlayingService.PlayingBinder playingBinder = (PlayingService.PlayingBinder) binder;
+                playingService.postValue(playingBinder.getService());
+                callback.onStart(playingBinder.getService());
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                playingService.postValue(null);
             }
         };
     }

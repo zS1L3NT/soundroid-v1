@@ -39,7 +39,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         public void onSongClicked(Song song) {
             Info info = new Info(song.getSongId(), "Search Result", Collections.singletonList(song.getSongId()));
             Playlist playlist = new Playlist(info, Collections.singletonList(song));
-            mPlayingVM.startPlaylist(mActivity, playlist, song.getSongId(), mMainVM.myUser.getValue().getHighStreamQuality());
+            mActivity.getPlayingService(service -> service.startPlaylist(playlist, song.getSongId(), mMainVM.myUser.getValue().getHighStreamQuality()));
 
             if (mMainVM.myUser.getValue().getOpenPlayingScreen()) {
                 mNavController.navigate(SearchFragmentDirections.openPlaying());
@@ -87,7 +87,7 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         mSearchVM.message.observe(this, this::onMessageChange);
         mSearchVM.error.observe(this, this::onErrorChange);
         B.headerBackImage.setOnClickListener(this::onBackPressed);
-        mPlayingVM.currentSong.observe(this, searchAdapter::updateCurrentSong);
+        mActivity.getPlayingService(service -> service.currentSong.observe(this, searchAdapter::updateCurrentSong));
 
         B.headerTextEditor.setText(mSearchVM.query.getValue());
 

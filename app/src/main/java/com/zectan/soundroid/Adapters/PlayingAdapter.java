@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.zectan.soundroid.Adapters.DiffCallbacks.SongsReorderDiffCallback;
+import com.zectan.soundroid.DiffCallbacks.SongsReorderDiffCallback;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.SongReorderListItemBinding;

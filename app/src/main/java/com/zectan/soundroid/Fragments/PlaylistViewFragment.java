@@ -38,7 +38,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         @Override
         public void onSongClicked(String songId) {
             Playlist playlist = new Playlist(mPlaylistViewVM.info.getValue(), mPlaylistViewVM.songs.getValue());
-            mPlayingVM.startPlaylist(mActivity, playlist, songId, mMainVM.myUser.getValue().getHighStreamQuality());
+            mActivity.getPlayingService(service -> service.startPlaylist(playlist, songId, mMainVM.myUser.getValue().getHighStreamQuality()));
 
             if (mMainVM.myUser.getValue().getOpenPlayingScreen()) {
                 mNavController.navigate(PlaylistViewFragmentDirections.openPlaying());
@@ -72,7 +72,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         mPlaylistViewVM.info.observe(this, this::onInfoChange);
         mPlaylistViewVM.songs.observe(this, this::onSongsChange);
         mPlaylistViewVM.loading.observe(this, B.swipeRefresh::setRefreshing);
-        mPlayingVM.currentSong.observe(this, playlistViewAdapter::updateCurrentSong);
+        mActivity.getPlayingService(service -> service.currentSong.observe(this, playlistViewAdapter::updateCurrentSong));
 
         mMainVM.watchInfoFromPlaylist(this, mPlaylistViewVM.playlistId.getValue(), mPlaylistViewVM.info::setValue);
         mMainVM.watchSongsFromPlaylist(this, mPlaylistViewVM.playlistId.getValue(), mPlaylistViewVM.songs::setValue);
@@ -134,7 +134,7 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         if (isLocal == null) return;
 
         Info info = mPlaylistViewVM.info.getValue();
-        List<Song> songs = mActivity.mainVM.getSongsFromPlaylist(info.getId());
+        List<Song> songs = mActivity.mMainVM.getSongsFromPlaylist(info.getId());
         Playlist playlist = new Playlist(info, songs);
 
         MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();

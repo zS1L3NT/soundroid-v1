@@ -21,7 +21,6 @@ import com.zectan.soundroid.databinding.FragmentHomeBinding;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment<FragmentHomeBinding> {
@@ -34,7 +33,7 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
     private final HomeAdapter.Callback callback = new HomeAdapter.Callback() {
         @Override
         public void onSongClicked(Playlist playlist, String songId) {
-            mPlayingVM.startPlaylist(mActivity, playlist, songId, mMainVM.myUser.getValue().getHighStreamQuality());
+            mActivity.getPlayingService(service -> service.startPlaylist(playlist, songId, mMainVM.myUser.getValue().getHighStreamQuality()));
 
             if (mMainVM.myUser.getValue().getOpenPlayingScreen()) {
                 mNavController.navigate(HomeFragmentDirections.openPlaying());
@@ -61,7 +60,7 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
         // Live Observers
         mHomeVM.songs.observe(this, homeAdapter::updateSongs);
         mHomeVM.loading.observe(this, B.swipeRefresh::setRefreshing);
-        mPlayingVM.currentSong.observe(this, homeAdapter::updateCurrentSong);
+        mActivity.getPlayingService(service -> service.currentSong.observe(this, homeAdapter::updateCurrentSong));
 
         mMainVM.mySongs.observe(this, mHomeVM.songs::setValue);
         B.searchbar.setOnClickListener(this::onSearchbarClicked);

@@ -1,4 +1,4 @@
-package com.zectan.soundroid;
+package com.zectan.soundroid.Services;
 
 import android.app.NotificationManager;
 import android.app.Service;
@@ -12,8 +12,10 @@ import android.os.IBinder;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.Song;
+import com.zectan.soundroid.R;
 import com.zectan.soundroid.Utils.DownloadProcess;
 import com.zectan.soundroid.Utils.Utils;
 

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.zectan.soundroid.Adapters.DiffCallbacks.SearchResultDiffCallback;
+import com.zectan.soundroid.DiffCallbacks.SearchResultDiffCallback;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.Info;
 import com.zectan.soundroid.Models.Playlist;
@@ -153,7 +153,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             }
 
             if (result.getLocation().equals("Local")) {
-                Playlist playlist = new Playlist(info, activity.mainVM.getSongsFromPlaylist(info.getId()));
+                Playlist playlist = new Playlist(info, activity.mMainVM.getSongsFromPlaylist(info.getId()));
                 B.downloadedDot.setAlpha(playlist.isDownloaded(activity) ? 1 : 0);
             }
 

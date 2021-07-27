@@ -1,6 +1,5 @@
 package com.zectan.soundroid.Utils;
 
-
 import android.content.Context;
 import android.util.Log;
 
@@ -9,6 +8,7 @@ import androidx.annotation.Nullable;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.zectan.soundroid.Classes.StrictLiveData;
 import com.zectan.soundroid.Models.Song;
+import com.zectan.soundroid.Services.PlayingService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,40 +18,38 @@ public class QueueManager {
     private static final String TAG = "(SounDroid) QueueManager";
     private final Context mContext;
     private final SimpleExoPlayer mPlayer;
+
     private final StrictLiveData<List<Song>> mQueue;
     private final StrictLiveData<Boolean> mIsLooping;
     private final StrictLiveData<Boolean> mIsShuffling;
     private final StrictLiveData<Song> mCurrentSong;
-    private final List<Song> mSongs;
 
+    private final List<Song> mSongs;
     private final List<String> mSortedOrder;
     private final List<String> mShuffledOrder;
+
     private final boolean mHighQuality;
     private int mPosition;
 
     public QueueManager(
-        Context context,
+        PlayingService playingService,
+        SimpleExoPlayer player,
         List<Song> songs,
         List<String> order,
-        StrictLiveData<Boolean> isLooping,
-        StrictLiveData<Boolean> isShuffling,
-        StrictLiveData<Song> currentSong,
-        StrictLiveData<List<Song>> queue,
-        SimpleExoPlayer player,
         boolean highQuality
     ) {
-        mContext = context;
-        mIsLooping = isLooping;
-        mIsShuffling = isShuffling;
-        mSongs = new ArrayList<>(songs);
-        mPosition = 0;
-        mCurrentSong = currentSong;
+        mContext = playingService.getApplicationContext();
         mPlayer = player;
-        mQueue = queue;
-        mHighQuality = highQuality;
 
+        mQueue = playingService.queue;
+        mIsLooping = playingService.isLooping;
+        mIsShuffling = playingService.isShuffling;
+        mCurrentSong = playingService.currentSong;
+
+        mSongs = new ArrayList<>(songs);
         mSortedOrder = new ArrayList<>(order);
         mShuffledOrder = ListArrayUtils.shuffleOrder(new ArrayList<>(order));
+        mHighQuality = highQuality;
     }
 
     private List<Song> formatQueue() {
@@ -237,10 +235,6 @@ public class QueueManager {
         updateLiveQueue();
     }
 
-    public List<String> getOrder() {
-        return mIsShuffling.getValue() ? mShuffledOrder : mSortedOrder;
-    }
-
     public @Nullable
     Song getSongById(String id) {
         List<Song> filtered = mSongs
@@ -273,4 +267,5 @@ public class QueueManager {
     public void updateLiveQueue() {
         mQueue.setValue(formatQueue());
     }
+
 }

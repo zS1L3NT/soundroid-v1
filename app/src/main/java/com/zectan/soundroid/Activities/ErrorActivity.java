@@ -1,4 +1,4 @@
-package com.zectan.soundroid;
+package com.zectan.soundroid.Activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;

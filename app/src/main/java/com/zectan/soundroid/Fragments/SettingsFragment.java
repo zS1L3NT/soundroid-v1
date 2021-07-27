@@ -16,11 +16,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.zectan.soundroid.AuthActivity;
+import com.zectan.soundroid.Activities.AuthActivity;
 import com.zectan.soundroid.Classes.Fragment;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.Models.User;
+import com.zectan.soundroid.Services.PlayingService;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.FragmentSettingsBinding;
 
@@ -75,11 +76,11 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             .setNegativeButton("Cancel", (dialog, which) -> {
             })
             .setPositiveButton("Sign Out", (dialog, which) -> {
-                List<Song> songs = mActivity.mainVM.mySongs.getValue();
+                List<Song> songs = mActivity.mMainVM.mySongs.getValue();
                 for (Song song : songs) {
                     song.deleteLocally(mActivity);
                 }
-                mPlayingVM.clearQueue(mActivity);
+                mActivity.getPlayingService(PlayingService::clearQueue);
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(mActivity, AuthActivity.class);
                 startActivity(intent);
@@ -89,7 +90,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
     }
 
     public static class SettingsPreference extends PreferenceFragmentCompat {
-        private MainActivity activity;
+        private MainActivity mActivity;
         private DocumentReference userRef;
         private SwitchPreferenceCompat openPlayingScreen;
         private SwitchPreferenceCompat highDownloadQuality;
@@ -117,8 +118,8 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             assert throwError != null;
             throwError.setOnPreferenceClickListener(this::onThrowErrorClicked);
 
-            activity = (MainActivity) requireContext();
-            if (activity.mainVM != null) updatePreferences(activity.mainVM.myUser.getValue());
+            mActivity = (MainActivity) requireContext();
+            if (mActivity.mMainVM != null) updatePreferences(mActivity.mMainVM.myUser.getValue());
         }
 
         public void updatePreferences(User user) {
@@ -138,7 +139,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             if (userRef != null)
                 userRef
                     .update("openPlayingScreen", Boolean.parseBoolean(o.toString()))
-                    .addOnFailureListener(activity::handleError);
+                    .addOnFailureListener(mActivity::handleError);
             return false;
         }
 
@@ -146,7 +147,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             if (userRef != null)
                 userRef
                     .update("highDownloadQuality", Boolean.parseBoolean(o.toString()))
-                    .addOnFailureListener(activity::handleError);
+                    .addOnFailureListener(mActivity::handleError);
             return false;
         }
 
@@ -154,22 +155,22 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             if (userRef != null)
                 userRef
                     .update("highStreamQuality", Boolean.parseBoolean(o.toString()))
-                    .addOnFailureListener(activity::handleError);
+                    .addOnFailureListener(mActivity::handleError);
             return false;
         }
 
         private boolean onClearAllDownloadsClick(Preference preference) {
-            new MaterialAlertDialogBuilder(activity)
+            new MaterialAlertDialogBuilder(mActivity)
                 .setTitle("Are you sure?")
                 .setMessage("All downloaded songs will be deleted")
                 .setNegativeButton("Cancel", (dialog, which) -> {
                 })
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    List<Song> songs = activity.mainVM.mySongs.getValue();
+                    List<Song> songs = mActivity.mMainVM.mySongs.getValue();
                     for (Song song : songs) {
-                        song.deleteLocally(activity);
+                        song.deleteLocally(mActivity);
                     }
-                    activity.playingVM.clearQueue(activity);
+                    mActivity.getPlayingService(PlayingService::clearQueue);
                 })
                 .show();
             return false;

@@ -17,6 +17,7 @@ import com.zectan.soundroid.Models.Info;
 import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.Models.User;
+import com.zectan.soundroid.Services.PlayingService;
 import com.zectan.soundroid.R;
 
 import java.util.ArrayList;
@@ -116,7 +117,7 @@ public class MenuEvents {
             };
 
             boolean inPlaylist = mActivity
-                .mainVM
+                .mMainVM
                 .getSongsFromPlaylist(info.getId())
                 .stream()
                 .anyMatch(song -> song.getSongId().equals(mSong.getSongId()));
@@ -125,7 +126,7 @@ public class MenuEvents {
                 mActivity.handleError(new Exception("Song already in playlist!"));
             } else {
                 mSong.setPlaylistId(info.getId());
-                mSong.setUserId(mActivity.mainVM.userId);
+                mSong.setUserId(mActivity.mMainVM.userId);
                 mDb.collection("songs")
                     .add(mSong.toMap())
                     .addOnSuccessListener(onSuccessListener)
@@ -138,18 +139,18 @@ public class MenuEvents {
             }
         };
 
-        infos.addAll(mActivity.mainVM.myInfos.getValue());
+        infos.addAll(mActivity.mMainVM.myInfos.getValue());
         dialog.setItems(ListArrayUtils.toArray(CharSequence.class, infos.stream().map(Info::getName).collect(Collectors.toList())), onClickListener);
         dialog.show();
     }
 
     private void addToQueue() {
-        mActivity.playingVM.addToQueue(mSong);
+        mActivity.getPlayingService(service -> service.addToQueue(mSong));
         mActivity.snack("Song added to queue");
     }
 
     private void editSong() {
-        mActivity.songEditVM.song.setValue(mSong);
+        mActivity.mSongEditVM.song.setValue(mSong);
         mRunnable.run();
     }
 
@@ -158,15 +159,15 @@ public class MenuEvents {
     }
 
     private void clearQueue() {
-        mActivity.playingVM.clearQueue(mActivity);
+        mActivity.getPlayingService(PlayingService::clearQueue);
         mActivity.snack("Cleared queue");
     }
 
     private void startDownloads() {
         mActivity.getDownloadService(binder -> {
-            Playlist playlist = new Playlist(mInfo, mActivity.mainVM.getSongsFromPlaylist(mInfo.getId()));
+            Playlist playlist = new Playlist(mInfo, mActivity.mMainVM.getSongsFromPlaylist(mInfo.getId()));
 
-            User user = mActivity.mainVM.myUser.getValue();
+            User user = mActivity.mMainVM.myUser.getValue();
             if (binder.startDownload(playlist, user.getHighDownloadQuality())) {
                 mActivity.snack("Download starting");
             } else {
@@ -176,7 +177,7 @@ public class MenuEvents {
     }
 
     private void stopDownloads() {
-        Playlist playlist = new Playlist(mInfo, mActivity.mainVM.getSongsFromPlaylist(mInfo.getId()));
+        Playlist playlist = new Playlist(mInfo, mActivity.mMainVM.getSongsFromPlaylist(mInfo.getId()));
         mActivity.getDownloadService(binder -> {
             if (binder.isDownloading(playlist.getInfo().getId())) {
                 binder.stopDownload(playlist);
@@ -194,8 +195,8 @@ public class MenuEvents {
             .setNegativeButton("Cancel", (dialog, which) -> {
             })
             .setPositiveButton("Delete", (dialog, which) -> {
-                for (Song song : mActivity.mainVM.getSongsFromPlaylist(mInfo.getId())) {
-                    song.deleteIfNotUsed(mActivity, mActivity.mainVM.mySongs.getValue());
+                for (Song song : mActivity.mMainVM.getSongsFromPlaylist(mInfo.getId())) {
+                    song.deleteIfNotUsed(mActivity, mActivity.mMainVM.mySongs.getValue());
                 }
 
                 mActivity.snack("Songs deleted");
@@ -210,7 +211,7 @@ public class MenuEvents {
     }
 
     private void savePlaylist() {
-        mInfo.setUserId(mActivity.mainVM.userId);
+        mInfo.setUserId(mActivity.mMainVM.userId);
         new SavePlaylistRequest(mInfo, new SavePlaylistRequest.Callback() {
             @Override
             public void onComplete(String playlistId) {
@@ -226,17 +227,17 @@ public class MenuEvents {
     }
 
     private void playPlaylist() {
-        List<Song> songs = mActivity.mainVM.getSongsFromPlaylist(mInfo.getId());
+        List<Song> songs = mActivity.mMainVM.getSongsFromPlaylist(mInfo.getId());
         Playlist playlist = new Playlist(mInfo, songs);
-        mActivity.playingVM.startPlaylist(mActivity, playlist, songs.get(0).getSongId(), mActivity.mainVM.myUser.getValue().getHighStreamQuality());
+        mActivity.getPlayingService(service -> service.startPlaylist(playlist, songs.get(0).getSongId(), mActivity.mMainVM.myUser.getValue().getHighStreamQuality()));
 
-        if (mActivity.mainVM.myUser.getValue().getOpenPlayingScreen()) {
-            mActivity.navController.navigate(R.id.fragment_playing);
+        if (mActivity.mMainVM.myUser.getValue().getOpenPlayingScreen()) {
+            mActivity.mNavController.navigate(R.id.fragment_playing);
         }
     }
 
     private void editPlaylist() {
-        mActivity.playlistEditVM.playlistId.setValue(mInfo.getId());
+        mActivity.mPlaylistEditVM.playlistId.setValue(mInfo.getId());
         mRunnable.run();
     }
 
@@ -268,7 +269,7 @@ public class MenuEvents {
             "New Playlist",
             "https://firebasestorage.googleapis.com/v0/b/android-soundroid.appspot.com/o/playing_cover_default.png?alt=media&token=e8980e80-ab5d-4f21-8ed4-6bc6e7e06ef7",
             "#7b828b",
-            mActivity.mainVM.userId,
+            mActivity.mMainVM.userId,
             new ArrayList<>(),
             Utils.getQueries("New Playlist")
         );
@@ -278,7 +279,7 @@ public class MenuEvents {
             .set(info.toMap())
             .addOnSuccessListener(snap -> {
                 mActivity.snack("Created Playlist");
-                mActivity.playlistEditVM.playlistId.setValue(id);
+                mActivity.mPlaylistEditVM.playlistId.setValue(id);
                 mRunnable.run();
             })
             .addOnFailureListener(mActivity::handleError);

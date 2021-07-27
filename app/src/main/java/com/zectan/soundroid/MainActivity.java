@@ -23,19 +23,20 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.zectan.soundroid.Activities.AuthActivity;
 import com.zectan.soundroid.Classes.CrashDebugApplication;
 import com.zectan.soundroid.Connections.VersionCheckRequest;
 import com.zectan.soundroid.Models.Info;
 import com.zectan.soundroid.Models.Song;
+import com.zectan.soundroid.Services.DownloadService;
+import com.zectan.soundroid.Services.PlayingService;
 import com.zectan.soundroid.Utils.MenuEvents;
 import com.zectan.soundroid.Utils.Utils;
 import com.zectan.soundroid.ViewModels.MainViewModel;
-import com.zectan.soundroid.ViewModels.PlayingViewModel;
 import com.zectan.soundroid.ViewModels.PlaylistEditViewModel;
 import com.zectan.soundroid.ViewModels.PlaylistViewViewModel;
 import com.zectan.soundroid.ViewModels.PlaylistsViewModel;
@@ -53,18 +54,20 @@ import java.util.Map;
 
 public class MainActivity extends CrashDebugApplication {
     private static final String TAG = "(SounDroid) MainActivity";
-    public static final String DOWNLOAD_CHANNEL_ID = "Downloads";
+    public static final String DOWNLOAD_CHANNEL_ID = "DOWNLOAD_CHANNEL_ID";
+    public static final String PLAYING_CHANNEL_ID = "PLAYING_CHANNEL_ID";
+    public static final String FRAGMENT_PLAYING = "FRAGMENT_PLAYING";
     public final FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     public ActivityMainBinding B;
-    public NavController navController;
-    public NotificationManager notificationManager;
-    public MainViewModel mainVM;
-    public PlayingViewModel playingVM;
-    public PlaylistsViewModel playlistsVM;
-    public PlaylistViewViewModel playlistViewVM;
-    public PlaylistEditViewModel playlistEditVM;
-    public SongEditViewModel songEditVM;
     private InputMethodManager imm;
+
+    public NavController mNavController;
+    public NotificationManager mNotificationManager;
+    public MainViewModel mMainVM;
+    public PlaylistsViewModel mPlaylistsVM;
+    public PlaylistViewViewModel mPlaylistViewVM;
+    public PlaylistEditViewModel mPlaylistEditVM;
+    public SongEditViewModel mSongEditVM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +75,7 @@ public class MainActivity extends CrashDebugApplication {
         B = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(B.getRoot());
         imm = getSystemService(InputMethodManager.class);
-        notificationManager = getSystemService(NotificationManager.class);
+        mNotificationManager = getSystemService(NotificationManager.class);
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
@@ -82,15 +85,18 @@ public class MainActivity extends CrashDebugApplication {
 
         // View Model
         SearchViewModel searchVM = new ViewModelProvider(this).get(SearchViewModel.class);
-        mainVM = new ViewModelProvider(this).get(MainViewModel.class);
-        playingVM = new ViewModelProvider(this).get(PlayingViewModel.class);
-        playlistsVM = new ViewModelProvider(this).get(PlaylistsViewModel.class);
-        playlistViewVM = new ViewModelProvider(this).get(PlaylistViewViewModel.class);
-        playlistEditVM = new ViewModelProvider(this).get(PlaylistEditViewModel.class);
-        songEditVM = new ViewModelProvider(this).get(SongEditViewModel.class);
+        mMainVM = new ViewModelProvider(this).get(MainViewModel.class);
+        mPlaylistsVM = new ViewModelProvider(this).get(PlaylistsViewModel.class);
+        mPlaylistViewVM = new ViewModelProvider(this).get(PlaylistViewViewModel.class);
+        mPlaylistEditVM = new ViewModelProvider(this).get(PlaylistEditViewModel.class);
+        mSongEditVM = new ViewModelProvider(this).get(SongEditViewModel.class);
+
+        // Services
+        getDownloadService(service -> {});
+        getPlayingService(service -> {});
 
         // Live Observers
-        mainVM.error.observe(this, this::handleError);
+        mMainVM.error.observe(this, this::handleError);
         searchVM.watch(this);
 
         // Navigation
@@ -98,12 +104,8 @@ public class MainActivity extends CrashDebugApplication {
             (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
         assert navHostFragment != null;
-        navController = navHostFragment.getNavController();
-        NavigationUI.setupWithNavController(B.bottomNavigator, navController);
-
-        // Music Player
-        SimpleExoPlayer player = new SimpleExoPlayer.Builder(this).build();
-        playingVM.setPlayer(this, player);
+        mNavController = navHostFragment.getNavController();
+        NavigationUI.setupWithNavController(B.bottomNavigator, mNavController);
 
         // Notification Channels
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
@@ -113,15 +115,20 @@ public class MainActivity extends CrashDebugApplication {
                 NotificationManager.IMPORTANCE_DEFAULT
             );
             downloadChannel.setDescription("Download songs for offline listening");
-            notificationManager.createNotificationChannel(downloadChannel);
+            mNotificationManager.createNotificationChannel(downloadChannel);
+            NotificationChannel playingChannel = new NotificationChannel(
+                MainActivity.PLAYING_CHANNEL_ID,
+                MainActivity.PLAYING_CHANNEL_ID,
+                NotificationManager.IMPORTANCE_DEFAULT
+            );
+            playingChannel.setDescription("Current playing song notification");
+            mNotificationManager.createNotificationChannel(playingChannel);
         }
 
-        // Playing Screen background
-        int[] colors = {getColor(R.color.default_cover_color), getAttributeResource(R.attr.colorSecondary)};
-        GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
-        playingVM.background.setValue(newGD);
+        // User ID
+        mMainVM.userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        mainVM.userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        // Check for newer version
         new VersionCheckRequest(new VersionCheckRequest.Callback() {
             @Override
             public void onComplete(String version) {
@@ -136,19 +143,31 @@ public class MainActivity extends CrashDebugApplication {
             }
         });
 
-        getDownloadService(service -> {});
+        // Playing Screen background
+        int[] colors = {getColor(R.color.default_cover_color), getAttributeResource(R.attr.colorSecondary)};
+        GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
+
+        // Ensure service exists
+        getPlayingService(service -> {
+            service.background.setValue(newGD);
+
+            if (getIntent().getAction() != null) {
+                if (FRAGMENT_PLAYING.equals(getIntent().getAction())) {
+                    mNavController.navigate(R.id.fragment_playing);
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mainVM.watch(this);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        playingVM.cleanup();
+        mMainVM.watch(this);
     }
 
     @Override
@@ -185,7 +204,7 @@ public class MainActivity extends CrashDebugApplication {
         error.put("class", e.getClass().getName());
 
         mDb.collection("users")
-            .document(mainVM.userId)
+            .document(mMainVM.userId)
             .collection("errors")
             .add(error)
             .addOnSuccessListener(__ -> Log.i(TAG, "Error stored successfully"))
@@ -240,12 +259,22 @@ public class MainActivity extends CrashDebugApplication {
     }
 
     public void getDownloadService(DownloadServiceCallback callback) {
-        if (mainVM.downloadService.getValue() != null) {
-            callback.onStart(mainVM.downloadService.getValue());
+        if (mMainVM.downloadService.getValue() != null) {
+            callback.onStart(mMainVM.downloadService.getValue());
         } else {
             Intent downloadIntent = new Intent(this, DownloadService.class);
             startService(downloadIntent);
-            bindService(downloadIntent, mainVM.getDownloadConnection(callback), Context.BIND_AUTO_CREATE);
+            bindService(downloadIntent, mMainVM.getDownloadConnection(callback), Context.BIND_AUTO_CREATE);
+        }
+    }
+
+    public void getPlayingService(PlayingServiceCallback callback) {
+        if (mMainVM.playingService.getValue() != null) {
+            callback.onStart(mMainVM.playingService.getValue());
+        } else {
+            Intent playingIntent = new Intent(this, PlayingService.class);
+            startService(playingIntent);
+            bindService(playingIntent, mMainVM.getPlayingConnection(callback), Context.BIND_AUTO_CREATE);
         }
     }
 
@@ -267,6 +296,10 @@ public class MainActivity extends CrashDebugApplication {
 
     public interface DownloadServiceCallback {
         void onStart(DownloadService service);
+    }
+
+    public interface PlayingServiceCallback {
+        void onStart(PlayingService service);
     }
 
 }

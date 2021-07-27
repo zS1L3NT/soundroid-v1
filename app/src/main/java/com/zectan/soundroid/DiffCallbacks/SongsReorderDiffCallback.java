@@ -1,4 +1,4 @@
-package com.zectan.soundroid.Adapters.DiffCallbacks;
+package com.zectan.soundroid.DiffCallbacks;
 
 import androidx.recyclerview.widget.DiffUtil;
 
@@ -6,15 +6,12 @@ import com.zectan.soundroid.Models.Song;
 
 import java.util.List;
 
-public class SongsDiffCallback extends DiffUtil.Callback {
+public class SongsReorderDiffCallback extends DiffUtil.Callback {
     private final List<Song> mOldSongs, mNewSongs;
-    private final Song mCurrentSong, mPreviousSong;
 
-    public SongsDiffCallback(List<Song> oldSongs, List<Song> newSongs, Song currentSong, Song previousSong) {
+    public SongsReorderDiffCallback(List<Song> oldSongs, List<Song> newSongs) {
         mOldSongs = oldSongs;
         mNewSongs = newSongs;
-        mCurrentSong = currentSong;
-        mPreviousSong = previousSong;
     }
 
     @Override
@@ -38,6 +35,6 @@ public class SongsDiffCallback extends DiffUtil.Callback {
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
         Song oldSong = mOldSongs.get(oldItemPosition);
         Song newSong = mNewSongs.get(newItemPosition);
-        return oldSong.equals(newSong) && !oldSong.equals(mCurrentSong) && !oldSong.equals(mPreviousSong);
+        return oldSong.equals(newSong);
     }
 }

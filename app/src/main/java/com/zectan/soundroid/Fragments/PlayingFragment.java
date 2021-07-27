@@ -9,7 +9,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +26,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.Adapters.PlayingAdapter;
 import com.zectan.soundroid.Classes.Fragment;
 import com.zectan.soundroid.Models.Song;
+import com.zectan.soundroid.Services.PlayingService;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.Utils.Animations;
 import com.zectan.soundroid.Utils.MenuBuilder;
@@ -43,7 +43,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     private final PlayingAdapter.Callback callback = new PlayingAdapter.Callback() {
         @Override
         public void onSongClicked(Song song) {
-            mPlayingVM.changeSong(song.getSongId());
+            mPlayingService.changeSong(song.getSongId());
             B.recyclerView.scrollToPosition(0);
 
             if (mMainVM.myUser.getValue().getOpenPlayingScreen()) {
@@ -53,12 +53,12 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
 
         @Override
         public void onMove(int oldPosition, int newPosition) {
-            mPlayingVM.onMoveSong(oldPosition + 1, newPosition + 1);
+            mPlayingService.onMoveSong(oldPosition + 1, newPosition + 1);
         }
 
         @Override
         public void onRemove(String songId) {
-            mPlayingVM.onRemoveSong(songId);
+            mPlayingService.onRemoveSong(songId);
         }
 
         @Override
@@ -74,7 +74,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
                 mFinalTouch = progress;
 
                 double percent = (double) progress / 1000;
-                double duration = (double) mPlayingVM.duration.getValue();
+                double duration = (double) mPlayingService.duration.getValue();
                 int selectedTime = (int) (percent * duration);
                 B.timeText.setText(Utils.formatDuration(selectedTime));
             }
@@ -82,17 +82,18 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
 
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
-            mPlayingVM.touchingSeekbar = true;
+            mPlayingService.touchingSeekbar.setValue(true);
         }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-            mPlayingVM.seekTo(mFinalTouch);
-            mPlayingVM.touchingSeekbar = false;
+            mPlayingService.seekTo(mFinalTouch);
+            mPlayingService.touchingSeekbar.setValue(false);
         }
     };
     private PlayingAdapter mPlayingAdapter;
     private ItemTouchHelper mItemTouchHelper;
+    private PlayingService mPlayingService;
 
     @SuppressLint("ClickableViewAccessibility")
     @Nullable
@@ -110,18 +111,24 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         B.recyclerView.setLayoutManager(layoutManager);
         mItemTouchHelper.attachToRecyclerView(B.recyclerView);
 
+        if (mMainVM.playingService.getValue() == null) {
+            mActivity.getPlayingService(service -> mPlayingService = service);
+        } else {
+            mPlayingService = mMainVM.playingService.getValue();
+        }
+
         // Live Observers
-        mPlayingVM.queue.observe(this, mPlayingAdapter::updateSongs);
-        mPlayingVM.currentSong.observe(this, this::onCurrentSongChange);
-        mPlayingVM.time.observe(this, this::onTimeChange);
-        mPlayingVM.buffered.observe(this, B.seekbar::setSecondaryProgress);
-        mPlayingVM.progress.observe(this, B.seekbar::setProgress);
-        mPlayingVM.duration.observe(this, this::onDurationChange);
-        mPlayingVM.isBuffering.observe(this, this::onIsBufferingChange);
-        mPlayingVM.isPlaying.observe(this, this::onIsPlayingChange);
-        mPlayingVM.isShuffling.observe(this, this::onIsShufflingChange);
-        mPlayingVM.isLooping.observe(this, this::onIsLoopingChange);
-        mPlayingVM.error.observe(this, this::onErrorChange);
+        mPlayingService.queue.observe(this, mPlayingAdapter::updateSongs);
+        mPlayingService.currentSong.observe(this, this::onCurrentSongChange);
+        mPlayingService.time.observe(this, this::onTimeChange);
+        mPlayingService.buffered.observe(this, B.seekbar::setSecondaryProgress);
+        mPlayingService.progress.observe(this, B.seekbar::setProgress);
+        mPlayingService.duration.observe(this, this::onDurationChange);
+        mPlayingService.isBuffering.observe(this, this::onIsBufferingChange);
+        mPlayingService.isPlaying.observe(this, this::onIsPlayingChange);
+        mPlayingService.isShuffling.observe(this, this::onIsShufflingChange);
+        mPlayingService.isLooping.observe(this, this::onIsLoopingChange);
+        mPlayingService.error.observe(this, this::onErrorChange);
 
         B.backNavigateImage.setOnClickListener(__ -> mActivity.onBackPressed());
         B.moreImage.setOnClickListener(this::onMoreImageClicked);
@@ -129,19 +136,19 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         B.playPauseImage.setOnTouchListener(Animations::animationSmallSqueeze);
         B.playPauseMiniImage.setOnClickListener(this::playPauseSong);
         B.playPauseMiniImage.setOnTouchListener(Animations::animationMediumSqueeze);
-        B.shuffleImage.setOnClickListener(__ -> mPlayingVM.toggleShuffle());
+        B.shuffleImage.setOnClickListener(__ -> mPlayingService.toggleShuffle());
         B.shuffleImage.setOnTouchListener(Animations::animationMediumSqueeze);
-        B.backImage.setOnClickListener(__ -> mPlayingVM.playPreviousSong());
+        B.backImage.setOnClickListener(__ -> mPlayingService.playPreviousSong());
         B.backImage.setOnTouchListener(Animations::animationMediumSqueeze);
-        B.nextImage.setOnClickListener(__ -> mPlayingVM.playNextSong());
+        B.nextImage.setOnClickListener(__ -> mPlayingService.playNextSong());
         B.nextImage.setOnTouchListener(Animations::animationMediumSqueeze);
-        B.loopImage.setOnClickListener(__ -> mPlayingVM.toggleLoop());
+        B.loopImage.setOnClickListener(__ -> mPlayingService.toggleLoop());
         B.loopImage.setOnTouchListener(Animations::animationMediumSqueeze);
         B.seekbar.setOnSeekBarChangeListener(onSeekBarChangeListener);
         B.parent.setTransitionListener(mActivity.getTransitionListener());
 
-        B.parent.setBackground(mPlayingVM.background.getValue());
-        mPlayingVM.error.setValue("");
+        B.parent.setBackground(mPlayingService.background.getValue());
+        mPlayingService.error.setValue("");
         mFinalTouch = 0;
 
         return B.getRoot();
@@ -152,21 +159,20 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         items.addToPlaylist();
         items.openQueue();
         items.clearQueue();
-        MenuBuilder.createMenu(view, items, mPlayingVM.currentSong.getValue(), (song, item) -> mActivity.handleMenuItemClick(null, song, item, B.parent::transitionToEnd));
+        MenuBuilder.createMenu(view, items, mPlayingService.currentSong.getValue(), (song, item) -> mActivity.handleMenuItemClick(null, song, item, B.parent::transitionToEnd));
     }
 
     public void playPauseSong(View v) {
-        if (mPlayingVM.isBuffering.getValue()) return;
-        if (mPlayingVM.isPlaying.getValue()) {
-            mPlayingVM.pause();
+        if (mPlayingService.isBuffering.getValue()) return;
+        if (mPlayingService.isPlaying.getValue()) {
+            mPlayingService.pause();
         } else {
-            mPlayingVM.play();
+            mPlayingService.play();
         }
     }
 
     private void onCurrentSongChange(Song song) {
         String colorHex;
-        mPlayingVM.onCurrentSongChanged(Looper.getMainLooper(), song);
 
         if (song == null) {
             mPlayingAdapter.updateSongs(new ArrayList<>());
@@ -181,7 +187,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             String cover = song.getCover();
             colorHex = song.getColorHex();
 
-            B.playlistNameText.setText(mPlayingVM.playlist.getValue().getInfo().getName());
+            B.playlistNameText.setText(mPlayingService.playlist.getValue().getInfo().getName());
             B.titleText.setText(title);
             B.descriptionText.setText(artiste);
             Glide
@@ -193,14 +199,14 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
                 .into(B.coverImage);
         }
 
-        GradientDrawable oldGD = mPlayingVM.background.getValue();
+        GradientDrawable oldGD = mPlayingService.background.getValue();
         int[] colors = {Color.parseColor(colorHex), mActivity.getAttributeResource(R.attr.colorSecondary)};
         GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
 
         Drawable[] layers = {oldGD, newGD};
         TransitionDrawable transition = new TransitionDrawable(layers);
         B.parent.setBackground(transition);
-        mPlayingVM.background.setValue(newGD);
+        mPlayingService.background.setValue(newGD);
         transition.startTransition(500);
     }
 
@@ -251,8 +257,8 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             B.errorText.animate().alpha(1).setDuration(500).setStartDelay(500).start();
             B.retryText.animate().alpha(1).setDuration(500).setStartDelay(500).start();
             new Handler().postDelayed(() -> B.coverImage.setOnClickListener(__ -> {
-                mPlayingVM.retry();
-                mPlayingVM.error.setValue("");
+                mPlayingService.retry();
+                mPlayingService.error.setValue("");
             }), 1000);
         } else {
             B.coverImage.setOnClickListener(__ -> {

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.zectan.soundroid.Adapters.DiffCallbacks.InfoDiffCallback;
+import com.zectan.soundroid.DiffCallbacks.InfoDiffCallback;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.Info;
 import com.zectan.soundroid.Models.Playlist;
@@ -77,7 +77,7 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
 
     public void bind(Info info) {
         MainActivity activity = (MainActivity) B.parent.getContext();
-        Playlist playlist = new Playlist(info, activity.mainVM.getSongsFromPlaylist(info.getId()));
+        Playlist playlist = new Playlist(info, activity.mMainVM.getSongsFromPlaylist(info.getId()));
 
         String name = info.getName();
         String cover = info.getCover();
@@ -96,7 +96,7 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
             .into(B.coverImage);
         B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
 
-        B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forPlaylist(new Playlist(info, activity.mainVM.getSongsFromPlaylist(info.getId())), activity), info, mCallback));
+        B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forPlaylist(new Playlist(info, activity.mMainVM.getSongsFromPlaylist(info.getId())), activity), info, mCallback));
     }
 
 }

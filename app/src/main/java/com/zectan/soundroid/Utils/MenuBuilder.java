@@ -10,7 +10,7 @@ import android.view.View;
 import androidx.appcompat.view.menu.MenuItemImpl;
 import androidx.appcompat.widget.PopupMenu;
 
-import com.zectan.soundroid.DownloadService;
+import com.zectan.soundroid.Services.DownloadService;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.Song;
@@ -111,7 +111,7 @@ public class MenuBuilder {
                 items.clearDownloads();
             } else {
                 // If playlists is being downloaded
-                DownloadService downloadService = activity.mainVM.downloadService.getValue();
+                DownloadService downloadService = activity.mMainVM.downloadService.getValue();
                 if (downloadService != null && downloadService.isDownloading(playlist.getInfo().getId())) {
                     items.stopDownloads();
                 } else {

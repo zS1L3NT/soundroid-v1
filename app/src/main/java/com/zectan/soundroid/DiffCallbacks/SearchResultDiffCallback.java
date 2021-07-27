@@ -1,4 +1,4 @@
-package com.zectan.soundroid.Adapters.DiffCallbacks;
+package com.zectan.soundroid.DiffCallbacks;
 
 import androidx.recyclerview.widget.DiffUtil;
 
