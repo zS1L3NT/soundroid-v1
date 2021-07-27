@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -54,13 +53,11 @@ import java.util.Map;
 
 public class MainActivity extends CrashDebugApplication {
     private static final String TAG = "(SounDroid) MainActivity";
-    public static final String DOWNLOAD_CHANNEL_ID = "DOWNLOAD_CHANNEL_ID";
-    public static final String PLAYING_CHANNEL_ID = "PLAYING_CHANNEL_ID";
+    public static final String DOWNLOAD_CHANNEL_ID = "Downloads";
+    public static final String PLAYING_CHANNEL_ID = "Playing";
     public static final String FRAGMENT_PLAYING = "FRAGMENT_PLAYING";
     public final FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     public ActivityMainBinding B;
-    private InputMethodManager imm;
-
     public NavController mNavController;
     public NotificationManager mNotificationManager;
     public MainViewModel mMainVM;
@@ -68,13 +65,14 @@ public class MainActivity extends CrashDebugApplication {
     public PlaylistViewViewModel mPlaylistViewVM;
     public PlaylistEditViewModel mPlaylistEditVM;
     public SongEditViewModel mSongEditVM;
+    private InputMethodManager mInputMethodManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         B = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(B.getRoot());
-        imm = getSystemService(InputMethodManager.class);
+        mInputMethodManager = getSystemService(InputMethodManager.class);
         mNotificationManager = getSystemService(NotificationManager.class);
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             Intent intent = new Intent(this, AuthActivity.class);
@@ -92,8 +90,10 @@ public class MainActivity extends CrashDebugApplication {
         mSongEditVM = new ViewModelProvider(this).get(SongEditViewModel.class);
 
         // Services
-        getDownloadService(service -> {});
-        getPlayingService(service -> {});
+        getDownloadService(service -> {
+        });
+        getPlayingService(service -> {
+        });
 
         // Live Observers
         mMainVM.error.observe(this, this::handleError);
@@ -108,22 +108,20 @@ public class MainActivity extends CrashDebugApplication {
         NavigationUI.setupWithNavController(B.bottomNavigator, mNavController);
 
         // Notification Channels
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
-            NotificationChannel downloadChannel = new NotificationChannel(
-                MainActivity.DOWNLOAD_CHANNEL_ID,
-                MainActivity.DOWNLOAD_CHANNEL_ID,
-                NotificationManager.IMPORTANCE_DEFAULT
-            );
-            downloadChannel.setDescription("Download songs for offline listening");
-            mNotificationManager.createNotificationChannel(downloadChannel);
-            NotificationChannel playingChannel = new NotificationChannel(
-                MainActivity.PLAYING_CHANNEL_ID,
-                MainActivity.PLAYING_CHANNEL_ID,
-                NotificationManager.IMPORTANCE_DEFAULT
-            );
-            playingChannel.setDescription("Current playing song notification");
-            mNotificationManager.createNotificationChannel(playingChannel);
-        }
+        NotificationChannel downloadChannel = new NotificationChannel(
+            MainActivity.DOWNLOAD_CHANNEL_ID,
+            MainActivity.DOWNLOAD_CHANNEL_ID,
+            NotificationManager.IMPORTANCE_DEFAULT
+        );
+        downloadChannel.setDescription("Download songs for offline listening");
+        mNotificationManager.createNotificationChannel(downloadChannel);
+        NotificationChannel playingChannel = new NotificationChannel(
+            MainActivity.PLAYING_CHANNEL_ID,
+            MainActivity.PLAYING_CHANNEL_ID,
+            NotificationManager.IMPORTANCE_DEFAULT
+        );
+        playingChannel.setDescription("Current playing song notification");
+        mNotificationManager.createNotificationChannel(playingChannel);
 
         // User ID
         mMainVM.userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -177,11 +175,11 @@ public class MainActivity extends CrashDebugApplication {
     }
 
     public void showKeyboard() {
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+        mInputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
     public void hideKeyboard(View currentFocus) {
-        imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
+        mInputMethodManager.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
     }
 
     public void updateNavigator(float alpha) {
@@ -273,7 +271,7 @@ public class MainActivity extends CrashDebugApplication {
             callback.onStart(mMainVM.playingService.getValue());
         } else {
             Intent playingIntent = new Intent(this, PlayingService.class);
-            startService(playingIntent);
+            startForegroundService(playingIntent);
             bindService(playingIntent, mMainVM.getPlayingConnection(callback), Context.BIND_AUTO_CREATE);
         }
     }

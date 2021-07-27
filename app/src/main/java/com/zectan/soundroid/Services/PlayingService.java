@@ -1,6 +1,5 @@
 package com.zectan.soundroid.Services;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -13,7 +12,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -79,7 +77,6 @@ public class PlayingService extends Service {
     private SimpleExoPlayer mPlayer;
     private AudioManager am;
     private AudioFocusRequest afr;
-    private Context mContext;
     private Bitmap mDefaultCover;
 
     private int mNotificationID;
@@ -106,7 +103,7 @@ public class PlayingService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        mContext = getApplicationContext();
+        Context mContext = getApplicationContext();
         mNotificationManager = getSystemService(NotificationManager.class);
         mNotificationID = Utils.getRandomInt();
 
@@ -130,11 +127,12 @@ public class PlayingService extends Service {
             .setContentText("-")
             .setSmallIcon(R.drawable.ic_launcher)
             .setLargeIcon(mDefaultCover)
-            .setPriority(Notification.PRIORITY_LOW)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setContentIntent(pendingIntentOpen)
-            .addAction(R.drawable.controls_back, "Back", pendingIntentBack)
-            .addAction(R.drawable.controls_play, "Play", pendingIntentPlayPause)
-            .addAction(R.drawable.controls_next, "Back", pendingIntentNext)
+            .setSilent(true)
+            .addAction(R.drawable.ic_notification_back, "Back", pendingIntentBack)
+            .addAction(R.drawable.ic_notification_play, "Play", pendingIntentPlayPause)
+            .addAction(R.drawable.ic_notification_next, "Back", pendingIntentNext)
             .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(0, 1, 2)
                 .setMediaSession(mediaSession.getSessionToken()));
@@ -146,15 +144,15 @@ public class PlayingService extends Service {
             public void onIsPlayingChanged(boolean state) {
                 mNotificationBuilder.clearActions();
                 mNotificationBuilder
-                    .addAction(R.drawable.controls_back, "Back", pendingIntentBack)
+                    .addAction(R.drawable.ic_notification_back, "Back", pendingIntentBack)
                     .addAction(state
-                            ? R.drawable.controls_pause
-                            : R.drawable.controls_play,
+                            ? R.drawable.ic_notification_pause
+                            : R.drawable.ic_notification_play,
                         state
                             ? "Pause"
                             : "Play",
                         pendingIntentPlayPause)
-                    .addAction(R.drawable.controls_next, "Back", pendingIntentNext);
+                    .addAction(R.drawable.ic_notification_next, "Back", pendingIntentNext);
                 mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
                 isPlaying.postValue(state);
             }
@@ -197,13 +195,11 @@ public class PlayingService extends Service {
         });
 
         am = getSystemService(AudioManager.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            afr = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                .setAcceptsDelayedFocusGain(true)
-                .setWillPauseWhenDucked(true)
-                .setOnAudioFocusChangeListener(this::onAudioFocusChange)
-                .build();
-        }
+        afr = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+            .setAcceptsDelayedFocusGain(true)
+            .setWillPauseWhenDucked(true)
+            .setOnAudioFocusChangeListener(this::onAudioFocusChange)
+            .build();
 
         mQueueManager = new QueueManager(
             this,
@@ -335,15 +331,7 @@ public class PlayingService extends Service {
 
     private void requestAudioFocus() {
         if (am == null) return;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            am.requestAudioFocus(afr);
-        } else {
-            am.requestAudioFocus(
-                this::onAudioFocusChange,
-                AudioManager.STREAM_MUSIC,
-                AudioManager.AUDIOFOCUS_GAIN
-            );
-        }
+        am.requestAudioFocus(afr);
     }
 
     private void onAudioFocusChange(int focusChange) {
@@ -355,11 +343,7 @@ public class PlayingService extends Service {
                 play();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    am.abandonAudioFocusRequest(afr);
-                } else {
-                    am.abandonAudioFocus(this::onAudioFocusChange);
-                }
+                am.abandonAudioFocusRequest(afr);
                 stop();
                 break;
         }

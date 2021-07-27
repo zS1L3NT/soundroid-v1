@@ -220,9 +220,9 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
 
     private void onIsPlayingChange(boolean isPlaying) {
         B.playPauseImage.setImageDrawable(
-            mActivity.getDrawable(isPlaying ? R.drawable.controls_pause_filled : R.drawable.controls_play_filled));
+            mActivity.getDrawable(isPlaying ? R.drawable.ic_controls_pause_filled : R.drawable.ic_controls_play_filled));
         B.playPauseMiniImage
-            .setImageDrawable(mActivity.getDrawable(isPlaying ? R.drawable.controls_pause : R.drawable.controls_play));
+            .setImageDrawable(mActivity.getDrawable(isPlaying ? R.drawable.ic_controls_pause : R.drawable.ic_controls_play));
     }
 
     private void onIsBufferingChange(boolean loading) {
