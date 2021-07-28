@@ -25,7 +25,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.lifecycle.MutableLiveData;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -81,6 +80,7 @@ public class PlayingService extends Service {
     private Bitmap mDefaultCover;
 
     private int mNotificationID;
+    private boolean mExplicitPlay;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -284,15 +284,12 @@ public class PlayingService extends Service {
 
     public void play() {
         requestAudioFocus();
+        mExplicitPlay = true;
         mPlayer.play();
     }
 
     public void pause() {
         mPlayer.pause();
-    }
-
-    public void stop() {
-        mPlayer.stop();
     }
 
     public void onMoveSong(int oldPosition, int newPosition) {
@@ -341,11 +338,17 @@ public class PlayingService extends Service {
                 pause();
                 break;
             case AudioManager.AUDIOFOCUS_GAIN:
-                play();
+                if (mExplicitPlay) {
+                    play();
+                } else {
+                    am.abandonAudioFocusRequest(afr);
+                }
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
                 am.abandonAudioFocusRequest(afr);
-                stop();
+                mExplicitPlay = false;
+                seekTo(0);
+                pause();
                 break;
         }
     }
