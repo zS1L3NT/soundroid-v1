@@ -112,7 +112,7 @@ public class MenuEvents {
             AtomicInteger completed = new AtomicInteger(0);
             OnSuccessListener<Object> onSuccessListener = __ -> {
                 if (completed.incrementAndGet() == 2) {
-                    mActivity.snack("Song added");
+                    mActivity.snack("Song added to playlist");
                 }
             };
 
@@ -160,15 +160,14 @@ public class MenuEvents {
 
     private void clearQueue() {
         mActivity.getPlayingService(PlayingService::clearQueue);
-        mActivity.snack("Cleared queue");
     }
 
     private void startDownloads() {
-        mActivity.getDownloadService(binder -> {
+        mActivity.getDownloadService(service -> {
             Playlist playlist = new Playlist(mInfo, mActivity.mMainVM.getSongsFromPlaylist(mInfo.getId()));
 
             User user = mActivity.mMainVM.myUser.getValue();
-            if (binder.startDownload(playlist, user.getHighDownloadQuality())) {
+            if (service.startDownload(playlist, user.getHighDownloadQuality())) {
                 mActivity.snack("Download starting");
             } else {
                 mActivity.snack("Already downloading playlist...");
@@ -181,7 +180,7 @@ public class MenuEvents {
         mActivity.getDownloadService(binder -> {
             if (binder.isDownloading(playlist.getInfo().getId())) {
                 binder.stopDownload(playlist);
-                mActivity.snack("Download stopped");
+                mActivity.snack("Downloading stopped");
             } else {
                 mActivity.snack("This playlist isn't being downloaded...?");
             }
@@ -199,7 +198,7 @@ public class MenuEvents {
                     song.deleteIfNotUsed(mActivity, mActivity.mMainVM.mySongs.getValue());
                 }
 
-                mActivity.snack("Songs deleted");
+                mActivity.snack("Songs deleted locally");
             })
             .show();
 
@@ -278,7 +277,6 @@ public class MenuEvents {
             .document(id)
             .set(info.toMap())
             .addOnSuccessListener(snap -> {
-                mActivity.snack("Created Playlist");
                 mActivity.mPlaylistEditVM.playlistId.setValue(id);
                 mRunnable.run();
             })
