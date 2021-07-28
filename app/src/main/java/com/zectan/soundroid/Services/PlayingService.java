@@ -25,6 +25,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.lifecycle.MutableLiveData;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -383,7 +384,7 @@ public class PlayingService extends Service {
                     .into(new CustomTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(@NonNull @NotNull Bitmap resource, @Nullable @org.jetbrains.annotations.Nullable Transition<? super Bitmap> transition) {
-                            mNotificationBuilder.setLargeIcon(resource);
+                            mNotificationBuilder.setLargeIcon(Utils.cropSquare(resource));
                             mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
                         }
 

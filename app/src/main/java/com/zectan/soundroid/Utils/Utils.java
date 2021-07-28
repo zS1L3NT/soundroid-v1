@@ -1,5 +1,6 @@
 package com.zectan.soundroid.Utils;
 
+import android.graphics.Bitmap;
 import android.view.View;
 
 import androidx.navigation.fragment.FragmentNavigator;
@@ -89,5 +90,25 @@ public class Utils {
         formatted.append(seconds);
 
         return formatted.toString();
+    }
+
+    public static Bitmap cropSquare(Bitmap bitmap) {
+        if (bitmap.getWidth() >= bitmap.getHeight()) {
+            return Bitmap.createBitmap(
+                bitmap,
+                bitmap.getWidth() / 2 - bitmap.getHeight() / 2,
+                0,
+                bitmap.getHeight(),
+                bitmap.getHeight()
+            );
+        } else {
+            return Bitmap.createBitmap(
+                bitmap,
+                0,
+                bitmap.getHeight() / 2 - bitmap.getWidth() / 2,
+                bitmap.getWidth(),
+                bitmap.getWidth()
+            );
+        }
     }
 }
