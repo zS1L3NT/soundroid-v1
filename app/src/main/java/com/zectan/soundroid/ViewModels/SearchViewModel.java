@@ -21,10 +21,6 @@ public class SearchViewModel extends ViewModel {
     public final StrictLiveData<String> error = new StrictLiveData<>("");
     private int search_count = 0;
 
-    public SearchViewModel() {
-        // Required empty public constructor
-    }
-
     /**
      * We want <b>serverResults</b> and <b>databaseResults</b> to combine to form <b>results</b>.
      * So we observe both and set results when either changes. We start watching in the MainActivity

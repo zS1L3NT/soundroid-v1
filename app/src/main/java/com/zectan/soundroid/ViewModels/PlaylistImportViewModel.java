@@ -7,8 +7,4 @@ import com.zectan.soundroid.Classes.StrictLiveData;
 public class PlaylistImportViewModel extends ViewModel {
     public final StrictLiveData<String> text = new StrictLiveData<>("");
     public final StrictLiveData<Boolean> loading = new StrictLiveData<>(false);
-
-    public PlaylistImportViewModel() {
-        // Required empty public constructor
-    }
 }

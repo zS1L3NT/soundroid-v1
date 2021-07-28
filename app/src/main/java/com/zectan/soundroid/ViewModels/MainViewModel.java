@@ -39,10 +39,6 @@ public class MainViewModel extends ViewModel {
 
     public String userId;
 
-    public MainViewModel() {
-
-    }
-
     public ServiceConnection getDownloadConnection(MainActivity.DownloadServiceCallback callback) {
         return new ServiceConnection() {
             @Override

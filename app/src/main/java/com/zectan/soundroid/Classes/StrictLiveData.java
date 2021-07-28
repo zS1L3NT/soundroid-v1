@@ -9,10 +9,6 @@ import java.util.Objects;
 
 public class StrictLiveData<@NotNull T> extends androidx.lifecycle.MutableLiveData<@NotNull T> {
 
-    public StrictLiveData() {
-        throw new UnsupportedOperationException("This method must be initialized with a value");
-    }
-
     public StrictLiveData(@NonNull @NotNull T value) {
         super(value);
     }

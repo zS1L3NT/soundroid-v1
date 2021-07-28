@@ -11,8 +11,4 @@ import java.util.List;
 public class HomeViewModel extends ViewModel {
     public final StrictLiveData<List<Song>> songs = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<Boolean> loading = new StrictLiveData<>(false);
-
-    public HomeViewModel() {
-
-    }
 }

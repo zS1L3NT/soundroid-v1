@@ -14,8 +14,4 @@ public class PlaylistViewViewModel extends ViewModel {
     public final StrictLiveData<Info> info = new StrictLiveData<>(Info.getEmpty());
     public final StrictLiveData<List<Song>> songs = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<Boolean> loading = new StrictLiveData<>(false);
-
-    public PlaylistViewViewModel() {
-        // Required empty public constructor
-    }
 }
