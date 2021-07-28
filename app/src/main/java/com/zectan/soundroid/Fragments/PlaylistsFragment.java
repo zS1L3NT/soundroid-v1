@@ -73,6 +73,7 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
     private Runnable menuItemRunnable(MenuItem item) {
         return () -> {
             switch (item.getItemId()) {
+                case MenuBuilder.ADD_PLAYLIST:
                 case MenuBuilder.EDIT_PLAYLIST:
                     mNavController.navigate(PlaylistsFragmentDirections.openPlaylistEdit());
                     break;
