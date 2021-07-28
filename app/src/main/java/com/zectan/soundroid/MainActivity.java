@@ -56,6 +56,7 @@ public class MainActivity extends CrashDebugApplication {
     public static final String DOWNLOAD_CHANNEL_ID = "Downloads";
     public static final String PLAYING_CHANNEL_ID = "Playing";
     public static final String FRAGMENT_PLAYING = "FRAGMENT_PLAYING";
+    public static final String FRAGMENT_PLAYLIST_VIEW = "FRAGMENT_PLAYLIST_VIEW";
     public final FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     public ActivityMainBinding B;
     public NavController mNavController;
@@ -144,22 +145,23 @@ public class MainActivity extends CrashDebugApplication {
         // Playing Screen background
         int[] colors = {getColor(R.color.default_cover_color), getAttributeResource(R.attr.colorSecondary)};
         GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
+        getPlayingService(service -> service.background.setValue(newGD));
 
-        // Ensure service exists
         getPlayingService(service -> {
-            service.background.setValue(newGD);
-
-            if (getIntent().getAction() != null) {
-                if (FRAGMENT_PLAYING.equals(getIntent().getAction())) {
-                    mNavController.navigate(R.id.fragment_playing);
+            Intent intent = getIntent();
+            if (intent.getAction() != null) {
+                switch (intent.getAction()) {
+                    case FRAGMENT_PLAYING:
+                        mNavController.navigate(R.id.fragment_playing);
+                        break;
+                    case FRAGMENT_PLAYLIST_VIEW:
+                        mPlaylistViewVM.playlistId.setValue(intent.getStringExtra("playlistId"));
+                        mPlaylistViewVM.songs.setValue(new ArrayList<>());
+                        mNavController.navigate(R.id.fragment_playlist_view);
+                        break;
                 }
             }
         });
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
     }
 
     @Override

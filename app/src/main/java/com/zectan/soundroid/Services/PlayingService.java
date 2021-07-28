@@ -49,9 +49,9 @@ import java.util.stream.Collectors;
 
 public class PlayingService extends Service {
     private static final String TAG = "(SounDroid) PlayingService";
-    private static final String BACK = "ACTION_BACK";
-    private static final String PLAY_PAUSE = "ACTION_PLAY_PAUSE";
-    private static final String NEXT = "ACTION_NEXT";
+    private static final String BACK = "BACK";
+    private static final String PLAY_PAUSE = "PLAY_PAUSE";
+    private static final String NEXT = "NEXT";
     private final IBinder mBinder = new PlayingService.PlayingBinder();
 
     public final StrictLiveData<Playlist> playlist = new StrictLiveData<>(Playlist.getEmpty());
@@ -379,7 +379,6 @@ public class PlayingService extends Service {
                 Glide
                     .with(this)
                     .asBitmap()
-                    .centerCrop()
                     .load(song.getCover())
                     .into(new CustomTarget<Bitmap>() {
                         @Override

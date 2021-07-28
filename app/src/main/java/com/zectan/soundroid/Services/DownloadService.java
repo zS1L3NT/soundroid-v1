@@ -1,6 +1,7 @@
 package com.zectan.soundroid.Services;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -23,12 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadService extends Service {
+    private static final String CANCEL = "CANCEL";
     private final IBinder mBinder = new DownloadBinder();
+
     private NotificationManager mNotificationManager;
+    private NotificationCompat.Builder mNotificationBuilder;
+
     private List<Playlist> mPlaylists;
     private boolean mHighDownloadQuality = true;
 
-    private Playlist mCurrent;
+    private Playlist mCurrentPlaylist;
     private int mNotificationID;
     private int mPlaylistIndex;
     private int mDownloadIndex;
@@ -52,26 +57,43 @@ public class DownloadService extends Service {
         mNotificationManager.cancel(mNotificationID);
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null && intent.getAction() != null) {
+            if (CANCEL.equals(intent.getAction())) {
+                cancelDownloads(true);
+            }
+        }
+        return START_STICKY;
+    }
+
     private void downloadFirstPlaylist() {
-        mCurrent = mPlaylists.get(0);
+        mCurrentPlaylist = mPlaylists.get(0);
         mFailed = false;
         mPlaylistIndex = 0;
         mDownloadIndex = 1;
-        mDownloadCount = (int) mCurrent
+        mDownloadCount = (int) mCurrentPlaylist
             .getSongs()
             .stream()
             .filter(s -> !s.isDownloaded(getApplicationContext()))
             .count();
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
-            .setContentTitle("Downloading Playlist")
-            .setContentText(mCurrent.getInfo().getName())
+        Intent intentOpen = new Intent(this, MainActivity.class).setAction(MainActivity.FRAGMENT_PLAYLIST_VIEW).putExtra("playlistId", mCurrentPlaylist.getInfo().getId());
+        Intent intentCancel = new Intent(this, DownloadService.class).setAction(CANCEL);
+        PendingIntent pendingIntentOpen = PendingIntent.getActivity(getApplicationContext(), 0, intentOpen, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntentCancel = PendingIntent.getService(getApplicationContext(), 0, intentCancel, 0);
+
+        mNotificationBuilder = new NotificationCompat
+            .Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
+            .setContentTitle("Downloading Service")
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setContentIntent(pendingIntentOpen)
+            .addAction(R.drawable.ic_close, "Cancel", pendingIntentCancel)
             .setSilent(true);
-        startForeground(mNotificationID, builder.build());
+        startForeground(mNotificationID, mNotificationBuilder.build());
 
-        downloadSong(mCurrent);
+        downloadSong(mCurrentPlaylist);
     }
 
     private void downloadSong(Playlist playlist) {
@@ -93,24 +115,21 @@ public class DownloadService extends Service {
         }
 
         // Is Cancelled
-        if (!playlist.equals(mCurrent)) {
+        if (!playlist.equals(mCurrentPlaylist)) {
             mFailed = true;
             return;
         }
 
         mNotificationManager.cancel(mNotificationID);
-        NotificationCompat.Builder builder = new NotificationCompat
-            .Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
+        mNotificationBuilder
             .setContentTitle(song.getTitle())
-            .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setSilent(true);
-        mNotificationManager.notify(mNotificationID, builder.build());
+            .setProgress(100, 0, true);
+        mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
 
         new DownloadProcess(getApplicationContext(), song, mHighDownloadQuality, new DownloadProcess.Callback() {
             @Override
             public boolean isCancelled() {
-                return !playlist.equals(mCurrent) || mDestroyed;
+                return !playlist.equals(mCurrentPlaylist) || mDestroyed;
             }
 
             @Override
@@ -130,28 +149,28 @@ public class DownloadService extends Service {
                 String string = "Pinging server...\n" +
                     String.format("Elapsed Time: %sm %ss", minutes, seconds);
 
-                builder
+                mNotificationBuilder
                     .setContentText("Pinging server...")
                     .setStyle(new NotificationCompat.BigTextStyle()
                         .setSummaryText(getSummaryText())
                         .bigText(string));
 
-                if (!isCancelled()) mNotificationManager.notify(mNotificationID, builder.build());
+                if (!isCancelled()) mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
             }
 
             @Override
             public void showConvertingTime(int attemptIndex, int minutes, int seconds) {
-                String string = "Converting...\n" +
+                String string = "Converting to MP3...\n" +
                     String.format("Attempt: %s/%s\n", attemptIndex, DownloadProcess.RETRY_COUNT) +
                     String.format("Elapsed Time: %sm %ss", minutes, seconds);
 
-                builder
-                    .setContentText("Converting...")
+                mNotificationBuilder
+                    .setContentText("Converting to MP3...")
                     .setStyle(new NotificationCompat.BigTextStyle()
                         .setSummaryText(getSummaryText())
                         .bigText(string));
 
-                if (!isCancelled()) mNotificationManager.notify(mNotificationID, builder.build());
+                if (!isCancelled()) mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
             }
 
             @Override
@@ -159,14 +178,14 @@ public class DownloadService extends Service {
                 String string = String.format("Progress: %s%%\n", progress) +
                     String.format("Attempt: %s/%s", attemptIndex, DownloadProcess.RETRY_COUNT);
 
-                builder
+                mNotificationBuilder
                     .setContentText(progress + "%")
                     .setProgress(100, progress, false)
                     .setStyle(new NotificationCompat.BigTextStyle()
                         .setSummaryText(getSummaryText())
                         .bigText(string));
 
-                if (!isCancelled()) mNotificationManager.notify(mNotificationID, builder.build());
+                if (!isCancelled()) mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
             }
 
             @Override
@@ -180,6 +199,7 @@ public class DownloadService extends Service {
     }
 
     private void downloadsDone() {
+        mCurrentPlaylist = null;
         mNotificationManager.cancel(mNotificationID);
         stopForeground(mNotificationID);
 
@@ -199,8 +219,8 @@ public class DownloadService extends Service {
         }
     }
 
-    private void cancelDownloads(boolean continue_) {
-        mCurrent = null;
+    private void cancelDownloads(boolean startNextPlaylist) {
+        mCurrentPlaylist = null;
         stopForeground(mNotificationID);
         mNotificationManager.cancel(mNotificationID);
 
@@ -212,7 +232,7 @@ public class DownloadService extends Service {
             .setSmallIcon(R.drawable.ic_close);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
 
-        if (continue_) {
+        if (startNextPlaylist) {
             mPlaylists.remove(0);
         } else {
             mPlaylists.clear();
