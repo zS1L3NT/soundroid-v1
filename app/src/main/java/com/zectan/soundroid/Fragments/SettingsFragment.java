@@ -141,7 +141,6 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             if (theme != null) {
                 theme.setValue(user.getTheme());
                 theme.setSummary(user.getTheme());
-                mActivity.updateTheme(user.getTheme());
             }
         }
 

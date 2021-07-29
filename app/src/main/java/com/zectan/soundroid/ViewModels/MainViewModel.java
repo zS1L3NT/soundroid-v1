@@ -82,7 +82,9 @@ public class MainViewModel extends ViewModel {
                     return;
                 }
                 assert snap != null;
-                myUser.postValue(Objects.requireNonNull(snap.toObject(User.class)));
+                User user = Objects.requireNonNull(snap.toObject(User.class));
+                myUser.postValue(user);
+                activity.updateTheme(user.getTheme());
             });
 
         mDb.collection("playlists")

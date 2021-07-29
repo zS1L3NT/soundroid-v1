@@ -128,9 +128,6 @@ public class MainActivity extends CrashDebugApplication {
         // User ID
         mMainVM.userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Theme
-        updateTheme(mMainVM.myUser.getValue().getTheme());
-
         // Check for newer version
         new VersionCheckRequest(new VersionCheckRequest.Callback() {
             @Override
