@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -127,6 +128,9 @@ public class MainActivity extends CrashDebugApplication {
         // User ID
         mMainVM.userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        // Theme
+        updateTheme(mMainVM.myUser.getValue().getTheme());
+
         // Check for newer version
         new VersionCheckRequest(new VersionCheckRequest.Callback() {
             @Override
@@ -225,6 +229,20 @@ public class MainActivity extends CrashDebugApplication {
     @SuppressLint("NonConstantResourceId")
     public boolean handleMenuItemClick(Info info, Song song, MenuItem item, Runnable runnable) {
         return new MenuEvents(this, info, song, item, runnable).handle();
+    }
+
+    public void updateTheme(String theme) {
+        switch (theme) {
+            case "Light":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "Dark":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case "System":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
+        }
     }
 
     public void snack(String message) {

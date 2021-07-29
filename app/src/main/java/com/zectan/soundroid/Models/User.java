@@ -10,17 +10,19 @@ public class User {
     private boolean openPlayingScreen;
     private boolean highStreamQuality;
     private boolean highDownloadQuality;
+    private String theme;
 
     public User() {
     }
 
-    public User(String id, String usnm, String profilePicture, boolean openPlayingScreen, boolean highStreamQuality, boolean highDownloadQuality) {
+    public User(String id, String usnm, String profilePicture, boolean openPlayingScreen, boolean highStreamQuality, boolean highDownloadQuality, String theme) {
         this.id = id;
         this.usnm = usnm;
         this.profilePicture = profilePicture;
         this.openPlayingScreen = openPlayingScreen;
         this.highStreamQuality = highStreamQuality;
         this.highDownloadQuality = highDownloadQuality;
+        this.theme = theme;
     }
 
     public static User getEmpty() {
@@ -30,7 +32,8 @@ public class User {
             "",
             true,
             true,
-            true
+            true,
+            "Dark"
         );
     }
 
@@ -58,6 +61,10 @@ public class User {
         return highDownloadQuality;
     }
 
+    public String getTheme() {
+        return theme;
+    }
+
     public Map<String, Object> toMap() {
         Map<String, Object> object = new HashMap<>();
         object.put("id", id);
@@ -66,6 +73,7 @@ public class User {
         object.put("openPlayingScreen", openPlayingScreen);
         object.put("highDownloadQuality", highDownloadQuality);
         object.put("highStreamQuality", highStreamQuality);
+        object.put("theme", theme);
         return object;
     }
 }

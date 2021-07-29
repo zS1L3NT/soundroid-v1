@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.SwitchPreferenceCompat;
@@ -95,6 +97,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
         private SwitchPreferenceCompat openPlayingScreen;
         private SwitchPreferenceCompat highDownloadQuality;
         private SwitchPreferenceCompat highStreamQuality;
+        private ListPreference theme;
 
         public SettingsPreference() {
 
@@ -106,9 +109,11 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             openPlayingScreen = findPreference("open_playing_screen");
             highDownloadQuality = findPreference("high_download_quality");
             highStreamQuality = findPreference("high_stream_quality");
+            theme = findPreference("theme");
             openPlayingScreen.setOnPreferenceChangeListener(this::onOpenPlayingScreenChange);
             highDownloadQuality.setOnPreferenceChangeListener(this::onHighDownloadQualityChange);
             highStreamQuality.setOnPreferenceChangeListener(this::onHighStreamQualityChange);
+            theme.setOnPreferenceChangeListener(this::onThemeChange);
 
             Preference clearAllDownloads = findPreference("clear_all_downloads");
             assert clearAllDownloads != null;
@@ -133,6 +138,11 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
                 highDownloadQuality.setChecked(user.getHighDownloadQuality());
             if (highStreamQuality != null)
                 highStreamQuality.setChecked(user.getHighStreamQuality());
+            if (theme != null) {
+                theme.setValue(user.getTheme());
+                theme.setSummary(user.getTheme());
+                mActivity.updateTheme(user.getTheme());
+            }
         }
 
         private boolean onOpenPlayingScreenChange(Preference preference, Object o) {
@@ -155,6 +165,14 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             if (userRef != null)
                 userRef
                     .update("highStreamQuality", Boolean.parseBoolean(o.toString()))
+                    .addOnFailureListener(mActivity::handleError);
+            return false;
+        }
+
+        private boolean onThemeChange(Preference preference, Object o) {
+            if (userRef != null)
+                userRef
+                    .update("theme", o.toString())
                     .addOnFailureListener(mActivity::handleError);
             return false;
         }

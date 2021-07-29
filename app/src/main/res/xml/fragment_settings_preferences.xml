@@ -26,6 +26,13 @@
 
     <com.zectan.soundroid.Classes.PreferenceCategory app:title="Others">
 
+        <ListPreference
+            app:key="theme"
+            app:summary=""
+            app:title="Theme"
+            app:entries="@array/themes"
+            app:entryValues="@array/themes" />
+
         <Preference
             app:key="clear_all_downloads"
             app:summary="Clear all downloads from all playlists"
