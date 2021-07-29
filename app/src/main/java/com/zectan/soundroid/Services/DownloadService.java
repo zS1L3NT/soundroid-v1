@@ -38,7 +38,6 @@ public class DownloadService extends Service {
     private int mPlaylistIndex;
     private int mDownloadIndex;
     private int mDownloadCount;
-    private boolean mDestroyed;
     private boolean mFailed;
 
     @Override
@@ -47,13 +46,11 @@ public class DownloadService extends Service {
         mNotificationManager = getSystemService(NotificationManager.class);
         mNotificationID = Utils.getRandomInt();
         mPlaylists = new ArrayList<>();
-        mDestroyed = false;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mDestroyed = true;
         mNotificationManager.cancel(mNotificationID);
     }
 
@@ -68,6 +65,11 @@ public class DownloadService extends Service {
     }
 
     private void downloadFirstPlaylist() {
+        if (mPlaylists.size() == 0) {
+            stopSelf();
+            return;
+        }
+
         mCurrentPlaylist = mPlaylists.get(0);
         mFailed = false;
         mPlaylistIndex = 0;
@@ -97,7 +99,7 @@ public class DownloadService extends Service {
     }
 
     private void downloadSong(Playlist playlist) {
-        if (isOffline() || mDestroyed) {
+        if (isOffline()) {
             cancelDownloads(false);
             return;
         }
@@ -107,7 +109,7 @@ public class DownloadService extends Service {
             return;
         }
 
-        Song song = mPlaylists.get(0).getSongs().get(mPlaylistIndex);
+        Song song = mCurrentPlaylist.getSongs().get(mPlaylistIndex);
         if (song.isDownloaded(getApplicationContext())) {
             mPlaylistIndex++;
             downloadSong(playlist);
@@ -129,7 +131,7 @@ public class DownloadService extends Service {
         new DownloadProcess(getApplicationContext(), song, mHighDownloadQuality, new DownloadProcess.Callback() {
             @Override
             public boolean isCancelled() {
-                return !playlist.equals(mCurrentPlaylist) || mDestroyed;
+                return !playlist.equals(mCurrentPlaylist);
             }
 
             @Override
@@ -199,19 +201,19 @@ public class DownloadService extends Service {
     }
 
     private void downloadsDone() {
-        mCurrentPlaylist = null;
         mNotificationManager.cancel(mNotificationID);
         stopForeground(mNotificationID);
 
         int NOTIFICATION_ID = Utils.getRandomInt();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
             .setContentTitle(mFailed ? "Downloads Incomplete" : "Downloading Finished")
-            .setContentText(mPlaylists.get(0).getInfo().getName())
+            .setContentText(mCurrentPlaylist.getInfo().getName())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSmallIcon(android.R.drawable.stat_sys_download_done);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
+        mCurrentPlaylist = null;
 
-        mPlaylists.remove(0);
+        if (mPlaylists.size() > 0) mPlaylists.remove(0);
         if (mPlaylists.size() > 0) {
             downloadFirstPlaylist();
         } else {
@@ -220,20 +222,20 @@ public class DownloadService extends Service {
     }
 
     private void cancelDownloads(boolean startNextPlaylist) {
-        mCurrentPlaylist = null;
         stopForeground(mNotificationID);
         mNotificationManager.cancel(mNotificationID);
 
         int NOTIFICATION_ID = Utils.getRandomInt();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
             .setContentTitle("Downloads Cancelled")
-            .setContentText(mPlaylists.get(0).getInfo().getName())
+            .setContentText(mCurrentPlaylist.getInfo().getName())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSmallIcon(R.drawable.ic_close);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
+        mCurrentPlaylist = null;
 
         if (startNextPlaylist) {
-            mPlaylists.remove(0);
+            if (mPlaylists.size() > 0) mPlaylists.remove(0);
         } else {
             mPlaylists.clear();
         }
@@ -255,15 +257,15 @@ public class DownloadService extends Service {
     public boolean startDownload(Playlist playlist, boolean highDownloadQuality) {
         mHighDownloadQuality = highDownloadQuality;
 
-        if (isDownloading(playlist.getInfo().getId())) {
-            return false;
-        }
+        if (isDownloading(playlist.getInfo().getId())) return false;
+
         mPlaylists.add(playlist);
         if (mPlaylists.size() == 1) downloadFirstPlaylist();
         return true;
     }
 
     public void stopDownload(Playlist playlist) {
+        if (mPlaylists.size() == 0) return;
         if (mPlaylists.get(0).equals(playlist)) {
             cancelDownloads(true);
         } else {
