@@ -17,8 +17,8 @@ import com.zectan.soundroid.Models.Info;
 import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.Models.User;
-import com.zectan.soundroid.Services.PlayingService;
 import com.zectan.soundroid.R;
+import com.zectan.soundroid.Services.PlayingService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -269,8 +269,7 @@ public class MenuEvents {
             "https://firebasestorage.googleapis.com/v0/b/android-soundroid.appspot.com/o/playing_cover_default.png?alt=media&token=e8980e80-ab5d-4f21-8ed4-6bc6e7e06ef7",
             "#7b828b",
             mActivity.mMainVM.userId,
-            new ArrayList<>(),
-            Utils.getQueries("New Playlist")
+            new ArrayList<>()
         );
 
         mDb.collection("playlists")

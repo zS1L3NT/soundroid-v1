@@ -7,9 +7,12 @@ import androidx.navigation.fragment.FragmentNavigator;
 
 import com.zectan.soundroid.BuildConfig;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class Utils {
 
@@ -23,14 +26,6 @@ public class Utils {
      */
     public static FragmentNavigator.Extras makeExtras(View view, String transitionName) {
         return new FragmentNavigator.Extras.Builder().addSharedElement(view, transitionName).build();
-    }
-
-    public static List<String> getQueries(String str) {
-        List<String> queries = new ArrayList<>();
-        for (int i = 0; i < str.length(); i++) {
-            queries.add(str.substring(0, i + 1).toLowerCase());
-        }
-        return queries;
     }
 
     public static int getRandomInt() {
@@ -112,5 +107,18 @@ public class Utils {
                 bitmap.getWidth()
             );
         }
+    }
+
+    public static <T> Predicate<T> filterDistinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
+    }
+
+    public static String createRegex(String query) {
+        StringBuilder regex = new StringBuilder(".*");
+        for (int i = 0; i < query.length(); i++) {
+            regex.append(String.format("(?=.*%s.*)", query.charAt(i)));
+        }
+        return regex.append(".*").toString();
     }
 }

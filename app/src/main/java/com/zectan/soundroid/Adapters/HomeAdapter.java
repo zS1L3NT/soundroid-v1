@@ -18,16 +18,14 @@ import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.Utils.MenuBuilder;
+import com.zectan.soundroid.Utils.Utils;
 import com.zectan.soundroid.databinding.SongListItemBinding;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @SuppressLint("UseCompatLoadingForDrawables")
@@ -52,16 +50,11 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
         return new HomeViewHolder(itemView, mCallback);
     }
 
-    private static <T> Predicate<T> filterDistinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
-    }
-
     public void updateSongs(List<Song> songs) {
         List<Song> sortedSongs = songs
             .stream()
-            .filter(filterDistinctByKey(Song::getSongId))
-            .sorted((song1, song2) -> song1.getTitle().compareTo(song2.getTitle()))
+            .filter(Utils.filterDistinctByKey(Song::getSongId))
+            .sorted(Comparator.comparing(Song::getTitle))
             .collect(Collectors.toList());
 
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new SongsDiffCallback(

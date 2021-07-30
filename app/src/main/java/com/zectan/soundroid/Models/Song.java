@@ -6,12 +6,10 @@ import android.net.Uri;
 import com.google.android.exoplayer2.MediaItem;
 
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +26,6 @@ public class Song {
     private String colorHex;
     private String playlistId;
     private String userId;
-    private List<String> queries;
 
     public Song() {
 
@@ -41,8 +38,7 @@ public class Song {
         String cover,
         String colorHex,
         String playlistId,
-        String userId,
-        List<String> queries
+        String userId
     ) {
         this.songId = songId;
         this.title = title;
@@ -51,7 +47,6 @@ public class Song {
         this.colorHex = colorHex;
         this.playlistId = playlistId;
         this.userId = userId;
-        this.queries = queries;
     }
 
     /**
@@ -67,8 +62,7 @@ public class Song {
             "-",
             "#7b828b",
             "",
-            "",
-            new ArrayList<>()
+            ""
         );
     }
 
@@ -80,11 +74,7 @@ public class Song {
         String colorHex = object.getString("colorHex");
         String playlistId = object.getString("playlistId");
         String userId = object.getString("userId");
-        JSONArray queriesArray = object.getJSONArray("queries");
-        List<String> queries = new ArrayList<>();
-        for (int i = 0; i < queriesArray.length(); i++)
-            queries.add(queriesArray.getString(i));
-        return new Song(songId, title, artiste, cover, colorHex, playlistId, userId, queries);
+        return new Song(songId, title, artiste, cover, colorHex, playlistId, userId);
     }
 
     public JSONObject toJSON() throws JSONException {
@@ -96,9 +86,6 @@ public class Song {
         object.put("colorHex", colorHex);
         object.put("playlistId", playlistId);
         object.put("userId", userId);
-        JSONArray queriesArray = new JSONArray();
-        for (String query : queries) queriesArray.put(query);
-        object.put("queries", queriesArray);
         return object;
     }
 
@@ -140,10 +127,6 @@ public class Song {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public List<String> getQueries() {
-        return this.queries;
     }
 
     public MediaItem getMediaItem(Context context, boolean highQuality) {
@@ -196,7 +179,6 @@ public class Song {
         object.put("colorHex", colorHex);
         object.put("playlistId", playlistId);
         object.put("userId", userId);
-        object.put("queries", queries);
         return object;
     }
 

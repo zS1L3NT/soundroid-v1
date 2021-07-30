@@ -1,5 +1,7 @@
 package com.zectan.soundroid.Fragments;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -23,14 +25,11 @@ import com.zectan.soundroid.Classes.Fragment;
 import com.zectan.soundroid.Connections.SongEditRequest;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.R;
-import com.zectan.soundroid.Utils.Utils;
 import com.zectan.soundroid.databinding.FragmentSongEditBinding;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-
-import static android.app.Activity.RESULT_OK;
 
 public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
     private final FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -125,8 +124,7 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
             song.getCover(),
             song.getColorHex(),
             song.getPlaylistId(),
-            song.getUserId(),
-            Utils.getQueries(newTitle)
+            song.getUserId()
         );
 
         StorageReference ref = storage.getReference().child(String.format("songs/%s.png", song.getSongId()));

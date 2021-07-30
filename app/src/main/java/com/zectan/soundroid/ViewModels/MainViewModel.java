@@ -11,19 +11,21 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.Classes.StrictLiveData;
-import com.zectan.soundroid.Services.DownloadService;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.Info;
 import com.zectan.soundroid.Models.SearchResult;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.Models.User;
+import com.zectan.soundroid.Services.DownloadService;
 import com.zectan.soundroid.Services.PlayingService;
+import com.zectan.soundroid.Utils.Utils;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class MainViewModel extends ViewModel {
@@ -149,11 +151,15 @@ public class MainViewModel extends ViewModel {
 
     public List<SearchResult> getResultsMatchingQuery(String query) {
         List<SearchResult> results = new ArrayList<>();
+        String regex = Utils.createRegex(query);
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+
         results.addAll(
             myInfos
                 .getValue()
                 .stream()
-                .filter(info -> info.getQueries().contains(query))
+                .filter(info -> pattern.matcher(info.getName()).matches())
+                .filter(Utils.filterDistinctByKey(Info::getId))
                 .map(SearchResult::new)
                 .collect(Collectors.toList())
         );
@@ -161,7 +167,8 @@ public class MainViewModel extends ViewModel {
             mySongs
                 .getValue()
                 .stream()
-                .filter(song -> song.getQueries().contains(query))
+                .filter(song -> pattern.matcher(song.getTitle()).matches() || pattern.matcher(song.getArtiste()).matches())
+                .filter(Utils.filterDistinctByKey(Song::getSongId))
                 .map(SearchResult::new)
                 .collect(Collectors.toList())
         );
