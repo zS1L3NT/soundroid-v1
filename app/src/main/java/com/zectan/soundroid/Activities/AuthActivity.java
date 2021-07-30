@@ -124,17 +124,13 @@ public class AuthActivity extends CrashDebugApplication {
                 );
 
                 userRef.set(user.toMap())
-                    .addOnSuccessListener(__ -> new DefaultPlaylistsRequest(user.getId(), new Request.Callback() {
-                        @Override
-                        public void onComplete(String response) {
-                            new Handler(getMainLooper()).post(AuthActivity.this::changeScreen);
-                        }
-
-                        @Override
-                        public void onError(String message) {
-                            new Handler(getMainLooper()).post(AuthActivity.this::changeScreen);
-                        }
-                    }))
+                    .addOnSuccessListener(__ -> {
+                        new DefaultPlaylistsRequest(user.getId());
+                        Intent intent = new Intent(this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                        restoreButton();
+                    })
                     .addOnFailureListener(error -> {
                         Snackbar.make(B.getRoot(), "Error creating user in database", Snackbar.LENGTH_SHORT).show();
                         error.printStackTrace();
@@ -148,13 +144,6 @@ public class AuthActivity extends CrashDebugApplication {
                 restoreButton();
                 mAuth.signOut();
             });
-    }
-
-    private void changeScreen() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
-        restoreButton();
     }
 
     private void restoreButton() {
