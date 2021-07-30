@@ -38,6 +38,8 @@ import com.zectan.soundroid.ViewModels.PlaylistsViewModel;
 import com.zectan.soundroid.ViewModels.SongEditViewModel;
 import com.zectan.soundroid.databinding.ActivityMainBinding;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -205,17 +207,19 @@ public class MainActivity extends CrashDebugApplication {
         return new MenuEvents(this, info, song, item, runnable).handle();
     }
 
-    public void updateTheme(String theme) {
-        switch (theme) {
-            case "Light":
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                break;
-            case "Dark":
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                break;
-            case "System":
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                break;
+    public void updateTheme(@Nullable String theme) {
+        if (theme != null) {
+            switch (theme) {
+                case "Light":
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    break;
+                case "Dark":
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    break;
+                case "System":
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                    break;
+            }
         }
     }
 
