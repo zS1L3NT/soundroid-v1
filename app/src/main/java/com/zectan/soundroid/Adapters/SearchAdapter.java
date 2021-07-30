@@ -1,5 +1,6 @@
 package com.zectan.soundroid.Adapters;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,6 +100,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
         mCallback = callback;
     }
 
+    @SuppressLint("SetTextI18n")
     public void bind(List<SearchResult> results, Song currentSong, int position) {
         if (B == null) return;
 
@@ -112,7 +114,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             String cover = song.getCover();
 
             B.titleText.setText(title);
-            B.descriptionText.setText(String.format("%s • Song • %s", result.getLocation(), artiste));
+            B.descriptionText.setText(String.format("Song • %s", artiste));
             B.downloadedDot.setAlpha(song.isDownloaded(activity) ? 1 : 0);
             Glide
                 .with(activity)
@@ -158,7 +160,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             }
 
             B.titleText.setText(name);
-            B.descriptionText.setText(String.format("%s • Playlist", result.getLocation()));
+            B.descriptionText.setText("Playlist");
             Glide
                 .with(activity)
                 .load(cover)

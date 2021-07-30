@@ -35,7 +35,6 @@ import com.zectan.soundroid.ViewModels.MainViewModel;
 import com.zectan.soundroid.ViewModels.PlaylistEditViewModel;
 import com.zectan.soundroid.ViewModels.PlaylistViewViewModel;
 import com.zectan.soundroid.ViewModels.PlaylistsViewModel;
-import com.zectan.soundroid.ViewModels.SearchViewModel;
 import com.zectan.soundroid.ViewModels.SongEditViewModel;
 import com.zectan.soundroid.databinding.ActivityMainBinding;
 
@@ -79,7 +78,6 @@ public class MainActivity extends CrashDebugApplication {
         }
 
         // View Model
-        SearchViewModel searchVM = new ViewModelProvider(this).get(SearchViewModel.class);
         mMainVM = new ViewModelProvider(this).get(MainViewModel.class);
         mPlaylistsVM = new ViewModelProvider(this).get(PlaylistsViewModel.class);
         mPlaylistViewVM = new ViewModelProvider(this).get(PlaylistViewViewModel.class);
@@ -94,7 +92,6 @@ public class MainActivity extends CrashDebugApplication {
 
         // Live Observers
         mMainVM.error.observe(this, this::handleError);
-        searchVM.watch(this);
 
         // Navigation
         NavHostFragment navHostFragment =

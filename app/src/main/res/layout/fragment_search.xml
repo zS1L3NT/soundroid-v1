@@ -71,69 +71,21 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/message_text"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="4dp"
-        android:alpha="0.4"
-        android:fontFamily="@font/sans_bold"
-        android:maxLines="1"
-        android:textAlignment="center"
-        app:layout_constraintTop_toBottomOf="@+id/header" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layoutAnimation="@anim/songs_recycler_animation"
-        android:overScrollMode="never"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/message_text"
-        tools:listitem="@layout/song_list_item" />
-
-    <LinearLayout
-        android:id="@+id/response_layout"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:alpha="0"
-        android:orientation="vertical"
+        android:background="?attr/backgroundColor"
+        app:layout_constraintTop_toBottomOf="@id/header"
+        app:tabMode="fixed"
+        app:tabTextColor="?attr/colorOnBackground" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/response_image"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:layout_gravity="center_horizontal"
-            android:contentDescription="@string/no_results"
-            android:src="@drawable/ic_search"
-            app:tint="?attr/colorOnBackground" />
-
-        <TextView
-            android:id="@+id/response_header_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:fontFamily="@font/sans_light"
-            android:text="@string/no_results"
-            android:textSize="32sp" />
-
-        <TextView
-            android:id="@+id/response_message_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:fontFamily="@font/sans_regular"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/connect_to_the_internet_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:fontFamily="@font/sans_regular"
-            android:textSize="16sp" />
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@id/tab_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
