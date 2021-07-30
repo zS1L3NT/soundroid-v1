@@ -173,6 +173,7 @@ public class QueueManager {
         mSongs.addAll(songs.stream().filter(s -> !s.getSongId().equals(songId)).collect(Collectors.toList()));
         mSortedOrder.remove(songId);
         mShuffledOrder.remove(songId);
+        if (mPosition == mSortedOrder.size()) mPosition--;
 
         updateLiveQueue();
     }
