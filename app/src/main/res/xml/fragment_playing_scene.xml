@@ -13,6 +13,9 @@
                 app:attributeName="enabled"
                 app:customBoolean="true" />
         </Constraint>
+        <Constraint android:id="@id/loading_circle">
+            <Transform android:elevation="6dp" />
+        </Constraint>
         <Constraint android:id="@+id/shuffle_image">
             <CustomAttribute
                 app:attributeName="enabled"
@@ -120,7 +123,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toTopOf="@+id/description_text"
-                app:layout_constraintEnd_toStartOf="@+id/loading_circle"
+                app:layout_constraintEnd_toEndOf="@+id/description_text"
                 app:layout_constraintStart_toStartOf="@+id/description_text"
                 app:layout_constraintTop_toTopOf="@id/cover_image" />
             <Transform
@@ -135,7 +138,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="0dp"
                 app:layout_constraintBottom_toBottomOf="@id/cover_image"
-                app:layout_constraintEnd_toStartOf="@+id/loading_circle"
+                app:layout_constraintEnd_toStartOf="@+id/play_pause_mini_image"
                 app:layout_constraintStart_toStartOf="@id/cover_image"
                 app:layout_constraintTop_toBottomOf="@+id/title_text" />
             <Transform
@@ -146,10 +149,11 @@
             <Layout
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:layout_marginEnd="72dp"
                 app:layout_constraintBottom_toBottomOf="@id/cover_image"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/cover_image"
+                app:layout_constraintStart_toStartOf="@id/cover_image"
                 app:layout_constraintTop_toTopOf="@id/cover_image" />
+            <Transform android:elevation="6dp" />
         </Constraint>
         <Constraint android:id="@+id/shuffle_image">
             <Layout
@@ -345,7 +349,8 @@
             <KeyPosition
                 app:framePosition="50"
                 app:motionTarget="@id/loading_circle"
-                app:percentX="1.5" />
+                app:percentX="0"
+                app:percentY="0.75" />
             <KeyPosition
                 app:framePosition="50"
                 app:motionTarget="@id/play_pause_mini_image"

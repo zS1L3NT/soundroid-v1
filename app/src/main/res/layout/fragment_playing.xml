@@ -123,7 +123,7 @@
         android:textColor="@color/white"
         android:textSize="22sp"
         app:layout_constraintBottom_toTopOf="@+id/description_text"
-        app:layout_constraintEnd_toStartOf="@id/loading_circle"
+        app:layout_constraintEnd_toEndOf="@id/description_text"
         app:layout_constraintStart_toStartOf="@+id/description_text" />
 
     <TextView
@@ -132,6 +132,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginBottom="8dp"
+        android:layout_marginEnd="32dp"
         android:alpha="0.6"
         android:elevation="6dp"
         android:ellipsize="end"
@@ -140,20 +141,21 @@
         android:textColor="@color/white"
         android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/seekbar"
-        app:layout_constraintEnd_toStartOf="@id/loading_circle"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <ProgressBar
         android:id="@+id/loading_circle"
         style="?android:attr/progressBarStyle"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginEnd="32dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:alpha="0"
+        android:elevation="6dp"
         android:indeterminateTint="@color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/title_text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/title_text" />
+        app:layout_constraintBottom_toBottomOf="@id/cover_image"
+        app:layout_constraintEnd_toEndOf="@id/cover_image"
+        app:layout_constraintStart_toStartOf="@id/cover_image"
+        app:layout_constraintTop_toTopOf="@id/cover_image" />
 
     <SeekBar
         android:id="@+id/seekbar"

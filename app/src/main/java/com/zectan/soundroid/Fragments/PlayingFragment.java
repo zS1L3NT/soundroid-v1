@@ -1,5 +1,7 @@
 package com.zectan.soundroid.Fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
@@ -15,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.SeekBar;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -26,8 +29,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.Adapters.PlayingAdapter;
 import com.zectan.soundroid.Classes.Fragment;
 import com.zectan.soundroid.Models.Song;
-import com.zectan.soundroid.Services.PlayingService;
 import com.zectan.soundroid.R;
+import com.zectan.soundroid.Services.PlayingService;
 import com.zectan.soundroid.Utils.Animations;
 import com.zectan.soundroid.Utils.MenuBuilder;
 import com.zectan.soundroid.Utils.Utils;
@@ -40,6 +43,13 @@ import java.util.ArrayList;
 @SuppressLint("UseCompatLoadingForDrawables")
 public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     private static final String TAG = "(SounDroid) PlayingFragment";
+    private @ColorInt
+    int mImageColor;
+    private int mFinalTouch;
+    private ValueAnimator mImageAnimator;
+    private PlayingAdapter mPlayingAdapter;
+    private ItemTouchHelper mItemTouchHelper;
+    private PlayingService mPlayingService;
     private final PlayingAdapter.Callback callback = new PlayingAdapter.Callback() {
         @Override
         public void onSongClicked(Song song) {
@@ -66,7 +76,6 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             mItemTouchHelper.startDrag(viewHolder);
         }
     };
-    private int mFinalTouch;
     private final SeekBar.OnSeekBarChangeListener onSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -91,9 +100,6 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             mPlayingService.touchingSeekbar.setValue(false);
         }
     };
-    private PlayingAdapter mPlayingAdapter;
-    private ItemTouchHelper mItemTouchHelper;
-    private PlayingService mPlayingService;
 
     @SuppressLint("ClickableViewAccessibility")
     @Nullable
@@ -150,8 +156,45 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         B.parent.setBackground(mPlayingService.background.getValue());
         mPlayingService.error.setValue("");
         mFinalTouch = 0;
+        mImageColor = mActivity.getColor(R.color.white);
 
         return B.getRoot();
+    }
+
+    private void darkenAnimateImage() {
+        if (mImageAnimator != null) mImageAnimator.pause();
+        mImageAnimator = ValueAnimator.ofArgb(mImageColor, mActivity.getColor(R.color.playing_inactive)).setDuration(1000);
+        mImageAnimator.addUpdateListener(animation -> {
+            @ColorInt int color = (int) animation.getAnimatedValue();
+            B.coverImage.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+            mImageColor = color;
+        });
+        mImageAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mImageAnimator = null;
+            }
+        });
+        mImageAnimator.start();
+    }
+
+    private void brightenAnimateImage() {
+        if (mPlayingService.error.getValue().equals("") && !mPlayingService.isBuffering.getValue()) {
+            if (mImageAnimator != null) mImageAnimator.pause();
+            mImageAnimator = ValueAnimator.ofArgb(mImageColor, mActivity.getColor(R.color.white)).setDuration(1000);
+            mImageAnimator.addUpdateListener(animation -> {
+                @ColorInt int color = (int) animation.getAnimatedValue();
+                B.coverImage.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+                mImageColor = color;
+            });
+            mImageAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mImageAnimator = null;
+                }
+            });
+            mImageAnimator.start();
+        }
     }
 
     private void onMoreImageClicked(View view) {
@@ -228,6 +271,11 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     private void onIsBufferingChange(boolean loading) {
         B.loadingCircle.setAlpha(loading ? 1 : 0);
         B.parent.requestLayout();
+        if (loading) {
+            darkenAnimateImage();
+        } else {
+            brightenAnimateImage();
+        }
     }
 
     private void onIsShufflingChange(boolean isShuffling) {
@@ -247,15 +295,9 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     private void onErrorChange(String error) {
         if (!error.equals("")) {
             B.errorText.setText(error);
-            ValueAnimator darkenAnimation = ValueAnimator
-                .ofArgb(mActivity.getColor(R.color.white), mActivity.getColor(R.color.playing_inactive))
-                .setDuration(1000);
-            darkenAnimation.addUpdateListener(animation -> B.coverImage.setColorFilter(
-                (int) animation.getAnimatedValue(),
-                PorterDuff.Mode.MULTIPLY));
-            darkenAnimation.start();
             B.errorText.animate().alpha(1).setDuration(500).setStartDelay(500).start();
             B.retryText.animate().alpha(1).setDuration(500).setStartDelay(500).start();
+            darkenAnimateImage();
             new Handler().postDelayed(() -> B.coverImage.setOnClickListener(__ -> {
                 mPlayingService.retry();
                 mPlayingService.error.setValue("");
@@ -263,9 +305,9 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         } else {
             B.coverImage.setOnClickListener(__ -> {
             });
-            B.coverImage.clearColorFilter();
             B.errorText.setAlpha(0f);
             B.retryText.setAlpha(0f);
+            brightenAnimateImage();
         }
     }
 
