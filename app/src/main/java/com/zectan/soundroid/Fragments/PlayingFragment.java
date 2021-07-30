@@ -165,7 +165,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     public void playPauseSong(View v) {
         if (mPlayingService.isBuffering.getValue()) return;
         if (mPlayingService.isPlaying.getValue()) {
-            mPlayingService.pause();
+            mPlayingService.pause(true);
         } else {
             mPlayingService.play();
         }

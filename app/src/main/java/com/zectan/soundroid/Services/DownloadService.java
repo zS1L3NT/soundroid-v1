@@ -82,8 +82,8 @@ public class DownloadService extends Service {
 
         Intent intentOpen = new Intent(this, MainActivity.class).setAction(MainActivity.FRAGMENT_PLAYLIST_VIEW).putExtra("playlistId", mCurrentPlaylist.getInfo().getId());
         Intent intentCancel = new Intent(this, DownloadService.class).setAction(CANCEL);
-        PendingIntent pendingIntentOpen = PendingIntent.getActivity(getApplicationContext(), 0, intentOpen, PendingIntent.FLAG_UPDATE_CURRENT);
-        PendingIntent pendingIntentCancel = PendingIntent.getService(getApplicationContext(), 0, intentCancel, 0);
+        PendingIntent pendingIntentOpen = PendingIntent.getActivity(getApplicationContext(), 0, intentOpen, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntentCancel = PendingIntent.getService(getApplicationContext(), 0, intentCancel, PendingIntent.FLAG_IMMUTABLE);
 
         mNotificationBuilder = new NotificationCompat
             .Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)

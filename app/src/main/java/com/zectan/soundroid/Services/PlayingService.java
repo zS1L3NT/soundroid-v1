@@ -52,7 +52,9 @@ public class PlayingService extends Service {
     private static final String BACK = "BACK";
     private static final String PLAY_PAUSE = "PLAY_PAUSE";
     private static final String NEXT = "NEXT";
+    private static final String START_AGAIN = "START_AGAIN";
     private final IBinder mBinder = new PlayingService.PlayingBinder();
+    private Context mContext;
 
     public final StrictLiveData<Playlist> playlist = new StrictLiveData<>(Playlist.getEmpty());
     public final StrictLiveData<Song> currentSong = new StrictLiveData<>(Song.getEmpty());
@@ -73,11 +75,16 @@ public class PlayingService extends Service {
     public PlayingService.ProgressHandler progressHandler;
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mNotificationBuilder;
+    private AudioFocusRequest mAudioFocusRequest;
+    private AudioManager mAudioManager;
     private QueueManager mQueueManager;
     private SimpleExoPlayer mPlayer;
-    private AudioManager am;
-    private AudioFocusRequest afr;
     private Bitmap mDefaultCover;
+
+    private PendingIntent mPendingIntentBack;
+    private PendingIntent mPendingIntentPlayPause;
+    private PendingIntent mPendingIntentNext;
+    private MediaSessionCompat mMediaSession;
 
     private int mNotificationID;
     private boolean mExplicitPlay;
@@ -90,11 +97,14 @@ public class PlayingService extends Service {
                     playPreviousSong();
                     break;
                 case PLAY_PAUSE:
-                    if (isPlaying.getValue()) pause();
+                    if (isPlaying.getValue()) pause(true);
                     else play();
                     break;
                 case NEXT:
                     playNextSong();
+                    break;
+                case START_AGAIN:
+                    startAgain();
                     break;
             }
         }
@@ -104,24 +114,26 @@ public class PlayingService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Context mContext = getApplicationContext();
+        mContext = getApplicationContext();
         mNotificationManager = getSystemService(NotificationManager.class);
         mNotificationID = Utils.getRandomInt();
+
+        mExplicitPlay = true;
 
         mDefaultCover = BitmapFactory.decodeResource(
             mContext.getResources(),
             R.drawable.playing_cover_failed
         );
 
-        MediaSessionCompat mediaSession = new MediaSessionCompat(mContext, TAG);
         Intent intentOpen = new Intent(this, MainActivity.class).setAction(MainActivity.FRAGMENT_PLAYING);
         Intent intentBack = new Intent(this, PlayingService.class).setAction(BACK);
         Intent intentPlayPause = new Intent(this, PlayingService.class).setAction(PLAY_PAUSE);
         Intent intentNext = new Intent(this, PlayingService.class).setAction(NEXT);
-        PendingIntent pendingIntentOpen = PendingIntent.getActivity(mContext, 0, intentOpen, 0);
-        PendingIntent pendingIntentBack = PendingIntent.getService(mContext, 0, intentBack, 0);
-        PendingIntent pendingIntentPlayPause = PendingIntent.getService(mContext, 0, intentPlayPause, 0);
-        PendingIntent pendingIntentNext = PendingIntent.getService(mContext, 0, intentNext, 0);
+        PendingIntent pendingIntentOpen = PendingIntent.getActivity(mContext, 0, intentOpen, PendingIntent.FLAG_IMMUTABLE);
+        mPendingIntentBack = PendingIntent.getService(mContext, 0, intentBack, PendingIntent.FLAG_IMMUTABLE);
+        mPendingIntentPlayPause = PendingIntent.getService(mContext, 0, intentPlayPause, PendingIntent.FLAG_IMMUTABLE);
+        mPendingIntentNext = PendingIntent.getService(mContext, 0, intentNext, PendingIntent.FLAG_IMMUTABLE);
+        mMediaSession = new MediaSessionCompat(mContext, TAG);
 
         mNotificationBuilder = new NotificationCompat.Builder(mContext, MainActivity.PLAYING_CHANNEL_ID)
             .setContentTitle("-")
@@ -131,29 +143,29 @@ public class PlayingService extends Service {
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setContentIntent(pendingIntentOpen)
             .setSilent(true)
-            .addAction(R.drawable.ic_notification_back, "Back", pendingIntentBack)
-            .addAction(R.drawable.ic_notification_play, "Play", pendingIntentPlayPause)
-            .addAction(R.drawable.ic_notification_next, "Back", pendingIntentNext)
+            .addAction(R.drawable.ic_notification_back, "Back", mPendingIntentBack)
+            .addAction(R.drawable.ic_notification_play, "Play", mPendingIntentPlayPause)
+            .addAction(R.drawable.ic_notification_next, "Back", mPendingIntentNext)
             .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(0, 1, 2)
-                .setMediaSession(mediaSession.getSessionToken()));
+                .setMediaSession(mMediaSession.getSessionToken()));
         startForeground(mNotificationID, mNotificationBuilder.build());
 
         mPlayer = new SimpleExoPlayer.Builder(mContext).build();
         mPlayer.addListener(new Player.Listener() {
             @Override
             public void onIsPlayingChanged(boolean state) {
-                mNotificationBuilder.clearActions();
                 mNotificationBuilder
-                    .addAction(R.drawable.ic_notification_back, "Back", pendingIntentBack)
+                    .clearActions()
+                    .addAction(R.drawable.ic_notification_back, "Back", mPendingIntentBack)
                     .addAction(state
                             ? R.drawable.ic_notification_pause
                             : R.drawable.ic_notification_play,
                         state
                             ? "Pause"
                             : "Play",
-                        pendingIntentPlayPause)
-                    .addAction(R.drawable.ic_notification_next, "Back", pendingIntentNext);
+                        mPendingIntentPlayPause)
+                    .addAction(R.drawable.ic_notification_next, "Back", mPendingIntentNext);
                 mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
                 isPlaying.postValue(state);
             }
@@ -195,8 +207,8 @@ public class PlayingService extends Service {
             }
         });
 
-        am = getSystemService(AudioManager.class);
-        afr = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+        mAudioManager = getSystemService(AudioManager.class);
+        mAudioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
             .setAcceptsDelayedFocusGain(true)
             .setWillPauseWhenDucked(true)
             .setOnAudioFocusChangeListener(this::onAudioFocusChange)
@@ -288,8 +300,21 @@ public class PlayingService extends Service {
         mPlayer.play();
     }
 
-    public void pause() {
+    public void pause(boolean loseAudioFocus) {
+        if (loseAudioFocus) revokeAudioFocus();
         mPlayer.pause();
+    }
+
+    private void startAgain() {
+        mNotificationBuilder
+            .addAction(R.drawable.ic_notification_back, "Back", mPendingIntentBack)
+            .addAction(R.drawable.ic_notification_play, "Play", mPendingIntentPlayPause)
+            .addAction(R.drawable.ic_notification_next, "Back", mPendingIntentNext)
+            .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                .setShowActionsInCompactView(0, 1, 2)
+                .setMediaSession(mMediaSession.getSessionToken()));
+        mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
+        play();
     }
 
     public void onMoveSong(int oldPosition, int newPosition) {
@@ -324,31 +349,44 @@ public class PlayingService extends Service {
     }
 
     public void seekTo(int progress) {
-        mPlayer.seekTo(duration.getValue() * progress);
+        mPlayer.seekTo((long) duration.getValue() * progress);
     }
 
     private void requestAudioFocus() {
-        if (am == null) return;
-        am.requestAudioFocus(afr);
+        if (mAudioManager == null) return;
+        mAudioManager.requestAudioFocus(mAudioFocusRequest);
+    }
+
+    private void revokeAudioFocus() {
+        mAudioManager.abandonAudioFocusRequest(mAudioFocusRequest);
     }
 
     private void onAudioFocusChange(int focusChange) {
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                pause();
+                pause(false);
                 break;
             case AudioManager.AUDIOFOCUS_GAIN:
                 if (mExplicitPlay) {
                     play();
                 } else {
-                    am.abandonAudioFocusRequest(afr);
+                    revokeAudioFocus();
                 }
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
-                am.abandonAudioFocusRequest(afr);
                 mExplicitPlay = false;
+                pause(true);
                 seekTo(0);
-                pause();
+
+                Intent intentStartAgain = new Intent(this, PlayingService.class).setAction(START_AGAIN);
+                PendingIntent pendingIntentStartAgain = PendingIntent.getService(mContext, 0, intentStartAgain, PendingIntent.FLAG_IMMUTABLE);
+                mNotificationBuilder
+                    .clearActions()
+                    .addAction(R.drawable.ic_notification_play, "Start Again", pendingIntentStartAgain)
+                    .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                        .setShowActionsInCompactView(0)
+                        .setMediaSession(mMediaSession.getSessionToken()));
+                mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
                 break;
         }
     }
