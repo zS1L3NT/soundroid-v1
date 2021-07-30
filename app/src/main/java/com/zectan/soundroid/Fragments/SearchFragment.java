@@ -61,6 +61,10 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
     };
     private SearchAdapter searchAdapter;
 
+    public SearchFragment() {
+        super(FLAG_HIDE_NAVIGATOR);
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

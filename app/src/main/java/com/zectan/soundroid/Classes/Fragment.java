@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
@@ -25,11 +26,15 @@ import com.zectan.soundroid.ViewModels.SongEditViewModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragment {
+    public static final int FLAG_TRANSPARENT_STATUS = 1;
+    public static final int FLAG_HIDE_NAVIGATOR = 2;
+    private final int[] mFlags;
     protected NavController mNavController;
     protected MainActivity mActivity;
     protected T B;
-
     protected MainViewModel mMainVM;
     protected HomeViewModel mHomeVM;
     protected PlaylistEditViewModel mPlaylistEditVM;
@@ -39,14 +44,12 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
     protected SongEditViewModel mSongEditVM;
     protected PlaylistImportViewModel mPlaylistImportVM;
 
-    private final boolean mTransparentStatus;
-
     public Fragment() {
-        mTransparentStatus = false;
+        mFlags = new int[0];
     }
 
-    public Fragment(boolean transparentStatus) {
-        mTransparentStatus = transparentStatus;
+    public Fragment(int... flags) {
+        mFlags = flags;
     }
 
     @Nullable
@@ -65,16 +68,26 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
         mSongEditVM = new ViewModelProvider(mActivity).get(SongEditViewModel.class);
         mPlaylistImportVM = new ViewModelProvider(mActivity).get(PlaylistImportViewModel.class);
 
-        mActivity.updateNavigator(1);
         mActivity.hideKeyboard(B.getRoot());
 
-        if (mTransparentStatus) {
-            mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        Window window = mActivity.getWindow();
+        if (Arrays.stream(mFlags).anyMatch(flag -> flag == FLAG_TRANSPARENT_STATUS)) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         } else {
-            mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
-        mActivity.getWindow().setStatusBarColor(mActivity.getAttributeResource(R.attr.statusBarBackground));
+        window.setStatusBarColor(mActivity.getAttributeResource(R.attr.statusBarBackground));
 
         return B.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (Arrays.stream(mFlags).noneMatch(flag -> flag == FLAG_HIDE_NAVIGATOR)) {
+            mActivity.updateNavigator(1);
+        } else {
+            mActivity.updateNavigator(0);
+        }
     }
 }

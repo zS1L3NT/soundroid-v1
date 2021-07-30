@@ -101,7 +101,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     };
 
     public PlayingFragment() {
-        super(true);
+        super(FLAG_TRANSPARENT_STATUS);
     }
 
     @SuppressLint("ClickableViewAccessibility")
