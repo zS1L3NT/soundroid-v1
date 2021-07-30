@@ -376,7 +376,6 @@ public class PlayingService extends Service {
             case AudioManager.AUDIOFOCUS_LOSS:
                 mExplicitPlay = false;
                 pause(true);
-                seekTo(0);
 
                 Intent intentStartAgain = new Intent(this, PlayingService.class).setAction(START_AGAIN);
                 PendingIntent pendingIntentStartAgain = PendingIntent.getService(mContext, 0, intentStartAgain, PendingIntent.FLAG_IMMUTABLE);
