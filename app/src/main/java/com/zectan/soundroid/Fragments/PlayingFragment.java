@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.SeekBar;
 
 import androidx.annotation.ColorInt;
@@ -101,13 +100,16 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         }
     };
 
+    public PlayingFragment() {
+        super(true);
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     @Nullable
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         B = FragmentPlayingBinding.inflate(inflater, container, false);
         super.onCreateView(inflater, container, savedInstanceState);
-        mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
         // Recycler Views
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mActivity);

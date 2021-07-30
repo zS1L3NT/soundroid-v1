@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.viewbinding.ViewBinding;
@@ -24,6 +23,7 @@ import com.zectan.soundroid.ViewModels.SearchViewModel;
 import com.zectan.soundroid.ViewModels.SongEditViewModel;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragment {
     protected NavController mNavController;
@@ -39,13 +39,19 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
     protected SongEditViewModel mSongEditVM;
     protected PlaylistImportViewModel mPlaylistImportVM;
 
+    private final boolean mTransparentStatus;
+
     public Fragment() {
+        mTransparentStatus = false;
+    }
+
+    public Fragment(boolean transparentStatus) {
+        mTransparentStatus = transparentStatus;
     }
 
     @Nullable
-    @org.jetbrains.annotations.Nullable
     @Override
-    public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mActivity = (MainActivity) getActivity();
         assert mActivity != null;
         mNavController = mActivity.mNavController;
@@ -60,9 +66,14 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
         mPlaylistImportVM = new ViewModelProvider(mActivity).get(PlaylistImportViewModel.class);
 
         mActivity.updateNavigator(1);
-        mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        mActivity.getWindow().setStatusBarColor(mActivity.getAttributeResource(R.attr.statusBarBackground));
         mActivity.hideKeyboard(B.getRoot());
+
+        if (mTransparentStatus) {
+            mActivity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        } else {
+            mActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
+        mActivity.getWindow().setStatusBarColor(mActivity.getAttributeResource(R.attr.statusBarBackground));
 
         return B.getRoot();
     }
