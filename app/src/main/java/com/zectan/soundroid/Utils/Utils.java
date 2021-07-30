@@ -5,6 +5,8 @@ import android.view.View;
 
 import androidx.navigation.fragment.FragmentNavigator;
 
+import com.zectan.soundroid.BuildConfig;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,8 +37,8 @@ public class Utils {
         return (int) (Math.random() * 1000000000);
     }
 
-    public static boolean versionAtLeast(String current, String test) {
-        List<String> currentPortions = Arrays.asList(current.split("\\."));
+    public static boolean versionAtLeast(String test) {
+        List<String> currentPortions = Arrays.asList(BuildConfig.VERSION_NAME.split("\\."));
         List<String> testPortions = Arrays.asList(test.split("\\."));
         assert currentPortions.size() == 3;
         assert testPortions.size() == 3;

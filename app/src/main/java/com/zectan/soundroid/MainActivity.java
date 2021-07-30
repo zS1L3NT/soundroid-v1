@@ -6,9 +6,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -23,19 +21,16 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.Activities.AuthActivity;
 import com.zectan.soundroid.Classes.CrashDebugApplication;
-import com.zectan.soundroid.Connections.VersionCheckRequest;
 import com.zectan.soundroid.Models.Info;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.Services.DownloadService;
 import com.zectan.soundroid.Services.PlayingService;
 import com.zectan.soundroid.Utils.MenuEvents;
-import com.zectan.soundroid.Utils.Utils;
 import com.zectan.soundroid.ViewModels.MainViewModel;
 import com.zectan.soundroid.ViewModels.PlaylistEditViewModel;
 import com.zectan.soundroid.ViewModels.PlaylistViewViewModel;
@@ -127,21 +122,6 @@ public class MainActivity extends CrashDebugApplication {
 
         // User ID
         mMainVM.userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        // Check for newer version
-        new VersionCheckRequest(new VersionCheckRequest.Callback() {
-            @Override
-            public void onComplete(String version) {
-                if (!Utils.versionAtLeast(BuildConfig.VERSION_NAME, version)) {
-                    new Handler(getMainLooper()).post(MainActivity.this::showUpdateDialog);
-                }
-            }
-
-            @Override
-            public void onError(String message) {
-                handleError(new Exception("Could not check for latest version"));
-            }
-        });
 
         // Playing Screen background
         int[] colors = {getColor(R.color.default_cover_color), getAttributeResource(R.attr.colorSecondary)};
@@ -291,22 +271,6 @@ public class MainActivity extends CrashDebugApplication {
             startForegroundService(playingIntent);
             bindService(playingIntent, mMainVM.getPlayingConnection(callback), Context.BIND_AUTO_CREATE);
         }
-    }
-
-    private void showUpdateDialog() {
-        new MaterialAlertDialogBuilder(MainActivity.this)
-            .setTitle("Update SounDroid")
-            .setMessage("A new version of SounDroid exists, so this version won't work anymore")
-            .setPositiveButton("Update", (dialog, which) -> {
-                Intent browserIntent = new Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("http://soundroid.zectan.com")
-                );
-                startActivity(browserIntent);
-                showUpdateDialog();
-            })
-            .setCancelable(false)
-            .show();
     }
 
     public interface DownloadServiceCallback {

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.ActivityErrorBinding;
 
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ public class ErrorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         ActivityErrorBinding B = ActivityErrorBinding.inflate(LayoutInflater.from(this));
         setContentView(B.getRoot());
+        getWindow().setStatusBarColor(getColor(R.color.red));
 
         try {
             Bundle extras = getIntent().getExtras();
