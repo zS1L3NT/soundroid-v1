@@ -247,6 +247,10 @@ public class QueueManager {
         return filtered.get(0);
     }
 
+    public List<Song> getSongs() {
+        return mSongs;
+    }
+
     private void updateLiveSong() {
         Song song;
         if (mIsShuffling.getValue()) {

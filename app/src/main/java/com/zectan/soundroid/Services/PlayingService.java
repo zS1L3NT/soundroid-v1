@@ -403,8 +403,7 @@ public class PlayingService extends Service {
         progress.setValue(0);
 
         if (mediaItem != null) {
-            List<Song> songs = playlist
-                .getValue()
+            List<Song> songs = mQueueManager
                 .getSongs()
                 .stream()
                 .filter(s -> s.getSongId().equals(mediaItem.mediaId))
