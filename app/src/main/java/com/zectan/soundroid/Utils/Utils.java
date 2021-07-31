@@ -8,7 +8,9 @@ import androidx.navigation.fragment.FragmentNavigator;
 import com.zectan.soundroid.BuildConfig;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -115,9 +117,20 @@ public class Utils {
     }
 
     public static String createRegex(String query) {
-        StringBuilder regex = new StringBuilder(".*");
+        HashMap<Character, Integer> characterCount = new HashMap<>();
         for (int i = 0; i < query.length(); i++) {
-            regex.append(String.format("(?=.*%s.*)", query.charAt(i)));
+            char c = query.charAt(i);
+            if (characterCount.containsKey(c)) {
+                characterCount.put(c, Objects.requireNonNull(characterCount.get(c)) + 1);
+            } else {
+                characterCount.put(c, 1);
+            }
+        }
+
+        StringBuilder regex = new StringBuilder(".*");
+        for (Character character : characterCount.keySet()) {
+            int count = Objects.requireNonNull(characterCount.get(character));
+            regex.append(String.format("(?=(.*%s.*){%s})", character, count));
         }
         return regex.append(".*").toString();
     }

@@ -47,7 +47,7 @@ public class SearchViewModel extends ViewModel {
         results.addAll(
             songs
                 .stream()
-                .filter(song -> pattern.matcher(song.getTitle()).matches() || pattern.matcher(song.getArtiste()).matches())
+                .filter(song -> pattern.matcher(song.getTitle() + " " + song.getArtiste()).matches())
                 .filter(Utils.filterDistinctByKey(Song::getSongId))
                 .map(SearchResult::new)
                 .collect(Collectors.toList())
