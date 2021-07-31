@@ -17,6 +17,7 @@ import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.R;
+import com.zectan.soundroid.Utils.Debounce;
 import com.zectan.soundroid.Utils.DownloadProcess;
 import com.zectan.soundroid.Utils.Utils;
 
@@ -128,10 +129,15 @@ public class DownloadService extends Service {
             .setProgress(100, 0, true);
         mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
 
+        Debounce debounce = new Debounce(1000);
         new DownloadProcess(getApplicationContext(), song, mHighDownloadQuality, new DownloadProcess.Callback() {
             @Override
             public boolean isCancelled() {
-                return !playlist.equals(mCurrentPlaylist);
+                if (!playlist.equals(mCurrentPlaylist)) {
+                    debounce.cancel();
+                    return true;
+                }
+                return false;
             }
 
             @Override
@@ -139,6 +145,7 @@ public class DownloadService extends Service {
                 mPlaylistIndex++;
                 mDownloadIndex++;
 
+                debounce.cancel();
                 new Handler(getMainLooper()).post(() -> downloadSong(playlist));
             }
 
@@ -180,14 +187,17 @@ public class DownloadService extends Service {
                 String string = String.format("Progress: %s%%\n", progress) +
                     String.format("Attempt: %s/%s", attemptIndex, DownloadProcess.RETRY_COUNT);
 
-                mNotificationBuilder
-                    .setContentText(progress + "%")
-                    .setProgress(100, progress, false)
-                    .setStyle(new NotificationCompat.BigTextStyle()
-                        .setSummaryText(getSummaryText())
-                        .bigText(string));
+                debounce.post(() -> {
+                    mNotificationBuilder
+                        .setContentText(progress + "%")
+                        .setProgress(100, progress, false)
+                        .setStyle(new NotificationCompat.BigTextStyle()
+                            .setSummaryText(getSummaryText())
+                            .bigText(string));
 
-                if (!isCancelled()) mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
+                    if (!isCancelled())
+                        mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
+                });
             }
 
             @Override
@@ -195,6 +205,7 @@ public class DownloadService extends Service {
                 mFailed = true;
                 mPlaylistIndex++;
                 mDownloadIndex++;
+                debounce.cancel();
                 downloadSong(playlist);
             }
         });
