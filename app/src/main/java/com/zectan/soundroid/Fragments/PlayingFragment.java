@@ -239,6 +239,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
                 .with(mActivity)
                 .load(cover)
                 .transition(DrawableTransitionOptions.withCrossFade())
+                .placeholder(R.drawable.playing_cover_failed)
                 .error(R.drawable.playing_cover_failed)
                 .centerCrop()
                 .into(B.coverImage);

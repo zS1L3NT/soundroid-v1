@@ -70,6 +70,11 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
 
         mActivity.hideKeyboard(B.getRoot());
 
+        return B.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @androidx.annotation.Nullable Bundle savedInstanceState) {
         Window window = mActivity.getWindow();
         if (Arrays.stream(mFlags).anyMatch(flag -> flag == FLAG_TRANSPARENT_STATUS)) {
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -77,16 +82,12 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
         window.setStatusBarColor(mActivity.getAttributeResource(R.attr.statusBarBackground));
-
-        return B.getRoot();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (Arrays.stream(mFlags).noneMatch(flag -> flag == FLAG_HIDE_NAVIGATOR)) {
-            mActivity.updateNavigator(1);
-        } else {
+        if (Arrays.stream(mFlags).anyMatch(flag -> flag == FLAG_HIDE_NAVIGATOR)) {
             mActivity.updateNavigator(0);
         }
     }
