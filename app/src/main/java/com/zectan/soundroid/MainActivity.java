@@ -53,7 +53,7 @@ public class MainActivity extends CrashDebugApplication {
     public static final String DOWNLOAD_CHANNEL_ID = "Downloads";
     public static final String PLAYING_CHANNEL_ID = "Playing";
     public static final String FRAGMENT_PLAYING = "FRAGMENT_PLAYING";
-    public static final String FRAGMENT_PLAYLIST_VIEW = "FRAGMENT_PLAYLIST_VIEW";
+    public static final String FRAGMENT_PLAYLISTS = "FRAGMENT_PLAYLISTS";
     public final FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     public ActivityMainBinding B;
     public NavController mNavController;
@@ -134,10 +134,8 @@ public class MainActivity extends CrashDebugApplication {
                     case FRAGMENT_PLAYING:
                         mNavController.navigate(R.id.fragment_playing);
                         break;
-                    case FRAGMENT_PLAYLIST_VIEW:
-                        mPlaylistViewVM.playlistId.setValue(intent.getStringExtra("playlistId"));
-                        mPlaylistViewVM.songs.setValue(new ArrayList<>());
-                        mNavController.navigate(R.id.fragment_playlist_view);
+                    case FRAGMENT_PLAYLISTS:
+                        mNavController.navigate(R.id.fragment_playlists);
                         break;
                 }
             }
