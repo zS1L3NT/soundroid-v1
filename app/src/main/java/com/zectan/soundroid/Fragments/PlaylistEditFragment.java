@@ -26,7 +26,7 @@ import com.google.firebase.storage.StorageReference;
 import com.zectan.soundroid.Adapters.PlaylistEditAdapter;
 import com.zectan.soundroid.Classes.Fragment;
 import com.zectan.soundroid.Connections.EditPlaylistRequest;
-import com.zectan.soundroid.Models.Info;
+import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.Utils.ListArrayUtils;
@@ -97,22 +97,22 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         B.coverImage.setOnClickListener(this::onCoverClicked);
         B.parent.setTransitionListener(mActivity.getTransitionListener());
 
-        Info info = mMainVM.getInfoFromPlaylist(mPlaylistEditVM.playlistId.getValue());
+        Playlist playlist = mMainVM.getInfoFromPlaylist(mPlaylistEditVM.playlistId.getValue());
         List<Song> songs = mMainVM.getSongsFromPlaylist(mPlaylistEditVM.playlistId.getValue());
-        assert info != null;
-        mPlaylistEditVM.info.setValue(info);
+        assert playlist != null;
+        mPlaylistEditVM.playlist.setValue(playlist);
         mPlaylistEditVM.songs.setValue(songs);
 
-        B.nameTextInput.setText(info.getName());
+        B.nameTextInput.setText(playlist.getName());
         Glide
             .with(mActivity)
-            .load(info.getCover())
+            .load(playlist.getCover())
             .placeholder(R.drawable.playing_cover_loading)
             .error(R.drawable.playing_cover_failed)
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
-        playlistEditAdapter.updateSongs(ListArrayUtils.sortSongs(songs, mPlaylistEditVM.info.getValue().getOrder()));
+        playlistEditAdapter.updateSongs(ListArrayUtils.sortSongs(songs, mPlaylistEditVM.playlist.getValue().getOrder()));
         removed.clear();
 
         return B.getRoot();
@@ -133,7 +133,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
 
     private void onSaveClicked(View view) {
         mPlaylistEditVM.saving.setValue(true);
-        Info info = mPlaylistEditVM.info.getValue();
+        Playlist playlist = mPlaylistEditVM.playlist.getValue();
         List<String> order = playlistEditAdapter
             .getSongs()
             .stream()
@@ -142,27 +142,27 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
 
         String newName;
         if (B.nameTextInput.getText() == null) {
-            newName = info.getName();
+            newName = playlist.getName();
         } else {
             newName = B.nameTextInput.getText().toString();
         }
 
-        Info newInfo = new Info(
-            info.getId(),
+        Playlist newPlaylist = new Playlist(
+            playlist.getId(),
             newName,
-            info.getCover(),
-            info.getColorHex(),
-            info.getUserId(),
+            playlist.getCover(),
+            playlist.getColorHex(),
+            playlist.getUserId(),
             order
         );
 
-        StorageReference ref = storage.getReference().child(String.format("playlists/%s.png", info.getId()));
+        StorageReference ref = storage.getReference().child(String.format("playlists/%s.png", playlist.getId()));
         if (newFilePath != null) {
             ref.putFile(newFilePath)
                 .addOnSuccessListener(snap -> ref.getDownloadUrl()
                     .addOnSuccessListener(uri -> {
-                        newInfo.setCover(uri.toString());
-                        sendEditPlaylistRequest(newInfo);
+                        newPlaylist.setCover(uri.toString());
+                        sendEditPlaylistRequest(newPlaylist);
                     })
                     .addOnFailureListener(error -> {
                         mPlaylistEditVM.saving.postValue(false);
@@ -173,12 +173,12 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
                     mMainVM.error.postValue(error);
                 });
         } else {
-            sendEditPlaylistRequest(newInfo);
+            sendEditPlaylistRequest(newPlaylist);
         }
     }
 
-    private void sendEditPlaylistRequest(Info info) {
-        new EditPlaylistRequest(info, removed, new EditPlaylistRequest.Callback() {
+    private void sendEditPlaylistRequest(Playlist playlist) {
+        new EditPlaylistRequest(playlist, removed, new EditPlaylistRequest.Callback() {
             @Override
             public void onComplete(String response) {
                 mPlaylistEditVM.songs

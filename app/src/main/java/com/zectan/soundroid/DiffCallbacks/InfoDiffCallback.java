@@ -2,39 +2,39 @@ package com.zectan.soundroid.DiffCallbacks;
 
 import androidx.recyclerview.widget.DiffUtil;
 
-import com.zectan.soundroid.Models.Info;
+import com.zectan.soundroid.Models.Playlist;
 
 import java.util.List;
 
 public class InfoDiffCallback extends DiffUtil.Callback {
-    private final List<Info> mOldInfos, mNewInfos;
+    private final List<Playlist> mOldPlaylists, mNewPlaylists;
 
-    public InfoDiffCallback(List<Info> oldInfos, List<Info> newInfos) {
-        mOldInfos = oldInfos;
-        mNewInfos = newInfos;
+    public InfoDiffCallback(List<Playlist> oldPlaylists, List<Playlist> newPlaylists) {
+        mOldPlaylists = oldPlaylists;
+        mNewPlaylists = newPlaylists;
     }
 
     @Override
     public int getOldListSize() {
-        return mOldInfos.size();
+        return mOldPlaylists.size();
     }
 
     @Override
     public int getNewListSize() {
-        return mNewInfos.size();
+        return mNewPlaylists.size();
     }
 
     @Override
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-        Info oldInfo = mOldInfos.get(oldItemPosition);
-        Info newInfo = mNewInfos.get(newItemPosition);
-        return oldInfo.getId().equals(newInfo.getId());
+        Playlist oldPlaylist = mOldPlaylists.get(oldItemPosition);
+        Playlist newPlaylist = mNewPlaylists.get(newItemPosition);
+        return oldPlaylist.getId().equals(newPlaylist.getId());
     }
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        Info oldInfo = mOldInfos.get(oldItemPosition);
-        Info newInfo = mNewInfos.get(newItemPosition);
-        return oldInfo.equals(newInfo);
+        Playlist oldPlaylist = mOldPlaylists.get(oldItemPosition);
+        Playlist newPlaylist = mNewPlaylists.get(newItemPosition);
+        return oldPlaylist.equals(newPlaylist);
     }
 }

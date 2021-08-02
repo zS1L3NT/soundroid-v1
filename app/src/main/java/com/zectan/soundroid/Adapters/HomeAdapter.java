@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.DiffCallbacks.SongsDiffCallback;
 import com.zectan.soundroid.MainActivity;
-import com.zectan.soundroid.Models.Info;
+import com.zectan.soundroid.Models.Playable;
 import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.R;
@@ -90,7 +90,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeViewHolder> {
     }
 
     public interface Callback extends MenuBuilder.MenuItemCallback<Song> {
-        void onSongClicked(Playlist playlist, String songId);
+        void onSongClicked(Playable playable, String songId);
     }
 }
 
@@ -140,10 +140,10 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
             .stream()
             .map(Song::getSongId)
             .collect(Collectors.toList());
-        Info info = new Info("", "All Songs", order);
-        Playlist playlist = new Playlist(info, songs);
+        Playlist playlist = new Playlist("", "All Songs", order);
+        Playable playable = new Playable(playlist, songs);
 
-        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(playlist, id));
+        B.parent.setOnClickListener(__ -> mCallback.onSongClicked(playable, id));
 
         B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forSong(song, activity, true), song, mCallback));
     }

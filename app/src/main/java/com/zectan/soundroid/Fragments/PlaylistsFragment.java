@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.zectan.soundroid.Adapters.PlaylistsAdapter;
 import com.zectan.soundroid.Classes.Fragment;
-import com.zectan.soundroid.Models.Info;
+import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Utils.MenuBuilder;
 import com.zectan.soundroid.databinding.FragmentPlaylistsBinding;
 
@@ -23,15 +23,15 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
     private static final String TAG = "(SounDroid) PlayingFragment";
     private final PlaylistsAdapter.Callback callback = new PlaylistsAdapter.Callback() {
         @Override
-        public void onPlaylistClicked(Info info) {
-            mPlaylistViewVM.playlistId.setValue(info.getId());
+        public void onPlaylistClicked(Playlist playlist) {
+            mPlaylistViewVM.playlistId.setValue(playlist.getId());
             mPlaylistViewVM.songs.setValue(new ArrayList<>());
             mNavController.navigate(PlaylistsFragmentDirections.openPlaylistView());
         }
 
         @Override
-        public boolean onMenuItemClicked(Info info, MenuItem item) {
-            return mActivity.handleMenuItemClick(info, null, item, menuItemRunnable(item));
+        public boolean onMenuItemClicked(Playlist playlist, MenuItem item) {
+            return mActivity.handleMenuItemClick(playlist, null, item, menuItemRunnable(item));
         }
     };
     private PlaylistsAdapter playlistsAdapter;
@@ -49,7 +49,7 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
 
         // Observers
         mPlaylistsVM.loading.observe(this, B.swipeRefresh::setRefreshing);
-        mMainVM.myInfos.observe(this, playlistsAdapter::updateInfos);
+        mMainVM.myPlaylists.observe(this, playlistsAdapter::updateInfos);
 
         B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.swipeRefresh.setOnRefreshListener(this::onReload);
@@ -58,7 +58,7 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
     }
 
     private void onReload() {
-        playlistsAdapter.updateInfos(mMainVM.myInfos.getValue());
+        playlistsAdapter.updateInfos(mMainVM.myPlaylists.getValue());
         mPlaylistsVM.loading.postValue(false);
     }
 

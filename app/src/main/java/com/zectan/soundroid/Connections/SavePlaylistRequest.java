@@ -1,14 +1,14 @@
 package com.zectan.soundroid.Connections;
 
 import com.zectan.soundroid.Classes.Request;
-import com.zectan.soundroid.Models.Info;
+import com.zectan.soundroid.Models.Playlist;
 
 public class SavePlaylistRequest extends Request {
 
-    public SavePlaylistRequest(Info info, Callback callback) {
+    public SavePlaylistRequest(Playlist playlist, Callback callback) {
         super("/playlist/save", callback);
 
-        replaceData(info.toJSON());
+        replaceData(playlist.toJSON());
         sendRequest(RequestType.PUT);
     }
 

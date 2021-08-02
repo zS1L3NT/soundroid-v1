@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.zectan.soundroid.Adapters.HomeAdapter;
 import com.zectan.soundroid.Classes.Fragment;
-import com.zectan.soundroid.Models.Playlist;
+import com.zectan.soundroid.Models.Playable;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.Utils.Utils;
@@ -32,8 +32,8 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
 
     private final HomeAdapter.Callback callback = new HomeAdapter.Callback() {
         @Override
-        public void onSongClicked(Playlist playlist, String songId) {
-            mActivity.getPlayingService(service -> service.startPlaylist(playlist, songId, mMainVM.myUser.getValue().getHighStreamQuality()));
+        public void onSongClicked(Playable playable, String songId) {
+            mActivity.getPlayingService(service -> service.startPlayable(playable, songId, mMainVM.myUser.getValue().getHighStreamQuality()));
 
             if (mMainVM.myUser.getValue().getOpenPlayingScreen()) {
                 mNavController.navigate(HomeFragmentDirections.openPlaying());

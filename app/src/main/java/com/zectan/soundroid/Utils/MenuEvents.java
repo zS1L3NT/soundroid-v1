@@ -13,7 +13,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.Connections.DeletePlaylistRequest;
 import com.zectan.soundroid.Connections.SavePlaylistRequest;
 import com.zectan.soundroid.MainActivity;
-import com.zectan.soundroid.Models.Info;
+import com.zectan.soundroid.Models.Playable;
 import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.Models.User;
@@ -27,22 +27,22 @@ import java.util.stream.Collectors;
 
 public class MenuEvents {
     private final MainActivity mActivity;
-    private final Info mInfo;
+    private final Playlist mPlaylist;
     private final Song mSong;
     private final MenuItem mItem;
     FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     private Runnable mRunnable;
 
-    public MenuEvents(MainActivity activity, Info info, Song song, MenuItem item) {
+    public MenuEvents(MainActivity activity, Playlist playlist, Song song, MenuItem item) {
         mActivity = activity;
-        mInfo = info;
+        mPlaylist = playlist;
         mSong = song;
         mItem = item;
     }
 
-    public MenuEvents(MainActivity activity, Info info, Song song, MenuItem item, Runnable runnable) {
+    public MenuEvents(MainActivity activity, Playlist playlist, Song song, MenuItem item, Runnable runnable) {
         mActivity = activity;
-        mInfo = info;
+        mPlaylist = playlist;
         mSong = song;
         mItem = item;
         mRunnable = runnable;
@@ -103,11 +103,11 @@ public class MenuEvents {
     }
 
     private void addToPlaylist() {
-        List<Info> infos = new ArrayList<>();
+        List<Playlist> playlists = new ArrayList<>();
         MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(mActivity).setTitle("Add To Playlist");
 
         DialogInterface.OnClickListener onClickListener = (dialog_, i) -> {
-            Info info = infos.get(i);
+            Playlist playlist = playlists.get(i);
 
             AtomicInteger completed = new AtomicInteger(0);
             OnSuccessListener<Object> onSuccessListener = __ -> {
@@ -118,29 +118,29 @@ public class MenuEvents {
 
             boolean inPlaylist = mActivity
                 .mMainVM
-                .getSongsFromPlaylist(info.getId())
+                .getSongsFromPlaylist(playlist.getId())
                 .stream()
                 .anyMatch(song -> song.getSongId().equals(mSong.getSongId()));
 
             if (inPlaylist) {
                 mActivity.handleError(new Exception("Song already in playlist!"));
             } else {
-                mSong.setPlaylistId(info.getId());
+                mSong.setPlaylistId(playlist.getId());
                 mSong.setUserId(mActivity.mMainVM.userId);
                 mDb.collection("songs")
                     .add(mSong.toMap())
                     .addOnSuccessListener(onSuccessListener)
                     .addOnFailureListener(mActivity::handleError);
                 mDb.collection("playlists")
-                    .document(info.getId())
+                    .document(playlist.getId())
                     .update("order", FieldValue.arrayUnion(mSong.getSongId()))
                     .addOnSuccessListener(onSuccessListener)
                     .addOnFailureListener(mActivity::handleError);
             }
         };
 
-        infos.addAll(mActivity.mMainVM.myInfos.getValue());
-        dialog.setItems(ListArrayUtils.toArray(CharSequence.class, infos.stream().map(Info::getName).collect(Collectors.toList())), onClickListener);
+        playlists.addAll(mActivity.mMainVM.myPlaylists.getValue());
+        dialog.setItems(ListArrayUtils.toArray(CharSequence.class, playlists.stream().map(Playlist::getName).collect(Collectors.toList())), onClickListener);
         dialog.show();
     }
 
@@ -164,10 +164,10 @@ public class MenuEvents {
 
     private void startDownloads() {
         mActivity.getDownloadService(service -> {
-            Playlist playlist = new Playlist(mInfo, mActivity.mMainVM.getSongsFromPlaylist(mInfo.getId()));
+            Playable playable = new Playable(mPlaylist, mActivity.mMainVM.getSongsFromPlaylist(mPlaylist.getId()));
 
             User user = mActivity.mMainVM.myUser.getValue();
-            if (service.startDownload(playlist, user.getHighDownloadQuality())) {
+            if (service.startDownload(playable, user.getHighDownloadQuality())) {
                 mActivity.snack("Download starting");
             } else {
                 mActivity.snack("Already downloading playlist...");
@@ -176,10 +176,10 @@ public class MenuEvents {
     }
 
     private void stopDownloads() {
-        Playlist playlist = new Playlist(mInfo, mActivity.mMainVM.getSongsFromPlaylist(mInfo.getId()));
+        Playable playable = new Playable(mPlaylist, mActivity.mMainVM.getSongsFromPlaylist(mPlaylist.getId()));
         mActivity.getDownloadService(binder -> {
-            if (binder.isDownloading(playlist.getInfo().getId())) {
-                binder.stopDownload(playlist);
+            if (binder.isDownloading(playable.getInfo().getId())) {
+                binder.stopDownload(playable);
                 mActivity.snack("Downloading stopped");
             } else {
                 mActivity.snack("This playlist isn't being downloaded...?");
@@ -194,7 +194,7 @@ public class MenuEvents {
             .setNegativeButton("Cancel", (dialog, which) -> {
             })
             .setPositiveButton("Delete", (dialog, which) -> {
-                for (Song song : mActivity.mMainVM.getSongsFromPlaylist(mInfo.getId())) {
+                for (Song song : mActivity.mMainVM.getSongsFromPlaylist(mPlaylist.getId())) {
                     song.deleteIfNotUsed(mActivity, mActivity.mMainVM.mySongs.getValue());
                 }
 
@@ -210,8 +210,8 @@ public class MenuEvents {
     }
 
     private void savePlaylist() {
-        mInfo.setUserId(mActivity.mMainVM.userId);
-        new SavePlaylistRequest(mInfo, new SavePlaylistRequest.Callback() {
+        mPlaylist.setUserId(mActivity.mMainVM.userId);
+        new SavePlaylistRequest(mPlaylist, new SavePlaylistRequest.Callback() {
             @Override
             public void onComplete(String playlistId) {
                 mActivity.snack("Saved playlist");
@@ -226,9 +226,9 @@ public class MenuEvents {
     }
 
     private void playPlaylist() {
-        List<Song> songs = mActivity.mMainVM.getSongsFromPlaylist(mInfo.getId());
-        Playlist playlist = new Playlist(mInfo, songs);
-        mActivity.getPlayingService(service -> service.startPlaylist(playlist, songs.get(0).getSongId(), mActivity.mMainVM.myUser.getValue().getHighStreamQuality()));
+        List<Song> songs = mActivity.mMainVM.getSongsFromPlaylist(mPlaylist.getId());
+        Playable playable = new Playable(mPlaylist, songs);
+        mActivity.getPlayingService(service -> service.startPlayable(playable, songs.get(0).getSongId(), mActivity.mMainVM.myUser.getValue().getHighStreamQuality()));
 
         if (mActivity.mMainVM.myUser.getValue().getOpenPlayingScreen()) {
             mActivity.mNavController.navigate(R.id.fragment_playing);
@@ -236,7 +236,7 @@ public class MenuEvents {
     }
 
     private void editPlaylist() {
-        mActivity.mPlaylistEditVM.playlistId.setValue(mInfo.getId());
+        mActivity.mPlaylistEditVM.playlistId.setValue(mPlaylist.getId());
         mRunnable.run();
     }
 
@@ -246,7 +246,7 @@ public class MenuEvents {
             .setMessage("This will delete the entire playlists at once!")
             .setNegativeButton("Cancel", (dialog, which) -> {
             })
-            .setPositiveButton("Delete", (dialog, which) -> new DeletePlaylistRequest(mInfo.getId(), new DeletePlaylistRequest.Callback() {
+            .setPositiveButton("Delete", (dialog, which) -> new DeletePlaylistRequest(mPlaylist.getId(), new DeletePlaylistRequest.Callback() {
                 @Override
                 public void onComplete(String response) {
                     mActivity.snack("Playlist deleted");
@@ -263,7 +263,7 @@ public class MenuEvents {
 
     private void addPlaylist() {
         String id = mDb.collection("playlists").document().getId();
-        Info info = new Info(
+        Playlist playlist = new Playlist(
             id,
             "New Playlist",
             "https://firebasestorage.googleapis.com/v0/b/android-soundroid.appspot.com/o/playing_cover_default.png?alt=media&token=e8980e80-ab5d-4f21-8ed4-6bc6e7e06ef7",
@@ -274,7 +274,7 @@ public class MenuEvents {
 
         mDb.collection("playlists")
             .document(id)
-            .set(info.toMap())
+            .set(playlist.toMap())
             .addOnSuccessListener(snap -> {
                 mActivity.mPlaylistEditVM.playlistId.setValue(id);
                 mRunnable.run();

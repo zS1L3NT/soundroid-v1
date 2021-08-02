@@ -4,11 +4,11 @@
 
     <string name="import_message">
         Import Playlists from your favourite music streaming apps to listen to on SounDroid!
-        Songs can be imported from Spotify. Paste the link to the playlist or album into the
+        Songs can be imported from Spotify. Paste the link to the playable or album into the
         input box above.
     </string>
     <string name="spotify_warning_message">
-        The server will search YouTube for the song in the playlist. However, the song result might
+        The server will search YouTube for the song in the playable. However, the song result might
         not be accurate and you may not get the right song. This feature has been tested and has a 70%
         accuracy when converting songs.
     </string>

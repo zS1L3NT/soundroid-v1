@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.DiffCallbacks.SearchResultDiffCallback;
 import com.zectan.soundroid.MainActivity;
-import com.zectan.soundroid.Models.Info;
+import com.zectan.soundroid.Models.Playable;
 import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.SearchResult;
 import com.zectan.soundroid.Models.Song;
@@ -85,7 +85,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> {
     public interface Callback extends MenuBuilder.MenuItemCallback<SearchResult> {
         void onSongClicked(Song song);
 
-        void onPlaylistClicked(Info info);
+        void onPlaylistClicked(Playlist playlist);
     }
 
 }
@@ -138,9 +138,9 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             B.parent.setOnClickListener(__ -> mCallback.onSongClicked(song));
             B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forSong(song, activity, false), result, mCallback));
         } else if (result.getPlaylistInfo() != null) {
-            Info info = result.getPlaylistInfo();
-            String name = info.getName();
-            String cover = info.getCover();
+            Playlist playlist = result.getPlaylistInfo();
+            String name = playlist.getName();
+            String cover = playlist.getCover();
 
             MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
             switch (result.getLocation()) {
@@ -155,8 +155,8 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             }
 
             if (result.getLocation().equals("Local")) {
-                Playlist playlist = new Playlist(info, activity.mMainVM.getSongsFromPlaylist(info.getId()));
-                B.downloadedDot.setAlpha(playlist.isDownloaded(activity) ? 1 : 0);
+                Playable playable = new Playable(playlist, activity.mMainVM.getSongsFromPlaylist(playlist.getId()));
+                B.downloadedDot.setAlpha(playable.isDownloaded(activity) ? 1 : 0);
             }
 
             B.titleText.setText(name);
@@ -172,7 +172,7 @@ class SearchViewHolder extends RecyclerView.ViewHolder {
             B.titleText.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
             B.descriptionText.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
             B.menuClickable.setTextColor(activity.getAttributeResource(R.attr.colorOnBackground));
-            B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
+            B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(playlist));
             B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(
                 v,
                 items,

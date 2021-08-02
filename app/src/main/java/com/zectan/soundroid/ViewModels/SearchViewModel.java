@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.zectan.soundroid.Classes.StrictLiveData;
 import com.zectan.soundroid.Connections.SearchSocket;
-import com.zectan.soundroid.Models.Info;
+import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.SearchResult;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.Utils.Utils;
@@ -24,7 +24,7 @@ public class SearchViewModel extends ViewModel {
     public final StrictLiveData<String> message = new StrictLiveData<>("");
     private int search_count = 0;
 
-    public void searchLocal(List<Info> infos, List<Song> songs) {
+    public void searchLocal(List<Playlist> playlists, List<Song> songs) {
         if (query.getValue().isEmpty()) {
             loading.postValue(false);
             localResults.postValue(new ArrayList<>());
@@ -37,10 +37,10 @@ public class SearchViewModel extends ViewModel {
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
 
         results.addAll(
-            infos
+            playlists
                 .stream()
                 .filter(info -> pattern.matcher(info.getName()).matches())
-                .filter(Utils.filterDistinctByKey(Info::getId))
+                .filter(Utils.filterDistinctByKey(Playlist::getId))
                 .map(SearchResult::new)
                 .collect(Collectors.toList())
         );

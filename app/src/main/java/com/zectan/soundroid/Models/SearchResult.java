@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class SearchResult {
     private final String mLocation;
-    private Info mInfo;
+    private Playlist mPlaylist;
     private Song mSong;
 
     public SearchResult(JSONObject object) throws JSONException {
@@ -17,7 +17,7 @@ public class SearchResult {
         if (type.equals("Song")) {
             mSong = Song.fromJSON(object);
         } else if (type.equals("Playlist")) {
-            mInfo = Info.fromJSON(object);
+            mPlaylist = Playlist.fromJSON(object);
         } else {
             throw new RuntimeException(String.format("Undefined data type: %s", type));
         }
@@ -28,17 +28,17 @@ public class SearchResult {
         mSong = song;
     }
 
-    public SearchResult(Info info) {
+    public SearchResult(Playlist playlist) {
         mLocation = "Local";
-        mInfo = info;
+        mPlaylist = playlist;
     }
 
     public Song getSong() {
         return mSong;
     }
 
-    public Info getPlaylistInfo() {
-        return mInfo;
+    public Playlist getPlaylistInfo() {
+        return mPlaylist;
     }
 
     public String getLocation() {
@@ -47,7 +47,7 @@ public class SearchResult {
 
     public String getId() {
         if (mSong != null) return mSong.getSongId();
-        if (mInfo != null) return mInfo.getId();
+        if (mPlaylist != null) return mPlaylist.getId();
         throw new RuntimeException("Undefined data type");
     }
 
@@ -56,12 +56,12 @@ public class SearchResult {
         if (this == o) return true;
         if (!(o instanceof SearchResult)) return false;
         SearchResult that = (SearchResult) o;
-        return Objects.equals(mInfo, that.mInfo) &&
+        return Objects.equals(mPlaylist, that.mPlaylist) &&
             Objects.equals(mSong, that.mSong);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mInfo, mSong);
+        return Objects.hash(mPlaylist, mSong);
     }
 }

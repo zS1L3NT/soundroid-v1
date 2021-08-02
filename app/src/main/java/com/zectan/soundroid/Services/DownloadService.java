@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.zectan.soundroid.MainActivity;
-import com.zectan.soundroid.Models.Playlist;
+import com.zectan.soundroid.Models.Playable;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.Utils.Debounce;
@@ -31,10 +31,10 @@ public class DownloadService extends Service {
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mNotificationBuilder;
 
-    private List<Playlist> mPlaylists;
+    private List<Playable> mPlayables;
     private boolean mHighDownloadQuality = true;
 
-    private Playlist mCurrentPlaylist;
+    private Playable mCurrentPlayable;
     private int mNotificationID;
     private int mPlaylistIndex;
     private int mDownloadIndex;
@@ -46,7 +46,7 @@ public class DownloadService extends Service {
         super.onCreate();
         mNotificationManager = getSystemService(NotificationManager.class);
         mNotificationID = Utils.getRandomInt();
-        mPlaylists = new ArrayList<>();
+        mPlayables = new ArrayList<>();
     }
 
     @Override
@@ -66,16 +66,16 @@ public class DownloadService extends Service {
     }
 
     private void downloadFirstPlaylist() {
-        if (mPlaylists.size() == 0) {
+        if (mPlayables.size() == 0) {
             stopSelf();
             return;
         }
 
-        mCurrentPlaylist = mPlaylists.get(0);
+        mCurrentPlayable = mPlayables.get(0);
         mFailed = false;
         mPlaylistIndex = 0;
         mDownloadIndex = 1;
-        mDownloadCount = (int) mCurrentPlaylist
+        mDownloadCount = (int) mCurrentPlayable
             .getSongs()
             .stream()
             .filter(s -> !s.isDownloaded(getApplicationContext()))
@@ -96,29 +96,29 @@ public class DownloadService extends Service {
             .setSilent(true);
         startForeground(mNotificationID, mNotificationBuilder.build());
 
-        downloadSong(mCurrentPlaylist);
+        downloadSong(mCurrentPlayable);
     }
 
-    private void downloadSong(Playlist playlist) {
+    private void downloadSong(Playable playable) {
         if (isOffline()) {
             cancelDownloads(false);
             return;
         }
 
-        if (mPlaylistIndex == playlist.size()) {
+        if (mPlaylistIndex == playable.size()) {
             downloadsDone();
             return;
         }
 
-        Song song = mCurrentPlaylist.getSongs().get(mPlaylistIndex);
+        Song song = mCurrentPlayable.getSongs().get(mPlaylistIndex);
         if (song.isDownloaded(getApplicationContext())) {
             mPlaylistIndex++;
-            downloadSong(playlist);
+            downloadSong(playable);
             return;
         }
 
         // Is Cancelled
-        if (!playlist.equals(mCurrentPlaylist)) {
+        if (!playable.equals(mCurrentPlayable)) {
             mFailed = true;
             return;
         }
@@ -133,7 +133,7 @@ public class DownloadService extends Service {
         new DownloadProcess(getApplicationContext(), song, mHighDownloadQuality, new DownloadProcess.Callback() {
             @Override
             public boolean isCancelled() {
-                if (!playlist.equals(mCurrentPlaylist)) {
+                if (!playable.equals(mCurrentPlayable)) {
                     debounce.cancel();
                     return true;
                 }
@@ -146,7 +146,7 @@ public class DownloadService extends Service {
                 mDownloadIndex++;
 
                 debounce.cancel();
-                new Handler(getMainLooper()).post(() -> downloadSong(playlist));
+                new Handler(getMainLooper()).post(() -> downloadSong(playable));
             }
 
             private String getSummaryText() {
@@ -206,7 +206,7 @@ public class DownloadService extends Service {
                 mPlaylistIndex++;
                 mDownloadIndex++;
                 debounce.cancel();
-                downloadSong(playlist);
+                downloadSong(playable);
             }
         });
     }
@@ -218,14 +218,14 @@ public class DownloadService extends Service {
         int NOTIFICATION_ID = Utils.getRandomInt();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
             .setContentTitle(mFailed ? "Downloads Incomplete" : "Downloading Finished")
-            .setContentText(mCurrentPlaylist.getInfo().getName())
+            .setContentText(mCurrentPlayable.getInfo().getName())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSmallIcon(android.R.drawable.stat_sys_download_done);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
-        mCurrentPlaylist = null;
+        mCurrentPlayable = null;
 
-        if (mPlaylists.size() > 0) mPlaylists.remove(0);
-        if (mPlaylists.size() > 0) {
+        if (mPlayables.size() > 0) mPlayables.remove(0);
+        if (mPlayables.size() > 0) {
             downloadFirstPlaylist();
         } else {
             stopSelf();
@@ -239,19 +239,19 @@ public class DownloadService extends Service {
         int NOTIFICATION_ID = Utils.getRandomInt();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
             .setContentTitle("Downloads Cancelled")
-            .setContentText(mCurrentPlaylist.getInfo().getName())
+            .setContentText(mCurrentPlayable.getInfo().getName())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setSmallIcon(R.drawable.ic_close);
         mNotificationManager.notify(NOTIFICATION_ID, builder.build());
-        mCurrentPlaylist = null;
+        mCurrentPlayable = null;
 
         if (startNextPlaylist) {
-            if (mPlaylists.size() > 0) mPlaylists.remove(0);
+            if (mPlayables.size() > 0) mPlayables.remove(0);
         } else {
-            mPlaylists.clear();
+            mPlayables.clear();
         }
 
-        if (mPlaylists.size() > 0) {
+        if (mPlayables.size() > 0) {
             downloadFirstPlaylist();
         } else {
             stopSelf();
@@ -265,27 +265,27 @@ public class DownloadService extends Service {
         return !networkInfo.isConnected();
     }
 
-    public boolean startDownload(Playlist playlist, boolean highDownloadQuality) {
+    public boolean startDownload(Playable playable, boolean highDownloadQuality) {
         mHighDownloadQuality = highDownloadQuality;
 
-        if (isDownloading(playlist.getInfo().getId())) return false;
+        if (isDownloading(playable.getInfo().getId())) return false;
 
-        mPlaylists.add(playlist);
-        if (mPlaylists.size() == 1) downloadFirstPlaylist();
+        mPlayables.add(playable);
+        if (mPlayables.size() == 1) downloadFirstPlaylist();
         return true;
     }
 
-    public void stopDownload(Playlist playlist) {
-        if (mPlaylists.size() == 0) return;
-        if (mPlaylists.get(0).equals(playlist)) {
+    public void stopDownload(Playable playable) {
+        if (mPlayables.size() == 0) return;
+        if (mPlayables.get(0).equals(playable)) {
             cancelDownloads(true);
         } else {
-            mPlaylists.remove(playlist);
+            mPlayables.remove(playable);
         }
     }
 
     public boolean isDownloading(String playlistId) {
-        return mPlaylists.stream().anyMatch(p -> p.getInfo().getId().equals(playlistId));
+        return mPlayables.stream().anyMatch(p -> p.getInfo().getId().equals(playlistId));
     }
 
     @Nullable

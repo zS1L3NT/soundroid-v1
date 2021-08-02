@@ -33,7 +33,7 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.zectan.soundroid.Classes.StrictLiveData;
 import com.zectan.soundroid.MainActivity;
-import com.zectan.soundroid.Models.Playlist;
+import com.zectan.soundroid.Models.Playable;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.Utils.ListArrayUtils;
@@ -56,7 +56,7 @@ public class PlayingService extends Service {
     private final IBinder mBinder = new PlayingService.PlayingBinder();
     private Context mContext;
 
-    public final StrictLiveData<Playlist> playlist = new StrictLiveData<>(Playlist.getEmpty());
+    public final StrictLiveData<Playable> playable = new StrictLiveData<>(Playable.getEmpty());
     public final StrictLiveData<Song> currentSong = new StrictLiveData<>(Song.getEmpty());
     public final StrictLiveData<Integer> time = new StrictLiveData<>(0);
     public final StrictLiveData<Integer> buffered = new StrictLiveData<>(0);
@@ -230,15 +230,15 @@ public class PlayingService extends Service {
         mNotificationManager.cancel(mNotificationID);
     }
 
-    public void startPlaylist(Playlist playlist, String songId, boolean highQuality) {
-        Log.i(TAG, String.format("Start Playlist (%s)[%s]", playlist.getInfo().getId(), songId));
+    public void startPlayable(Playable playable, String songId, boolean highQuality) {
+        Log.i(TAG, String.format("Start Playlist (%s)[%s]", playable.getInfo().getId(), songId));
 
-        this.playlist.setValue(playlist);
+        this.playable.setValue(playable);
         mQueueManager = new QueueManager(
             this,
             mPlayer,
-            playlist.getSongs(),
-            ListArrayUtils.startOrderFromId(playlist.getInfo().getOrder(), songId),
+            playable.getSongs(),
+            ListArrayUtils.startOrderFromId(playable.getInfo().getOrder(), songId),
             highQuality
         );
 

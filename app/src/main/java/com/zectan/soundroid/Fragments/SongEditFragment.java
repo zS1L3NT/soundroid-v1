@@ -65,7 +65,7 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Observers
-        mPlaylistEditVM.saving.observe(this, this::onSavingChange);
+        mSongEditVM.saving.observe(this, this::onSavingChange);
 
         B.backImage.setOnClickListener(__ -> mNavController.navigateUp());
         B.saveImage.setOnClickListener(this::onSaveClicked);
@@ -100,7 +100,7 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
     }
 
     private void onSaveClicked(View view) {
-        mPlaylistEditVM.saving.setValue(true);
+        mSongEditVM.saving.setValue(true);
         Song song = mSongEditVM.song.getValue();
 
         String newTitle;
@@ -136,11 +136,11 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
                         sendColorHexRequest(newSong);
                     })
                     .addOnFailureListener(error -> {
-                        mPlaylistEditVM.saving.postValue(false);
+                        mSongEditVM.saving.postValue(false);
                         mMainVM.error.postValue(error);
                     }))
                 .addOnFailureListener(error -> {
-                    mPlaylistEditVM.saving.postValue(false);
+                    mSongEditVM.saving.postValue(false);
                     mMainVM.error.postValue(error);
                 });
         } else {
@@ -152,14 +152,14 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
         new SongEditRequest(song, new SongEditRequest.Callback() {
             @Override
             public void onComplete(String response) {
-                mPlaylistEditVM.saving.postValue(false);
+                mSongEditVM.saving.postValue(false);
                 new Handler(Looper.getMainLooper()).post(mActivity::onBackPressed);
             }
 
             @Override
             public void onError(String message) {
                 mMainVM.error.postValue(new Exception(message));
-                mPlaylistEditVM.saving.postValue(false);
+                mSongEditVM.saving.postValue(false);
             }
         });
     }

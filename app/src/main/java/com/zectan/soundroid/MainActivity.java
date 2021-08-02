@@ -26,7 +26,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.Activities.AuthActivity;
 import com.zectan.soundroid.Classes.CrashDebugApplication;
-import com.zectan.soundroid.Models.Info;
+import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.Services.DownloadService;
 import com.zectan.soundroid.Services.PlayingService;
@@ -196,13 +196,13 @@ public class MainActivity extends CrashDebugApplication {
     }
 
     @SuppressLint("NonConstantResourceId")
-    public boolean handleMenuItemClick(Info info, Song song, MenuItem item) {
-        return new MenuEvents(this, info, song, item).handle();
+    public boolean handleMenuItemClick(Playlist playlist, Song song, MenuItem item) {
+        return new MenuEvents(this, playlist, song, item).handle();
     }
 
     @SuppressLint("NonConstantResourceId")
-    public boolean handleMenuItemClick(Info info, Song song, MenuItem item, Runnable runnable) {
-        return new MenuEvents(this, info, song, item, runnable).handle();
+    public boolean handleMenuItemClick(Playlist playlist, Song song, MenuItem item, Runnable runnable) {
+        return new MenuEvents(this, playlist, song, item, runnable).handle();
     }
 
     public void updateTheme(@Nullable String theme) {

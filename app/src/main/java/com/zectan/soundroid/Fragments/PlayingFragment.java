@@ -232,7 +232,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             String cover = song.getCover();
             colorHex = song.getColorHex();
 
-            B.playlistNameText.setText(mPlayingService.playlist.getValue().getInfo().getName());
+            B.playlistNameText.setText(mPlayingService.playable.getValue().getInfo().getName());
             B.titleText.setText(title);
             B.descriptionText.setText(artiste);
             Glide

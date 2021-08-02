@@ -10,11 +10,11 @@ import android.view.View;
 import androidx.appcompat.view.menu.MenuItemImpl;
 import androidx.appcompat.widget.PopupMenu;
 
-import com.zectan.soundroid.Services.DownloadService;
 import com.zectan.soundroid.MainActivity;
-import com.zectan.soundroid.Models.Playlist;
+import com.zectan.soundroid.Models.Playable;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.R;
+import com.zectan.soundroid.Services.DownloadService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,20 +105,20 @@ public class MenuBuilder {
             mItems = new ArrayList<>();
         }
 
-        public static MenuItems forPlaylist(Playlist playlist, MainActivity activity) {
+        public static MenuItems forPlaylist(Playable playable, MainActivity activity) {
             MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
-            if (playlist.isDownloaded(activity)) {
+            if (playable.isDownloaded(activity)) {
                 items.clearDownloads();
             } else {
                 // If playlists is being downloaded
                 DownloadService downloadService = activity.mMainVM.downloadService.getValue();
-                if (downloadService != null && downloadService.isDownloading(playlist.getInfo().getId())) {
+                if (downloadService != null && downloadService.isDownloading(playable.getInfo().getId())) {
                     items.stopDownloads();
                 } else {
                     items.startDownloads();
                 }
 
-                if (playlist.hasDownloaded(activity)) {
+                if (playable.hasDownloaded(activity)) {
                     items.clearDownloads();
                 }
             }

@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.Classes.StrictLiveData;
 import com.zectan.soundroid.MainActivity;
-import com.zectan.soundroid.Models.Info;
+import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.Models.User;
 import com.zectan.soundroid.Services.DownloadService;
@@ -30,7 +30,7 @@ public class MainViewModel extends ViewModel {
     private final FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     public final MutableLiveData<Exception> error = new MutableLiveData<>();
     public final StrictLiveData<User> myUser = new StrictLiveData<>(User.getEmpty());
-    public final StrictLiveData<List<Info>> myInfos = new StrictLiveData<>(new ArrayList<>());
+    public final StrictLiveData<List<Playlist>> myPlaylists = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<List<Song>> mySongs = new StrictLiveData<>(new ArrayList<>());
 
     public final MutableLiveData<DownloadService> downloadService = new MutableLiveData<>();
@@ -94,7 +94,7 @@ public class MainViewModel extends ViewModel {
                     return;
                 }
                 assert snaps != null;
-                myInfos.postValue(snaps.toObjects(Info.class));
+                myPlaylists.postValue(snaps.toObjects(Playlist.class));
             });
 
         mDb.collection("songs")
@@ -126,23 +126,23 @@ public class MainViewModel extends ViewModel {
         ));
     }
 
-    public @Nullable Info getInfoFromPlaylist(String playlistId) {
-        List<Info> infos = myInfos
+    public @Nullable Playlist getInfoFromPlaylist(String playlistId) {
+        List<Playlist> playlists = myPlaylists
             .getValue()
             .stream()
             .filter(info -> info.getId().equals(playlistId))
             .collect(Collectors.toList());
-        if (infos.size() == 0) return null;
-        return infos.get(0);
+        if (playlists.size() == 0) return null;
+        return playlists.get(0);
     }
 
-    public void watchInfoFromPlaylist(LifecycleOwner owner, String playlistId, OnChange<Info> onChange) {
-        myInfos.observe(owner, infos_ -> {
-            List<Info> infos = infos_
+    public void watchInfoFromPlaylist(LifecycleOwner owner, String playlistId, OnChange<Playlist> onChange) {
+        myPlaylists.observe(owner, infos_ -> {
+            List<Playlist> playlists = infos_
                 .stream()
                 .filter(info -> info.getId().equals(playlistId))
                 .collect(Collectors.toList());
-            if (infos.size() != 0) onChange.run(infos.get(0));
+            if (playlists.size() != 0) onChange.run(playlists.get(0));
         });
     }
 

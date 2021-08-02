@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.zectan.soundroid.DiffCallbacks.InfoDiffCallback;
 import com.zectan.soundroid.MainActivity;
-import com.zectan.soundroid.Models.Info;
+import com.zectan.soundroid.Models.Playable;
 import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.Utils.MenuBuilder;
@@ -25,7 +25,7 @@ import java.util.List;
 
 public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistViewHolder> {
     private final Callback mCallback;
-    private final List<Info> mInfos = new ArrayList<>();
+    private final List<Playlist> mPlaylists = new ArrayList<>();
 
     public PlaylistsAdapter(Callback callback) {
         mCallback = callback;
@@ -42,25 +42,25 @@ public class PlaylistsAdapter extends RecyclerView.Adapter<PlaylistViewHolder> {
         return new PlaylistViewHolder(itemView, mCallback);
     }
 
-    public void updateInfos(List<Info> infos) {
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new InfoDiffCallback(mInfos, infos));
+    public void updateInfos(List<Playlist> playlists) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new InfoDiffCallback(mPlaylists, playlists));
         diffResult.dispatchUpdatesTo(this);
-        mInfos.clear();
-        mInfos.addAll(infos);
+        mPlaylists.clear();
+        mPlaylists.addAll(playlists);
     }
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull PlaylistViewHolder holder, int position) {
-        holder.bind(mInfos.get(position));
+        holder.bind(mPlaylists.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mInfos.size();
+        return mPlaylists.size();
     }
 
-    public interface Callback extends MenuBuilder.MenuItemCallback<Info> {
-        void onPlaylistClicked(Info info);
+    public interface Callback extends MenuBuilder.MenuItemCallback<Playlist> {
+        void onPlaylistClicked(Playlist playlist);
     }
 
 }
@@ -75,17 +75,17 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
         mCallback = callback;
     }
 
-    public void bind(Info info) {
+    public void bind(Playlist playlist) {
         MainActivity activity = (MainActivity) B.parent.getContext();
-        Playlist playlist = new Playlist(info, activity.mMainVM.getSongsFromPlaylist(info.getId()));
+        Playable playable = new Playable(playlist, activity.mMainVM.getSongsFromPlaylist(playlist.getId()));
 
-        String name = info.getName();
-        String cover = info.getCover();
-        String songCount = info.getOrder().size() + " songs";
+        String name = playlist.getName();
+        String cover = playlist.getCover();
+        String songCount = playlist.getOrder().size() + " songs";
 
         B.titleText.setText(name);
         B.descriptionText.setText(songCount);
-        B.downloadedDot.setAlpha(playlist.isDownloaded(activity) ? 1 : 0);
+        B.downloadedDot.setAlpha(playable.isDownloaded(activity) ? 1 : 0);
         Glide
             .with(activity)
             .load(cover)
@@ -94,9 +94,9 @@ class PlaylistViewHolder extends RecyclerView.ViewHolder {
             .transition(new DrawableTransitionOptions().crossFade())
             .centerCrop()
             .into(B.coverImage);
-        B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(info));
+        B.parent.setOnClickListener(__ -> mCallback.onPlaylistClicked(playlist));
 
-        B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forPlaylist(new Playlist(info, activity.mMainVM.getSongsFromPlaylist(info.getId())), activity), info, mCallback));
+        B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forPlaylist(new Playable(playlist, activity.mMainVM.getSongsFromPlaylist(playlist.getId())), activity), playlist, mCallback));
     }
 
 }

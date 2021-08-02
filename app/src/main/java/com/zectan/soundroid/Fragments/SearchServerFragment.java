@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.zectan.soundroid.Adapters.SearchAdapter;
 import com.zectan.soundroid.Classes.Fragment;
-import com.zectan.soundroid.Models.Info;
+import com.zectan.soundroid.Models.Playable;
 import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.SearchResult;
 import com.zectan.soundroid.Models.Song;
@@ -30,9 +30,9 @@ public class SearchServerFragment extends Fragment<FragmentSearchServerBinding> 
     private final SearchAdapter.Callback callback = new SearchAdapter.Callback() {
         @Override
         public void onSongClicked(Song song) {
-            Info info = new Info(song.getSongId(), "Search Result", Collections.singletonList(song.getSongId()));
-            Playlist playlist = new Playlist(info, Collections.singletonList(song));
-            mActivity.getPlayingService(service -> service.startPlaylist(playlist, song.getSongId(), mMainVM.myUser.getValue().getHighStreamQuality()));
+            Playlist playlist = new Playlist(song.getSongId(), "Search Result", Collections.singletonList(song.getSongId()));
+            Playable playable = new Playable(playlist, Collections.singletonList(song));
+            mActivity.getPlayingService(service -> service.startPlayable(playable, song.getSongId(), mMainVM.myUser.getValue().getHighStreamQuality()));
 
             if (mMainVM.myUser.getValue().getOpenPlayingScreen()) {
                 mNavController.navigate(SearchFragmentDirections.openPlaying());
@@ -40,9 +40,9 @@ public class SearchServerFragment extends Fragment<FragmentSearchServerBinding> 
         }
 
         @Override
-        public void onPlaylistClicked(Info info) {
-            mPlaylistViewVM.playlistId.setValue(info.getId());
-            mPlaylistViewVM.info.postValue(info);
+        public void onPlaylistClicked(Playlist playlist) {
+            mPlaylistViewVM.playlistId.setValue(playlist.getId());
+            mPlaylistViewVM.playlist.postValue(playlist);
 
             mNavController.navigate(SearchFragmentDirections.openPlaylistView());
         }
