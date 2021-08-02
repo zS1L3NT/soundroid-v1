@@ -52,7 +52,7 @@ public class SearchLocalFragment extends Fragment<FragmentSearchLocalBinding> {
     private SearchAdapter mSearchAdapter;
 
     public SearchLocalFragment() {
-        super(FLAG_HIDE_NAVIGATOR);
+        super(FLAG_IGNORE_NAVIGATOR);
     }
 
     @Override

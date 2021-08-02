@@ -31,6 +31,7 @@ import java.util.Arrays;
 public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.app.Fragment {
     public static final int FLAG_TRANSPARENT_STATUS = 1;
     public static final int FLAG_HIDE_NAVIGATOR = 2;
+    public static final int FLAG_IGNORE_NAVIGATOR = 3;
     private final int[] mFlags;
     protected NavController mNavController;
     protected MainActivity mActivity;
@@ -76,7 +77,7 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
     @Override
     public void onViewCreated(@NonNull View view, @androidx.annotation.Nullable Bundle savedInstanceState) {
         Window window = mActivity.getWindow();
-        if (Arrays.stream(mFlags).anyMatch(flag -> flag == FLAG_TRANSPARENT_STATUS)) {
+        if (flagsContain(FLAG_TRANSPARENT_STATUS)) {
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -84,10 +85,14 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
         window.setStatusBarColor(mActivity.getAttributeResource(R.attr.statusBarBackground));
     }
 
+    private boolean flagsContain(int flag) {
+        return Arrays.stream(mFlags).anyMatch(f -> f == flag);
+    }
+
     @Override
     public void onResume() {
         super.onResume();
-        if (Arrays.stream(mFlags).anyMatch(flag -> flag == FLAG_HIDE_NAVIGATOR)) {
+        if (flagsContain(FLAG_HIDE_NAVIGATOR) && !flagsContain(FLAG_IGNORE_NAVIGATOR)) {
             mActivity.updateNavigator(0);
         }
     }

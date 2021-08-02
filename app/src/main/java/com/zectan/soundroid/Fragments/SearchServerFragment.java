@@ -56,7 +56,7 @@ public class SearchServerFragment extends Fragment<FragmentSearchServerBinding> 
     private SearchAdapter mSearchAdapter;
 
     public SearchServerFragment() {
-        super(FLAG_HIDE_NAVIGATOR);
+        super(FLAG_IGNORE_NAVIGATOR);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class SearchServerFragment extends Fragment<FragmentSearchServerBinding> 
         updateVisuals(results, loading);
 
         if (!loading) {
-            new Handler().postDelayed(() -> B.recyclerView.scrollToPosition(0), 600);
+            new Handler().postDelayed(() -> B.recyclerView.smoothScrollToPosition(0), 600);
         }
     }
 
