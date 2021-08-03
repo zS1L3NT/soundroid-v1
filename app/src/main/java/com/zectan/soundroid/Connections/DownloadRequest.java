@@ -17,13 +17,23 @@ public class DownloadRequest {
     private static final String TAG = "(SounDroid) SongDownloadTask";
     private static final String URL = "http://soundroid.zectan.com/song/%s/%s.mp3";
 
+    /**
+     * Downloads a file from the internet, downloads byte by byte.
+     * Using low level input stream, output stream and buffer.
+     * Download with a __ prefix when in progress then rename to actual when done
+     *
+     * @param context             Context
+     * @param song                Song to download
+     * @param highDownloadQuality Quality of download
+     * @param callback            Download Callback
+     */
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public DownloadRequest(Context context, Song song, boolean highQuality, Callback callback) {
-        File file = new File(context.getFilesDir(), String.format("/downloading__%s.mp3", song.getSongId()));
+    public DownloadRequest(Context context, Song song, boolean highDownloadQuality, Callback callback) {
+        File file = new File(context.getFilesDir(), String.format("/__%s.mp3", song.getSongId()));
         new Thread(() -> {
             int count;
             try {
-                URL fileURL = new URL(String.format(URL, highQuality ? "highest" : "lowest", song.getSongId()));
+                URL fileURL = new URL(String.format(URL, highDownloadQuality ? "highest" : "lowest", song.getSongId()));
                 URLConnection connection = fileURL.openConnection();
                 connection.connect();
 

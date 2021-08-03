@@ -45,10 +45,18 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
     protected SongEditViewModel mSongEditVM;
     protected PlaylistImportViewModel mPlaylistImportVM;
 
+    /**
+     * Base class for a Fragment with access to all the ViewModels
+     */
     public Fragment() {
         mFlags = new int[0];
     }
 
+    /**
+     * Base class for a Fragment with access to all the ViewModels
+     *
+     * @param flags Flags
+     */
     public Fragment(int... flags) {
         mFlags = flags;
     }
@@ -60,6 +68,7 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
         assert mActivity != null;
         mNavController = mActivity.mNavController;
 
+        // Reference ViewModels
         mMainVM = new ViewModelProvider(mActivity).get(MainViewModel.class);
         mHomeVM = new ViewModelProvider(mActivity).get(HomeViewModel.class);
         mPlaylistEditVM = new ViewModelProvider(mActivity).get(PlaylistEditViewModel.class);
@@ -85,6 +94,12 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
         window.setStatusBarColor(mActivity.getAttributeResource(R.attr.statusBarBackground));
     }
 
+    /**
+     * Check if the flags contain a flag
+     *
+     * @param flag Flag
+     * @return If the flag contains the flag
+     */
     private boolean flagsContain(int flag) {
         return Arrays.stream(mFlags).anyMatch(f -> f == flag);
     }
@@ -94,6 +109,8 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
         super.onResume();
         if (flagsContain(FLAG_HIDE_NAVIGATOR) && !flagsContain(FLAG_IGNORE_NAVIGATOR)) {
             mActivity.updateNavigator(0);
+        } else {
+            mActivity.updateNavigator(1);
         }
     }
 }

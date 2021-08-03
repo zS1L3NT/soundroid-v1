@@ -68,18 +68,16 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         B.recyclerView.setAdapter(playlistViewAdapter);
         B.recyclerView.setLayoutManager(layoutManager);
 
-        // Live Observers
+        // Listeners
         mPlaylistViewVM.playlist.observe(this, this::onInfoChange);
         mPlaylistViewVM.songs.observe(this, this::onSongsChange);
         mPlaylistViewVM.loading.observe(this, B.swipeRefresh::setRefreshing);
         mActivity.getPlayingService(service -> service.currentSong.observe(this, playlistViewAdapter::updateCurrentSong));
-
-        mMainVM.watchInfoFromPlaylist(this, mPlaylistViewVM.playlistId.getValue(), mPlaylistViewVM.playlist::setValue);
+        mMainVM.watchPlaylistFromPlaylists(this, mPlaylistViewVM.playlistId.getValue(), mPlaylistViewVM.playlist::setValue);
         mMainVM.watchSongsFromPlaylist(this, mPlaylistViewVM.playlistId.getValue(), mPlaylistViewVM.songs::setValue);
         B.backImage.setOnClickListener(__ -> mNavController.navigateUp());
         B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.swipeRefresh.setOnRefreshListener(this::onReload);
-        B.parent.setTransitionListener(mActivity.getTransitionListener());
 
         onReload();
 
@@ -90,8 +88,10 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         String playlistId = mPlaylistViewVM.playlistId.getValue();
         mPlaylistViewVM.loading.setValue(true);
 
-        Playlist playlist = mMainVM.getInfoFromPlaylist(playlistId);
+        Playlist playlist = mMainVM.getPlaylistFromPlaylists(playlistId);
         isLocal = playlist != null;
+
+        // If playlist is null from mMainVM, get it from the server
         if (playlist == null) {
             fetchFromServer();
         } else {
@@ -102,6 +102,9 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         }
     }
 
+    /**
+     * Get the playlist data from the server
+     */
     public void fetchFromServer() {
         new PlaylistSongsRequest(mPlaylistViewVM.playlistId.getValue(), new PlaylistSongsRequest.Callback() {
             @Override
@@ -113,11 +116,16 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             @Override
             public void onError(String message) {
                 mPlaylistViewVM.loading.postValue(false);
-                mMainVM.error.postValue(new Exception(message));
+                mActivity.warnError(new Exception(message));
             }
         });
     }
 
+    /**
+     * Callback for click of menu item
+     *
+     * @param item Menu item
+     */
     public void menuItemClicked(MenuItem item) {
         switch (item.getItemId()) {
             case MenuBuilder.EDIT_PLAYLIST:
@@ -137,9 +145,10 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
         List<Song> songs = mActivity.mMainVM.getSongsFromPlaylist(playlist.getId());
         Playable playable = new Playable(playlist, songs);
 
+        // Create menu based on whether the playlist is from Local or Server
         MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
         if (isLocal) {
-            items = MenuBuilder.MenuItems.forPlaylist(playable, mActivity);
+            items = MenuBuilder.MenuItems.forPlayable(playable, mActivity);
         } else {
             items.savePlaylist();
         }
@@ -169,11 +178,11 @@ public class PlaylistViewFragment extends Fragment<FragmentPlaylistViewBinding> 
             .centerCrop()
             .into(B.coverImage);
 
-        Drawable oldGD = B.background.getBackground();
+        // Set the gradient background
+        Drawable oldGradientDrawable = B.background.getBackground();
         int[] colors = {Color.parseColor(playlist.getColorHex()), mActivity.getAttributeResource(R.attr.backgroundColor)};
-        GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
-
-        Drawable[] layers = {oldGD, newGD};
+        GradientDrawable newGradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
+        Drawable[] layers = {oldGradientDrawable, newGradientDrawable};
         TransitionDrawable transition = new TransitionDrawable(layers);
         B.background.setBackground(transition);
         transition.startTransition(1000);

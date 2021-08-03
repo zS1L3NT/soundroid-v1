@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class MainViewModel extends ViewModel {
     private static final String TAG = "(SounDroid) MainViewModel";
     private final FirebaseFirestore mDb = FirebaseFirestore.getInstance();
-    public final MutableLiveData<Exception> error = new MutableLiveData<>();
     public final StrictLiveData<User> myUser = new StrictLiveData<>(User.getEmpty());
     public final StrictLiveData<List<Playlist>> myPlaylists = new StrictLiveData<>(new ArrayList<>());
     public final StrictLiveData<List<Song>> mySongs = new StrictLiveData<>(new ArrayList<>());
@@ -38,6 +37,12 @@ public class MainViewModel extends ViewModel {
 
     public String userId;
 
+    /**
+     * Connect to download service
+     *
+     * @param callback Callback
+     * @return ServiceConnection object
+     */
     public ServiceConnection getDownloadConnection(MainActivity.DownloadServiceCallback callback) {
         return new ServiceConnection() {
             @Override
@@ -54,6 +59,12 @@ public class MainViewModel extends ViewModel {
         };
     }
 
+    /**
+     * Connect to playing service
+     *
+     * @param callback Callback
+     * @return ServiceConnection object
+     */
     public ServiceConnection getPlayingConnection(MainActivity.PlayingServiceCallback callback) {
         return new ServiceConnection() {
             @Override
@@ -70,6 +81,11 @@ public class MainViewModel extends ViewModel {
         };
     }
 
+    /**
+     * Watch values from firebase and update respective livedata when the values change
+     *
+     * @param activity Activity
+     */
     public void watch(MainActivity activity) {
         Log.d(TAG, "STARTED WATCHING FIREBASE VALUES");
 
@@ -77,7 +93,7 @@ public class MainViewModel extends ViewModel {
             .document(userId)
             .addSnapshotListener(activity, (snap, error) -> {
                 if (error != null) {
-                    activity.handleError(error);
+                    activity.warnError(error);
                     return;
                 }
                 assert snap != null;
@@ -90,7 +106,7 @@ public class MainViewModel extends ViewModel {
             .whereEqualTo("userId", userId)
             .addSnapshotListener(activity, (snaps, error) -> {
                 if (error != null) {
-                    activity.handleError(error);
+                    activity.warnError(error);
                     return;
                 }
                 assert snaps != null;
@@ -101,7 +117,7 @@ public class MainViewModel extends ViewModel {
             .whereEqualTo("userId", userId)
             .addSnapshotListener(activity, (snaps, error) -> {
                 if (error != null) {
-                    activity.handleError(error);
+                    activity.warnError(error);
                     return;
                 }
                 assert snaps != null;
@@ -109,6 +125,12 @@ public class MainViewModel extends ViewModel {
             });
     }
 
+    /**
+     * Fetch songs with a playlistId as defined
+     *
+     * @param playlistId ID of playlist
+     * @return The list of song objects in the playlist
+     */
     public List<Song> getSongsFromPlaylist(String playlistId) {
         return mySongs
             .getValue()
@@ -117,6 +139,13 @@ public class MainViewModel extends ViewModel {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Watch songs with a playlistId as defined
+     *
+     * @param owner      LifeCycle owner
+     * @param playlistId ID of playlist
+     * @param onChange   Callback
+     */
     public void watchSongsFromPlaylist(LifecycleOwner owner, String playlistId, OnChange<List<Song>> onChange) {
         mySongs.observe(owner, songs -> onChange.run(
             songs
@@ -126,7 +155,12 @@ public class MainViewModel extends ViewModel {
         ));
     }
 
-    public @Nullable Playlist getInfoFromPlaylist(String playlistId) {
+    /**
+     * Fetch playlist with a playlistId as defined
+     *
+     * @param playlistId ID of playlist
+     */
+    public @Nullable Playlist getPlaylistFromPlaylists(String playlistId) {
         List<Playlist> playlists = myPlaylists
             .getValue()
             .stream()
@@ -136,7 +170,14 @@ public class MainViewModel extends ViewModel {
         return playlists.get(0);
     }
 
-    public void watchInfoFromPlaylist(LifecycleOwner owner, String playlistId, OnChange<Playlist> onChange) {
+    /**
+     * Watch a playlist with a playlistId as defined
+     *
+     * @param owner      LifeCycle owner
+     * @param playlistId ID of playlist
+     * @param onChange   Callback
+     */
+    public void watchPlaylistFromPlaylists(LifecycleOwner owner, String playlistId, OnChange<Playlist> onChange) {
         myPlaylists.observe(owner, infos_ -> {
             List<Playlist> playlists = infos_
                 .stream()

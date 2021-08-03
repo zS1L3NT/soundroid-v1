@@ -15,6 +15,17 @@ public class User {
     public User() {
     }
 
+    /**
+     * Object containing data about a user
+     *
+     * @param id                  User ID
+     * @param usnm                Username
+     * @param profilePicture      Profile Picture
+     * @param openPlayingScreen   Opens playing screen when click on a song
+     * @param highStreamQuality   Wants high quality streaming
+     * @param highDownloadQuality Wants high quality downloads
+     * @param theme               Theme
+     */
     public User(String id, String usnm, String profilePicture, boolean openPlayingScreen, boolean highStreamQuality, boolean highDownloadQuality, String theme) {
         this.id = id;
         this.usnm = usnm;
@@ -25,6 +36,9 @@ public class User {
         this.theme = theme;
     }
 
+    /**
+     * Create an empty object for a default user
+     */
     public static User getEmpty() {
         return new User(
             "",
@@ -65,6 +79,11 @@ public class User {
         return theme;
     }
 
+    /**
+     * Create a Map Object from a User Object
+     *
+     * @return Map Object
+     */
     public Map<String, Object> toMap() {
         Map<String, Object> object = new HashMap<>();
         object.put("id", id);

@@ -1,62 +1,56 @@
 package com.zectan.soundroid.Utils;
 
-import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 
 import androidx.annotation.NonNull;
+
+import com.zectan.soundroid.Classes.Interval;
 
 public class Debounce {
     private final LoopHandler mLoopHandler;
     private final int mDelay;
-    private Callback mCallback;
+    private Runnable mRunnable;
 
+    /**
+     * Debounce to prevent spam
+     * Fire and wait
+     *
+     * @param delay Time delay
+     */
     public Debounce(int delay) {
         mDelay = delay;
         mLoopHandler = new LoopHandler(Looper.getMainLooper());
     }
 
-    public void post(Callback callback) {
-        mCallback = callback;
+    /**
+     * Debounce a specific function
+     *
+     * @param runnable Runnable to be run
+     */
+    public void post(Runnable runnable) {
+        mRunnable = runnable;
         if (!mLoopHandler.isStarted()) {
-            mLoopHandler.sendEmptyMessage(0);
+            mLoopHandler.start();
         }
     }
 
+    /**
+     * Cancel the debounce
+     */
     public void cancel() {
         mLoopHandler.cancel();
     }
 
-    public interface Callback {
-        void run();
-    }
-
-    private class LoopHandler extends Handler {
-        private boolean mStarted;
-        private boolean mCancelled;
+    private class LoopHandler extends Interval {
 
         public LoopHandler(@NonNull Looper looper) {
-            super(looper);
-            mStarted = false;
-            mCancelled = false;
+            super(looper, mDelay);
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            mStarted = true;
-            if (!mCancelled) {
-                if (mCallback != null) mCallback.run();
-                mCallback = null;
-                sendEmptyMessageDelayed(0, mDelay);
-            }
-        }
-
-        public boolean isStarted() {
-            return mStarted;
-        }
-
-        public void cancel() {
-            mCancelled = true;
+        public void onNextCall() {
+            if (mRunnable != null) mRunnable.run();
+            mRunnable = null;
         }
     }
 

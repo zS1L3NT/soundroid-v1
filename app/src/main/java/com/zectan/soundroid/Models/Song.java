@@ -28,9 +28,19 @@ public class Song {
     private String userId;
 
     public Song() {
-
     }
 
+    /**
+     * Object containing data about a song
+     *
+     * @param songId     Song ID
+     * @param title      Title
+     * @param artiste    Artiste
+     * @param cover      Cover
+     * @param colorHex   Color Hex
+     * @param playlistId Playlist ID
+     * @param userId     User ID
+     */
     public Song(
         String songId,
         String title,
@@ -50,7 +60,7 @@ public class Song {
     }
 
     /**
-     * Creates an empty placeholder Song
+     * Create an empty object for a default song
      *
      * @return Song
      */
@@ -66,6 +76,13 @@ public class Song {
         );
     }
 
+    /**
+     * Create a Song Object from a JSON object
+     *
+     * @param object JSON Object
+     * @return Song Object
+     * @throws JSONException Error if object is unparsable
+     */
     public static Song fromJSON(JSONObject object) throws JSONException {
         String songId = object.getString("songId");
         String title = object.getString("title");
@@ -77,6 +94,11 @@ public class Song {
         return new Song(songId, title, artiste, cover, colorHex, playlistId, userId);
     }
 
+    /**
+     * Create a JSON Object from a Song Object
+     *
+     * @return JSON Object
+     */
     public JSONObject toJSON() throws JSONException {
         JSONObject object = new JSONObject();
         object.put("songId", songId);
@@ -129,28 +151,52 @@ public class Song {
         this.userId = userId;
     }
 
-    public MediaItem getMediaItem(Context context, boolean highQuality) {
+    /**
+     * Get the media item of a song so it can be parsed by ExoPlayer
+     *
+     * @param context             Context
+     * @param highDownloadQuality Quality of downloading
+     * @return Media item
+     */
+    public MediaItem getMediaItem(Context context, boolean highDownloadQuality) {
         Uri uri;
 
         if (isDownloaded(context)) {
             uri = Uri.fromFile(getFileDir(context));
         } else {
-            uri = Uri.parse(String.format(SongsURL, highQuality ? "highest" : "lowest", songId));
+            uri = Uri.parse(String.format(SongsURL, highDownloadQuality ? "highest" : "lowest", songId));
         }
 
         return new MediaItem.Builder().setUri(uri).setMediaId(songId).build();
     }
 
+    /**
+     * Check if a song is downloaded onto the local file system
+     *
+     * @param context Context
+     * @return If a song is downloaded
+     */
     public boolean isDownloaded(Context context) {
         return getFileDir(context).exists();
     }
 
+    /**
+     * Delete both the in-progress file and fully downloaded file form the system
+     *
+     * @param context Context
+     */
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void deleteLocally(Context context) {
         getFileDir(context).delete();
-        getDownloadFileDir(context).delete();
+        getPartialFileDir(context).delete();
     }
 
+    /**
+     * Delete a song if it is not in any other playlists
+     *
+     * @param context  Context
+     * @param allSongs All songs
+     */
     public void deleteIfNotUsed(Context context, List<Song> allSongs) {
         List<String> ids = allSongs
             .stream()
@@ -162,14 +208,31 @@ public class Song {
         }
     }
 
+    /**
+     * Get the directory of the fully downloaded file
+     *
+     * @param context Context
+     * @return File location
+     */
     private File getFileDir(Context context) {
         return new File(context.getFilesDir(), String.format("/%s.mp3", songId));
     }
 
-    private File getDownloadFileDir(Context context) {
-        return new File(context.getFilesDir(), String.format("/download__%s.mp3", songId));
+    /**
+     * Get the directory of the partially downloaded file
+     *
+     * @param context Context
+     * @return File location
+     */
+    private File getPartialFileDir(Context context) {
+        return new File(context.getFilesDir(), String.format("/__%s.mp3", songId));
     }
 
+    /**
+     * Create a Map Object from a Song Object
+     *
+     * @return Map Object
+     */
     public Map<String, Object> toMap() {
         Map<String, Object> object = new HashMap<>();
         object.put("songId", songId);

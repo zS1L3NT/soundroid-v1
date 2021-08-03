@@ -28,15 +28,25 @@ public class QueueManager {
     private final List<String> mSortedOrder;
     private final List<String> mShuffledOrder;
 
-    private final boolean mHighQuality;
+    private final boolean mHighDownloadQuality;
     private int mPosition;
 
+    /**
+     * Create a queue manager who's sole purpose is to manage the queue
+     * and update the current playing song being shown
+     *
+     * @param playingService      Playing Service
+     * @param player              Player
+     * @param songs               All the songs in the queue
+     * @param order               Order of the playlist
+     * @param highDownloadQuality Quality of downloads
+     */
     public QueueManager(
         PlayingService playingService,
         SimpleExoPlayer player,
         List<Song> songs,
         List<String> order,
-        boolean highQuality
+        boolean highDownloadQuality
     ) {
         mContext = playingService.getApplicationContext();
         mPlayer = player;
@@ -49,9 +59,14 @@ public class QueueManager {
         mSongs = new ArrayList<>(songs);
         mSortedOrder = new ArrayList<>(order);
         mShuffledOrder = ListArrayUtils.shuffleOrder(new ArrayList<>(order));
-        mHighQuality = highQuality;
+        mHighDownloadQuality = highDownloadQuality;
     }
 
+    /**
+     * Create the object which orders the queue
+     *
+     * @return Song list
+     */
     private List<Song> formatQueue() {
         List<Song> queue;
 
@@ -97,6 +112,10 @@ public class QueueManager {
         return queue;
     }
 
+    /**
+     * Skip to the next song in the queue
+     * Changes the position in the orders that is being played
+     */
     public void nextSong() {
         if (mSongs.size() == 0) return;
         int position = mPosition;
@@ -119,6 +138,10 @@ public class QueueManager {
         updateLiveSong();
     }
 
+    /**
+     * Rewind to the previous song in the queue
+     * Changes the position in the orders that is being played
+     */
     public void backSong() {
         if (mSongs.size() == 0) return;
         int position = mPosition;
@@ -139,6 +162,12 @@ public class QueueManager {
         updateLiveSong();
     }
 
+    /**
+     * Starts a song in the current queue
+     * Reorders the list of songs and sets the current playing to index 0
+     *
+     * @param song Song to start from
+     */
     public void goToSong(Song song) {
         mPosition = 0;
         List<String> sortedOrder = new ArrayList<>(ListArrayUtils.startOrderFromId(mSortedOrder, song.getSongId()));
@@ -151,6 +180,12 @@ public class QueueManager {
         updateLiveSong();
     }
 
+    /**
+     * Add a song to the queue
+     * Adds the song to the bottom of the orders
+     *
+     * @param song Song to add
+     */
     public void addSong(Song song) {
         if (mSongs.stream().anyMatch(s -> s.getSongId().equals(song.getSongId()))) {
             Log.d(TAG, String.format("Song %s already exists in queue, skipping", song));
@@ -167,6 +202,12 @@ public class QueueManager {
         updateLiveQueue();
     }
 
+    /**
+     * Remove a song from the queue
+     * Removes the id from the orders
+     *
+     * @param songId Song id to remove
+     */
     public void removeSong(String songId) {
         List<Song> songs = new ArrayList<>(mSongs);
         mSongs.clear();
@@ -178,6 +219,12 @@ public class QueueManager {
         updateLiveQueue();
     }
 
+    /**
+     * Move a song in the queue to another position
+     *
+     * @param oldPosition Old position in the queue it was at
+     * @param newPosition New position in the queue it was at
+     */
     public void moveSong(int oldPosition, int newPosition) {
         if (mIsShuffling.getValue()) {
             String currentId = mShuffledOrder.get(mPosition);
@@ -187,6 +234,7 @@ public class QueueManager {
                 mShuffledOrder.remove((oldPosition + mPosition) % mShuffledOrder.size())
             );
 
+            // This checks if the moved item went past beyond start/end of the queue
             if (mShuffledOrder.indexOf(currentId) > mPosition) {
                 mShuffledOrder.add(
                     mShuffledOrder.size() - 2,
@@ -206,6 +254,7 @@ public class QueueManager {
                 mSortedOrder.remove((oldPosition + mPosition) % mSortedOrder.size())
             );
 
+            // This checks if the moved item went past beyond start/end of the queue
             if (mSortedOrder.indexOf(currentId) > mPosition) {
                 mSortedOrder.add(
                     mSortedOrder.size() - 2,
@@ -222,11 +271,17 @@ public class QueueManager {
         updateLiveQueue();
     }
 
+    /**
+     * Toggle loop
+     */
     public void toggleLoop() {
         mIsLooping.setValue(!mIsLooping.getValue());
         updateLiveQueue();
     }
 
+    /**
+     * Toggle shuffle
+     */
     public void toggleShuffle() {
         List<String> shuffledOrder = ListArrayUtils.shuffleOrder(new ArrayList<>(mSortedOrder));
 
@@ -236,8 +291,14 @@ public class QueueManager {
         updateLiveQueue();
     }
 
-    public @Nullable
-    Song getSongById(String id) {
+    /**
+     * Fetch a song by its ID
+     *
+     * @param id ID
+     * @return Song object
+     */
+    @Nullable
+    public Song getSongById(String id) {
         List<Song> filtered = mSongs
             .stream()
             .filter(s -> s.getSongId().equals(id))
@@ -247,10 +308,18 @@ public class QueueManager {
         return filtered.get(0);
     }
 
+    /**
+     * Get all songs
+     *
+     * @return All songs
+     */
     public List<Song> getSongs() {
         return mSongs;
     }
 
+    /**
+     * Change the current playing song to he first song in the queue
+     */
     private void updateLiveSong() {
         Song song;
         if (mIsShuffling.getValue()) {
@@ -262,13 +331,16 @@ public class QueueManager {
         mCurrentSong.setValue(song);
 
         mPlayer.stop();
-        mPlayer.setMediaItem(song.getMediaItem(mContext, mHighQuality));
+        mPlayer.setMediaItem(song.getMediaItem(mContext, mHighDownloadQuality));
         mPlayer.prepare();
         mPlayer.play();
 
         updateLiveQueue();
     }
 
+    /**
+     * Update the queue with the latest queue
+     */
     public void updateLiveQueue() {
         mQueue.setValue(formatQueue());
     }

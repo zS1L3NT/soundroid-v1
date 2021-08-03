@@ -26,10 +26,6 @@ import java.util.List;
 public class HomeFragment extends Fragment<FragmentHomeBinding> {
     private static final String TAG = "(SounDroid) HomeFragment";
 
-    public HomeFragment() {
-        // Required empty public constructor
-    }
-
     private final HomeAdapter.Callback callback = new HomeAdapter.Callback() {
         @Override
         public void onSongClicked(Playable playable, String songId) {
@@ -57,16 +53,14 @@ public class HomeFragment extends Fragment<FragmentHomeBinding> {
         B.recyclerView.setLayoutManager(layoutManager);
         B.recyclerView.setAdapter(homeAdapter);
 
-        // Live Observers
+        // Listeners
         mHomeVM.songs.observe(this, homeAdapter::updateSongs);
         mHomeVM.loading.observe(this, B.swipeRefresh::setRefreshing);
         mActivity.getPlayingService(service -> service.currentSong.observe(this, homeAdapter::updateCurrentSong));
-
         mMainVM.mySongs.observe(this, mHomeVM.songs::setValue);
         B.searchbar.setOnClickListener(this::onSearchbarClicked);
         B.swipeRefresh.setOnRefreshListener(this::onReload);
         B.settingsImage.setOnClickListener(this::onSettingsClicked);
-        B.parent.setTransitionListener(mActivity.getTransitionListener());
 
         return B.getRoot();
     }

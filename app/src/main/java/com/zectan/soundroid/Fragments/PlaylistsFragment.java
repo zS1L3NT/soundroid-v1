@@ -47,10 +47,9 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
         B.recyclerView.setAdapter(playlistsAdapter);
         B.recyclerView.setLayoutManager(layoutManager);
 
-        // Observers
+        // Listeners
         mPlaylistsVM.loading.observe(this, B.swipeRefresh::setRefreshing);
         mMainVM.myPlaylists.observe(this, playlistsAdapter::updateInfos);
-
         B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.swipeRefresh.setOnRefreshListener(this::onReload);
 
@@ -70,6 +69,12 @@ public class PlaylistsFragment extends Fragment<FragmentPlaylistsBinding> {
         MenuBuilder.createMenu(view, items, null, (object, item) -> mActivity.handleMenuItemClick(null, null, item, menuItemRunnable(item)));
     }
 
+    /**
+     * Callback for click of menu item
+     *
+     * @param item Menu item
+     * @return Runnable
+     */
     private Runnable menuItemRunnable(MenuItem item) {
         return () -> {
             switch (item.getItemId()) {

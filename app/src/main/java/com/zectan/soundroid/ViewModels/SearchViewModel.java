@@ -24,6 +24,13 @@ public class SearchViewModel extends ViewModel {
     public final StrictLiveData<String> message = new StrictLiveData<>("");
     private int search_count = 0;
 
+    /**
+     * Do a local search through songs and playlists for a results
+     * Use regex pattern to search items
+     *
+     * @param playlists All playlists
+     * @param songs     All songs
+     */
     public void searchLocal(List<Playlist> playlists, List<Song> songs) {
         if (query.getValue().isEmpty()) {
             loading.postValue(false);
@@ -55,6 +62,9 @@ public class SearchViewModel extends ViewModel {
         localResults.postValue(results);
     }
 
+    /**
+     * Search YouTube Music API for song results
+     */
     public void searchServer() {
         int search_id = ++search_count;
         if (query.getValue().isEmpty()) {

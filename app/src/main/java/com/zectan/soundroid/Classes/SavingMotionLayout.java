@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +22,8 @@ public class SavingMotionLayout extends MotionLayout {
             mActivity = (MainActivity) context;
         } catch (Exception ignored) {
         }
+
+        initialiseNavigatorUpdater();
     }
 
     public SavingMotionLayout(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs) {
@@ -31,6 +32,8 @@ public class SavingMotionLayout extends MotionLayout {
             mActivity = (MainActivity) context;
         } catch (Exception ignored) {
         }
+
+        initialiseNavigatorUpdater();
     }
 
     public SavingMotionLayout(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs, int defStyleAttr) {
@@ -38,6 +41,36 @@ public class SavingMotionLayout extends MotionLayout {
         try {
             mActivity = (MainActivity) context;
         } catch (Exception ignored) {
+        }
+
+        initialiseNavigatorUpdater();
+    }
+
+    /**
+     * Set up transition listener
+     */
+    private void initialiseNavigatorUpdater() {
+        if (mActivity != null) {
+            setTransitionListener(new TransitionListener() {
+                @Override
+                public void onTransitionStarted(MotionLayout motionLayout, int i, int i1) {
+                    mActivity.updateNavigator(1f - motionLayout.getProgress());
+                }
+
+                @Override
+                public void onTransitionChange(MotionLayout motionLayout, int i, int i1, float v) {
+                    mActivity.updateNavigator(1f - motionLayout.getProgress());
+                }
+
+                @Override
+                public void onTransitionCompleted(MotionLayout motionLayout, int i) {
+                    mActivity.updateNavigator(1f - motionLayout.getProgress());
+                }
+
+                @Override
+                public void onTransitionTrigger(MotionLayout motionLayout, int i, boolean b, float v) {
+                }
+            });
         }
     }
 
@@ -56,6 +89,7 @@ public class SavingMotionLayout extends MotionLayout {
     protected void onRestoreInstanceState(Parcelable parcelable) {
         if (parcelable == null) return;
         if (parcelable instanceof State) {
+            // When restoring, get the previous state
             State state = (State) parcelable;
             super.onRestoreInstanceState(state.superParcel);
             setTransition(state.startState, state.endState);

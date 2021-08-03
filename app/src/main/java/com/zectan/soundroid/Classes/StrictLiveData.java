@@ -9,6 +9,12 @@ import java.util.Objects;
 
 public class StrictLiveData<@NotNull T> extends androidx.lifecycle.MutableLiveData<@NotNull T> {
 
+    /**
+     * Strict Live Data is an extension of MutableLiveData with @NotNull @NonNull annotations.
+     * Makes sure the value from Live Data is not null
+     *
+     * @param value Value
+     */
     public StrictLiveData(@NonNull @NotNull T value) {
         super(value);
     }

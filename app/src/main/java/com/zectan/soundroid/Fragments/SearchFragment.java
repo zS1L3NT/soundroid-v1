@@ -60,17 +60,17 @@ public class SearchFragment extends Fragment<FragmentSearchBinding> {
         super.onCreateView(inflater, container, savedInstanceState);
         mActivity.updateNavigator(0);
 
-        // Observers
+        mDebounce = new Debounce(250);
+        B.viewPager.setAdapter(new SearchViewPagerAdapter(mActivity));
+        new TabLayoutMediator(B.tabLayout, B.viewPager, (tab, position) -> tab.setText(position == 0 ? "Local" : "Server")).attach();
+
+        // Listeners
         mSearchVM.loading.observe(this, this::onLoadingChange);
         B.headerBackImage.setOnClickListener(__ -> mNavController.navigateUp());
         B.headerTextEditor.setText(mSearchVM.query.getValue());
-
-        mDebounce = new Debounce(250);
         B.headerTextEditor.addTextChangedListener(textWatcher);
 
         mActivity.showKeyboard();
-        B.viewPager.setAdapter(new SearchViewPagerAdapter(mActivity));
-        new TabLayoutMediator(B.tabLayout, B.viewPager, (tab, position) -> tab.setText(position == 0 ? "Local" : "Server")).attach();
 
         return B.getRoot();
     }

@@ -7,9 +7,16 @@ import org.json.JSONArray;
 
 import java.util.List;
 
-public class EditPlaylistRequest extends Request {
+public class PlaylistEditRequest extends Request {
 
-    public EditPlaylistRequest(Playlist playlist, List<String> removed, Callback callback) {
+    /**
+     * Edit a playlist
+     *
+     * @param playlist Playlist
+     * @param removed  List of removed songs
+     * @param callback Callback
+     */
+    public PlaylistEditRequest(Playlist playlist, List<String> removed, Callback callback) {
         super("/playlist/edit", callback);
 
         JSONArray removedArray = new JSONArray();
@@ -18,4 +25,5 @@ public class EditPlaylistRequest extends Request {
         putData("info", playlist.toJSON());
         sendRequest(RequestType.PUT);
     }
+
 }

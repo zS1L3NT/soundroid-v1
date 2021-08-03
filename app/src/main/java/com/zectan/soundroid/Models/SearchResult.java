@@ -10,6 +10,12 @@ public class SearchResult {
     private Playlist mPlaylist;
     private Song mSong;
 
+    /**
+     * Object containing data about a search result
+     *
+     * @param object JSON Object to parse
+     * @throws JSONException Error if cannot parse JSON from server
+     */
     public SearchResult(JSONObject object) throws JSONException {
         String type = object.getString("type");
         mLocation = "Server";
@@ -23,11 +29,21 @@ public class SearchResult {
         }
     }
 
+    /**
+     * Create a SearchResult containing data about a song
+     *
+     * @param song Song
+     */
     public SearchResult(Song song) {
         mLocation = "Local";
         mSong = song;
     }
 
+    /**
+     * Create a SearchResult containing data about a playlist
+     *
+     * @param playlist Playlist
+     */
     public SearchResult(Playlist playlist) {
         mLocation = "Local";
         mPlaylist = playlist;
@@ -45,6 +61,11 @@ public class SearchResult {
         return mLocation;
     }
 
+    /**
+     * Fetch the ID of the Song or Playlist
+     *
+     * @return ID
+     */
     public String getId() {
         if (mSong != null) return mSong.getSongId();
         if (mPlaylist != null) return mPlaylist.getId();

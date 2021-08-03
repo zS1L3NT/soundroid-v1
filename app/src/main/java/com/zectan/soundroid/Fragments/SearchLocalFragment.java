@@ -45,7 +45,7 @@ public class SearchLocalFragment extends Fragment<FragmentSearchLocalBinding> {
 
         @Override
         public boolean onMenuItemClicked(SearchResult result, MenuItem item) {
-            return mActivity.handleMenuItemClick(result.getPlaylistInfo(), result.getSong(), item);
+            return mActivity.handleMenuItemClick(result.getPlaylistInfo(), result.getSong(), item, null);
         }
     };
 
@@ -66,7 +66,7 @@ public class SearchLocalFragment extends Fragment<FragmentSearchLocalBinding> {
         B.recyclerView.setLayoutManager(layoutManager);
         B.recyclerView.setAdapter(mSearchAdapter);
 
-        // Observers
+        // Listeners
         mSearchVM.localResults.observe(this, this::onLocalResultsChange);
         mSearchVM.query.observe(this, query -> mSearchVM.searchLocal(mMainVM.myPlaylists.getValue(), mMainVM.mySongs.getValue()));
         mActivity.getPlayingService(service -> service.currentSong.observe(this, mSearchAdapter::updateCurrentSong));
@@ -74,14 +74,19 @@ public class SearchLocalFragment extends Fragment<FragmentSearchLocalBinding> {
         return B.getRoot();
     }
 
+    /**
+     * Update the message that is displayed in the search screen
+     *
+     * @param results List of search results
+     */
     @SuppressLint("UseCompatLoadingForDrawables")
     private void updateVisuals(List<SearchResult> results) {
         if (mSearchVM.query.getValue().equals("")) {
-            B.responseImage.setImageDrawable(mActivity.getDrawable(R.drawable.ic_search));
+            B.responseImage.setImageResource(R.drawable.ic_search);
             B.responseHeaderText.setText(R.string.search);
             B.responseMessageText.setText(R.string.searchbar_placeholder);
         } else {
-            B.responseImage.setImageDrawable(mActivity.getDrawable(R.drawable.ic_search_no_results));
+            B.responseImage.setImageResource(R.drawable.ic_search_no_results);
             B.responseHeaderText.setText(R.string.no_results);
             B.responseMessageText.setText(R.string.no_song_match_found);
         }

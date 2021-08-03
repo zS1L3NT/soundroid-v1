@@ -1,7 +1,6 @@
 package com.zectan.soundroid.Utils;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.MenuItem;
@@ -10,7 +9,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.zectan.soundroid.Connections.DeletePlaylistRequest;
+import com.zectan.soundroid.Connections.PlaylistDeleteRequest;
 import com.zectan.soundroid.Connections.SavePlaylistRequest;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.Playable;
@@ -26,20 +25,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class MenuEvents {
+    private final FirebaseFirestore mDb = FirebaseFirestore.getInstance();
     private final MainActivity mActivity;
     private final Playlist mPlaylist;
     private final Song mSong;
     private final MenuItem mItem;
-    FirebaseFirestore mDb = FirebaseFirestore.getInstance();
-    private Runnable mRunnable;
+    private final Runnable mRunnable;
 
-    public MenuEvents(MainActivity activity, Playlist playlist, Song song, MenuItem item) {
-        mActivity = activity;
-        mPlaylist = playlist;
-        mSong = song;
-        mItem = item;
-    }
-
+    /**
+     * Object that handles a click event of any of the menu items
+     *
+     * @param activity Activity
+     * @param playlist Playlist
+     * @param song     Song
+     * @param item     Menu item
+     * @param runnable Runnable
+     */
     public MenuEvents(MainActivity activity, Playlist playlist, Song song, MenuItem item, Runnable runnable) {
         mActivity = activity;
         mPlaylist = playlist;
@@ -103,10 +104,11 @@ public class MenuEvents {
     }
 
     private void addToPlaylist() {
-        List<Playlist> playlists = new ArrayList<>();
-        MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(mActivity).setTitle("Add To Playlist");
+        MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(mActivity).setTitle("Add To Playlist:");
+        List<Playlist> playlists = new ArrayList<>(mActivity.mMainVM.myPlaylists.getValue());
 
-        DialogInterface.OnClickListener onClickListener = (dialog_, i) -> {
+        // Items in the dialog box should represent the your playlists
+        dialog.setItems(ListArrayUtils.toArray(CharSequence.class, playlists.stream().map(Playlist::getName).collect(Collectors.toList())), (dialog_, i) -> {
             Playlist playlist = playlists.get(i);
 
             AtomicInteger completed = new AtomicInteger(0);
@@ -116,6 +118,7 @@ public class MenuEvents {
                 }
             };
 
+            // Check if song is in playlist[i]
             boolean inPlaylist = mActivity
                 .mMainVM
                 .getSongsFromPlaylist(playlist.getId())
@@ -123,24 +126,22 @@ public class MenuEvents {
                 .anyMatch(song -> song.getSongId().equals(mSong.getSongId()));
 
             if (inPlaylist) {
-                mActivity.handleError(new Exception("Song already in playlist!"));
+                mActivity.snack("Song already in playlist!");
             } else {
+                // Not in playlist, can add to playlist
                 mSong.setPlaylistId(playlist.getId());
                 mSong.setUserId(mActivity.mMainVM.userId);
                 mDb.collection("songs")
                     .add(mSong.toMap())
                     .addOnSuccessListener(onSuccessListener)
-                    .addOnFailureListener(mActivity::handleError);
+                    .addOnFailureListener(mActivity::warnError);
                 mDb.collection("playlists")
                     .document(playlist.getId())
                     .update("order", FieldValue.arrayUnion(mSong.getSongId()))
                     .addOnSuccessListener(onSuccessListener)
-                    .addOnFailureListener(mActivity::handleError);
+                    .addOnFailureListener(mActivity::warnError);
             }
-        };
-
-        playlists.addAll(mActivity.mMainVM.myPlaylists.getValue());
-        dialog.setItems(ListArrayUtils.toArray(CharSequence.class, playlists.stream().map(Playlist::getName).collect(Collectors.toList())), onClickListener);
+        });
         dialog.show();
     }
 
@@ -220,7 +221,7 @@ public class MenuEvents {
 
             @Override
             public void onError(String message) {
-                mActivity.handleError(new Exception(message));
+                mActivity.warnError(new Exception(message));
             }
         });
     }
@@ -246,7 +247,7 @@ public class MenuEvents {
             .setMessage("This will delete the entire playlists at once!")
             .setNegativeButton("Cancel", (dialog, which) -> {
             })
-            .setPositiveButton("Delete", (dialog, which) -> new DeletePlaylistRequest(mPlaylist.getId(), new DeletePlaylistRequest.Callback() {
+            .setPositiveButton("Delete", (dialog, which) -> new PlaylistDeleteRequest(mPlaylist.getId(), new PlaylistDeleteRequest.Callback() {
                 @Override
                 public void onComplete(String response) {
                     mActivity.snack("Playlist deleted");
@@ -255,7 +256,7 @@ public class MenuEvents {
 
                 @Override
                 public void onError(String message) {
-                    mActivity.handleError(new Exception(message));
+                    mActivity.warnError(new Exception(message));
                 }
             }))
             .show();
@@ -279,7 +280,7 @@ public class MenuEvents {
                 mActivity.mPlaylistEditVM.playlistId.setValue(id);
                 mRunnable.run();
             })
-            .addOnFailureListener(mActivity::handleError);
+            .addOnFailureListener(mActivity::warnError);
     }
 
     private void importPlaylist() {

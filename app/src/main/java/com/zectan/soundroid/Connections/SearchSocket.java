@@ -21,6 +21,12 @@ public class SearchSocket {
     private final Callback mCallback;
     private final Socket mSocket;
 
+    /**
+     * SocketIO request to the server for search results
+     *
+     * @param query    Search query
+     * @param callback Callback
+     */
     public SearchSocket(String query, Callback callback) {
         mCallback = callback;
         IO.Options options = IO.Options.builder().setTimeout(60_000).build();
@@ -37,6 +43,11 @@ public class SearchSocket {
         mSocket.on(Socket.EVENT_CONNECT_ERROR, this::onConnectError);
     }
 
+    /**
+     * When receiving a search result
+     *
+     * @param args Args
+     */
     private void onResult(Object... args) {
         if (mCallback.isInactive()) {
             mSocket.close();
@@ -53,6 +64,11 @@ public class SearchSocket {
         }
     }
 
+    /**
+     * When receiving a new message
+     *
+     * @param args Args
+     */
     private void onMessage(Object... args) {
         if (mCallback.isInactive()) {
             mSocket.close();
@@ -63,6 +79,11 @@ public class SearchSocket {
         mCallback.onMessage(args[0].toString());
     }
 
+    /**
+     * When search is done
+     *
+     * @param args Args
+     */
     private void onDone(Object... args) {
         if (mCallback.isInactive()) {
             mSocket.close();

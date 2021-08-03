@@ -22,6 +22,13 @@ public class Playlist {
     public Playlist() {
     }
 
+    /**
+     * Shortcut to create a simple playlist that will not be stored in Firebase
+     *
+     * @param id    Playlist ID
+     * @param name  Name
+     * @param order Order
+     */
     public Playlist(String id, String name, List<String> order) {
         this.id = id;
         this.name = name;
@@ -31,6 +38,16 @@ public class Playlist {
         this.order = order;
     }
 
+    /**
+     * Object containing data about a playlist
+     *
+     * @param id       Playlist ID
+     * @param name     Name
+     * @param cover    Cover
+     * @param colorHex Color Hex
+     * @param userId   User ID
+     * @param order    Order
+     */
     public Playlist(String id, String name, String cover, String colorHex, String userId, List<String> order) {
         this.id = id;
         this.name = name;
@@ -40,10 +57,22 @@ public class Playlist {
         this.order = order;
     }
 
+    /**
+     * Create an empty object for a default playlist
+     *
+     * @return Playlist
+     */
     public static Playlist getEmpty() {
         return new Playlist("", "", new ArrayList<>());
     }
 
+    /**
+     * Create a Playlist Object from a JSON object
+     *
+     * @param object JSON Object
+     * @return Playlist Object
+     * @throws JSONException Error if object is unparsable
+     */
     public static Playlist fromJSON(JSONObject object) throws JSONException {
         String id = object.getString("id");
         String name = object.getString("name");
@@ -57,6 +86,11 @@ public class Playlist {
         return new Playlist(id, name, cover, colorHex, userId, order);
     }
 
+    /**
+     * Create a JSON Object from a Playlist Object
+     *
+     * @return JSON Object
+     */
     public JSONObject toJSON() {
         JSONObject object = new JSONObject();
         try {
@@ -72,6 +106,11 @@ public class Playlist {
         }
     }
 
+    /**
+     * Create a Map Object from a Playlist Object
+     *
+     * @return Map Object
+     */
     public Map<String, Object> toMap() {
         Map<String, Object> object = new HashMap<>();
         object.put("id", id);

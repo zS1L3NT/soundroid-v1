@@ -14,6 +14,13 @@ public class Playable {
     private final Playlist playlist;
     private final List<Song> songs;
 
+    /**
+     * Object containing Playlist and List of Songs
+     * Passed into Playing Service
+     *
+     * @param playlist Playlist
+     * @param songs    Songs
+     */
     public Playable(Playlist playlist, List<Song> songs) {
         this.playlist = playlist;
         this.songs = ListArrayUtils.sortSongs(songs, playlist.getOrder());
@@ -36,14 +43,31 @@ public class Playable {
         return songs;
     }
 
+    /**
+     * Check if all songs in playable is downloaded
+     *
+     * @param context Context
+     * @return If all songs in playable is downloaded
+     */
     public boolean isDownloaded(Context context) {
         return size() > 0 && songs.stream().allMatch(song -> song.isDownloaded(context));
     }
 
+    /**
+     * Check if some songs in playable is downloaded
+     *
+     * @param context Context
+     * @return If some songs in playable is downloaded
+     */
     public boolean hasDownloaded(Context context) {
         return size() > 0 && songs.stream().anyMatch(song -> song.isDownloaded(context));
     }
 
+    /**
+     * Get number of songs
+     *
+     * @return Number of songs
+     */
     public int size() {
         return songs.size();
     }

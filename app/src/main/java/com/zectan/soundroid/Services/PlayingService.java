@@ -12,10 +12,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.Message;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 
@@ -31,6 +29,7 @@ import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.zectan.soundroid.Classes.Interval;
 import com.zectan.soundroid.Classes.StrictLiveData;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.Playable;
@@ -71,8 +70,8 @@ public class PlayingService extends Service {
     public final StrictLiveData<List<Song>> queue = new StrictLiveData<>(new ArrayList<>());
     public final MutableLiveData<GradientDrawable> background = new MutableLiveData<>();
 
-    public PlayingService.TimeHandler timeHandler;
-    public PlayingService.ProgressHandler progressHandler;
+    public PlayingService.TimeInterval mTimeInterval;
+    public PlayingService.ProgressInterval mProgressInterval;
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mNotificationBuilder;
     private AudioFocusRequest mAudioFocusRequest;
@@ -89,6 +88,14 @@ public class PlayingService extends Service {
     private int mNotificationID;
     private boolean mExplicitPlay;
 
+    /**
+     * Runs when an intent was passed to the Service
+     *
+     * @param intent  Intent
+     * @param flags   Flags
+     * @param startId Start ID
+     * @return START_STICKY
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && intent.getAction() != null) {
@@ -125,6 +132,7 @@ public class PlayingService extends Service {
             R.drawable.playing_cover_failed
         );
 
+        // Create intents
         Intent intentOpen = new Intent(this, MainActivity.class).setAction(MainActivity.FRAGMENT_PLAYING);
         Intent intentBack = new Intent(this, PlayingService.class).setAction(BACK);
         Intent intentPlayPause = new Intent(this, PlayingService.class).setAction(PLAY_PAUSE);
@@ -135,6 +143,7 @@ public class PlayingService extends Service {
         mPendingIntentNext = PendingIntent.getService(mContext, 0, intentNext, PendingIntent.FLAG_IMMUTABLE);
         mMediaSession = new MediaSessionCompat(mContext, TAG);
 
+        // Set up a notification
         mNotificationBuilder = new NotificationCompat.Builder(mContext, MainActivity.PLAYING_CHANNEL_ID)
             .setContentTitle("-")
             .setContentText("-")
@@ -151,6 +160,7 @@ public class PlayingService extends Service {
                 .setMediaSession(mMediaSession.getSessionToken()));
         startForeground(mNotificationID, mNotificationBuilder.build());
 
+        // Initialise player
         mPlayer = new SimpleExoPlayer.Builder(mContext).build();
         mPlayer.addListener(new Player.Listener() {
             @Override
@@ -189,6 +199,7 @@ public class PlayingService extends Service {
 
             @Override
             public void onPlayerError(@NotNull ExoPlaybackException err) {
+                // Errors to mute when the server hasn't converted the selected portion of the song
                 List<String> NotConvertedYetErrors = new ArrayList<>();
                 NotConvertedYetErrors.add("java.io.EOFException");
                 NotConvertedYetErrors.add("com.google.android.exoplayer2.ParserException");
@@ -207,6 +218,7 @@ public class PlayingService extends Service {
             }
         });
 
+        // Set up audio focus
         mAudioManager = getSystemService(AudioManager.class);
         mAudioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
             .setAcceptsDelayedFocusGain(true)
@@ -230,7 +242,15 @@ public class PlayingService extends Service {
         mNotificationManager.cancel(mNotificationID);
     }
 
-    public void startPlayable(Playable playable, String songId, boolean highQuality) {
+    /**
+     * Start playing from a playable.
+     * Stops the previous playable.
+     *
+     * @param playable            Playable
+     * @param songId              Song ID to start from
+     * @param highDownloadQuality Quality of download
+     */
+    public void startPlayable(Playable playable, String songId, boolean highDownloadQuality) {
         Log.i(TAG, String.format("Start Playlist (%s)[%s]", playable.getInfo().getId(), songId));
 
         this.playable.setValue(playable);
@@ -239,18 +259,23 @@ public class PlayingService extends Service {
             mPlayer,
             playable.getSongs(),
             ListArrayUtils.startOrderFromId(playable.getInfo().getOrder(), songId),
-            highQuality
+            highDownloadQuality
         );
 
         changeSong(songId);
     }
 
+    /**
+     * Change current playing song in playable
+     *
+     * @param songId Song ID selected
+     */
     public void changeSong(String songId) {
         Log.i(TAG, String.format("Changed Song to Song<%s>", songId));
         Song song = mQueueManager.getSongById(songId);
 
         if (song == null) {
-            throw new RuntimeException(String.format("Song not found in playlist: %s", songId));
+            throw new RuntimeException(String.format("Song not found in playable: %s", songId));
         }
 
         requestAudioFocus();
@@ -258,6 +283,9 @@ public class PlayingService extends Service {
         mQueueManager.goToSong(song);
     }
 
+    /**
+     * Try playing the music again
+     */
     public void retry() {
         requestAudioFocus();
         mPlayer.prepare();
@@ -286,25 +314,43 @@ public class PlayingService extends Service {
         mQueueManager.nextSong();
     }
 
+    /**
+     * Toggle shuffle
+     */
     public void toggleShuffle() {
         mQueueManager.toggleShuffle();
     }
 
+    /**
+     * Toggle loop
+     */
     public void toggleLoop() {
         mQueueManager.toggleLoop();
     }
 
+    /**
+     * Play the player, setting explicit play to true
+     */
     public void play() {
         requestAudioFocus();
         mExplicitPlay = true;
         mPlayer.play();
     }
 
+    /**
+     * Pause the player and revoke audio focus if wanted
+     *
+     * @param loseAudioFocus Lose audio focus
+     */
     public void pause(boolean loseAudioFocus) {
         if (loseAudioFocus) revokeAudioFocus();
         mPlayer.pause();
     }
 
+    /**
+     * Restore the controls of the music player to the original controls which have 3 buttons.
+     * Plays the music player
+     */
     private void startAgain() {
         mNotificationBuilder
             .addAction(R.drawable.ic_notification_back, "Back", mPendingIntentBack)
@@ -317,21 +363,40 @@ public class PlayingService extends Service {
         play();
     }
 
+    /**
+     * Move a song in the queue to another position
+     *
+     * @param oldPosition Old Position
+     * @param newPosition New Position
+     */
     public void onMoveSong(int oldPosition, int newPosition) {
         Log.i(TAG, String.format("Dragged song from %s to %s", oldPosition, newPosition));
         mQueueManager.moveSong(oldPosition, newPosition);
     }
 
+    /**
+     * Remove a song from the queue Removes the id from the orders
+     *
+     * @param songId Song id to remove
+     */
     public void onRemoveSong(String songId) {
         Log.i(TAG, String.format("Swiped song %s", songId));
         mQueueManager.removeSong(songId);
     }
 
+    /**
+     * Add a song to the queue Adds the song to the bottom of the orders
+     *
+     * @param song Song to add
+     */
     public void addToQueue(Song song) {
         Log.i(TAG, String.format("Added song %s", song));
         mQueueManager.addSong(song);
     }
 
+    /**
+     * Clear the queue
+     */
     public void clearQueue() {
         currentSong.setValue(Song.getEmpty());
         queue.setValue(new ArrayList<>());
@@ -348,19 +413,35 @@ public class PlayingService extends Service {
         mPlayer.clearMediaItems();
     }
 
+    /**
+     * Seek to a specific position
+     *
+     * @param progress Progress in progress/1000
+     */
     public void seekTo(int progress) {
         mPlayer.seekTo((long) duration.getValue() * progress);
     }
 
+    /**
+     * Get the audio focus from the system
+     */
     private void requestAudioFocus() {
         if (mAudioManager == null) return;
         mAudioManager.requestAudioFocus(mAudioFocusRequest);
     }
 
+    /**
+     * Abandon the audio focus
+     */
     private void revokeAudioFocus() {
         mAudioManager.abandonAudioFocusRequest(mAudioFocusRequest);
     }
 
+    /**
+     * Audio focus change callback
+     *
+     * @param focusChange New focus
+     */
     private void onAudioFocusChange(int focusChange) {
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -377,6 +458,8 @@ public class PlayingService extends Service {
                 mExplicitPlay = false;
                 pause(true);
 
+                // Turn the notification play controls into one button
+                // Show that the audio focus has been lost for a long time
                 Intent intentStartAgain = new Intent(this, PlayingService.class).setAction(START_AGAIN);
                 PendingIntent pendingIntentStartAgain = PendingIntent.getService(mContext, 0, intentStartAgain, PendingIntent.FLAG_IMMUTABLE);
                 mNotificationBuilder
@@ -396,13 +479,14 @@ public class PlayingService extends Service {
      * @param mediaItem Media Item
      */
     private void onMediaItemTransition(@org.jetbrains.annotations.Nullable MediaItem mediaItem) {
-        if (timeHandler != null) timeHandler.cancel();
-        if (progressHandler != null) progressHandler.cancel();
+        if (mTimeInterval != null) mTimeInterval.cancel();
+        if (mProgressInterval != null) mProgressInterval.cancel();
 
         time.setValue(0);
         progress.setValue(0);
 
         if (mediaItem != null) {
+            // Songs with the media id
             List<Song> songs = mQueueManager
                 .getSongs()
                 .stream()
@@ -410,12 +494,14 @@ public class PlayingService extends Service {
                 .collect(Collectors.toList());
 
             if (songs.size() == 1) {
+                // Song exists
                 Song song = songs.get(0);
                 mNotificationBuilder
                     .setContentTitle(song.getTitle())
                     .setContentText(song.getArtiste())
                     .setLargeIcon(mDefaultCover);
 
+                // Load cover image into notification
                 Glide
                     .with(this)
                     .asBitmap()
@@ -434,20 +520,23 @@ public class PlayingService extends Service {
                         }
                     });
 
+                // If song is not export, start the timer again
                 if (!song.equals(Song.getEmpty())) {
-                    timeHandler = new TimeHandler(getMainLooper());
-                    progressHandler = new ProgressHandler(getMainLooper());
+                    mTimeInterval = new TimeInterval(getMainLooper());
+                    mProgressInterval = new ProgressInterval(getMainLooper());
 
-                    timeHandler.start();
-                    progressHandler.start();
+                    mTimeInterval.start();
+                    mProgressInterval.start();
                 }
             } else {
+                // Song doesn't exist?
                 mNotificationBuilder
                     .setContentTitle("-")
                     .setContentText("-")
                     .setLargeIcon(mDefaultCover);
             }
         } else {
+            // No media item
             mNotificationBuilder
                 .setContentTitle("-")
                 .setContentText("-")
@@ -462,54 +551,33 @@ public class PlayingService extends Service {
         return mBinder;
     }
 
-    private class TimeHandler extends Handler {
-        private boolean mCancelled = false;
+    private class TimeInterval extends Interval {
 
-        public TimeHandler(@NonNull @NotNull Looper looper) {
-            super(looper);
+        public TimeInterval(@NonNull Looper looper) {
+            super(looper, 250);
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            if (!mCancelled) {
-                if (!touchingSeekbar.getValue())
-                    time.setValue((int) (mPlayer.getContentPosition() / 1000));
-                sendEmptyMessageDelayed(0, 250);
-            }
+        public void onNextCall() {
+            if (!touchingSeekbar.getValue())
+                time.setValue((int) (mPlayer.getContentPosition() / 1000));
+            sendEmptyMessageDelayed(0, 250);
         }
 
-        public void start() {
-            sendEmptyMessage(0);
-        }
-
-        public void cancel() {
-            mCancelled = true;
-        }
     }
 
-    private class ProgressHandler extends Handler {
-        private boolean mCancelled = false;
+    private class ProgressInterval extends Interval {
 
-        public ProgressHandler(@NonNull @NotNull Looper looper) {
-            super(looper);
+        public ProgressInterval(@NonNull Looper looper) {
+            super(looper, (int) (mPlayer.getDuration() / 1000));
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            if (!mCancelled) {
-                buffered.setValue((int) ((mPlayer.getBufferedPosition() * 1000) / mPlayer.getDuration()));
-                if (!touchingSeekbar.getValue())
-                    progress.setValue((int) ((mPlayer.getCurrentPosition() * 1000) / mPlayer.getDuration()));
-                sendEmptyMessageDelayed(0, mPlayer.getDuration() / 1000);
-            }
-        }
-
-        public void start() {
-            sendEmptyMessage(0);
-        }
-
-        public void cancel() {
-            mCancelled = true;
+        public void onNextCall() {
+            buffered.setValue((int) ((mPlayer.getBufferedPosition() * 1000) / mPlayer.getDuration()));
+            if (!touchingSeekbar.getValue())
+                progress.setValue((int) ((mPlayer.getCurrentPosition() * 1000) / mPlayer.getDuration()));
+            setDelay((int) (mPlayer.getDuration() / 1000));
         }
     }
 

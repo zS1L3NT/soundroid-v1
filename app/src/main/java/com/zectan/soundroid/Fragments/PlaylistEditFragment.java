@@ -25,7 +25,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.zectan.soundroid.Adapters.PlaylistEditAdapter;
 import com.zectan.soundroid.Classes.Fragment;
-import com.zectan.soundroid.Connections.EditPlaylistRequest;
+import com.zectan.soundroid.Connections.PlaylistEditRequest;
 import com.zectan.soundroid.Models.Playlist;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.R;
@@ -60,8 +60,11 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         new ActivityResultContracts.StartActivityForResult(),
         result -> {
             if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
+                // After an image has been selected
                 newFilePath = result.getData().getData();
                 try {
+                    // Set the image bitmap in the image
+                    // B.coverImage.setImageBitmap(bitmap) doesn't work
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(mActivity.getContentResolver(), newFilePath);
                     Glide
                         .with(mActivity)
@@ -89,15 +92,14 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         B.recyclerView.setLayoutManager(layoutManager);
         mItemTouchHelper.attachToRecyclerView(B.recyclerView);
 
-        // Live Observers
+        // Listeners
         mPlaylistEditVM.saving.observe(this, this::onSavingChange);
-
         B.backImage.setOnClickListener(__ -> mNavController.navigateUp());
         B.saveImage.setOnClickListener(this::onSaveClicked);
         B.coverImage.setOnClickListener(this::onCoverClicked);
-        B.parent.setTransitionListener(mActivity.getTransitionListener());
 
-        Playlist playlist = mMainVM.getInfoFromPlaylist(mPlaylistEditVM.playlistId.getValue());
+        // Get details from mMainVM and set them in the mPlaylistEditVM
+        Playlist playlist = mMainVM.getPlaylistFromPlaylists(mPlaylistEditVM.playlistId.getValue());
         List<Song> songs = mMainVM.getSongsFromPlaylist(mPlaylistEditVM.playlistId.getValue());
         assert playlist != null;
         mPlaylistEditVM.playlist.setValue(playlist);
@@ -124,10 +126,40 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
         mActivity.hideKeyboard(requireView());
     }
 
+    /**
+     * Send the request to the server about the new playlist data
+     *
+     * @param playlist Playlist
+     */
+    private void sendEditPlaylistRequest(Playlist playlist) {
+        new PlaylistEditRequest(playlist, removed, new PlaylistEditRequest.Callback() {
+            @Override
+            public void onComplete(String response) {
+                // Delete downloads for removed songs
+                mPlaylistEditVM.songs
+                    .getValue()
+                    .stream()
+                    .filter(song -> removed.contains(song.getSongId()))
+                    .forEach(song -> song.deleteIfNotUsed(mActivity, mMainVM.mySongs.getValue()));
+
+                mPlaylistEditVM.saving.postValue(false);
+                new Handler(Looper.getMainLooper()).post(mActivity::onBackPressed);
+            }
+
+            @Override
+            public void onError(String message) {
+                mActivity.warnError(new Exception(message));
+                mPlaylistEditVM.saving.postValue(false);
+            }
+        });
+    }
+
     private void onCoverClicked(View view) {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
+
+        // Launch image choose intent
         chooseCoverImage.launch(intent);
     }
 
@@ -147,6 +179,7 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
             newName = B.nameTextInput.getText().toString();
         }
 
+        // Construct a new playlist object that should be stored in Firestore
         Playlist newPlaylist = new Playlist(
             playlist.getId(),
             newName,
@@ -158,45 +191,30 @@ public class PlaylistEditFragment extends Fragment<FragmentPlaylistEditBinding> 
 
         StorageReference ref = storage.getReference().child(String.format("playlists/%s.png", playlist.getId()));
         if (newFilePath != null) {
+            // If the image was changed during the saving
             ref.putFile(newFilePath)
-                .addOnSuccessListener(snap -> ref.getDownloadUrl()
-                    .addOnSuccessListener(uri -> {
-                        newPlaylist.setCover(uri.toString());
-                        sendEditPlaylistRequest(newPlaylist);
-                    })
-                    .addOnFailureListener(error -> {
-                        mPlaylistEditVM.saving.postValue(false);
-                        mMainVM.error.postValue(error);
-                    }))
+                .addOnSuccessListener(snap -> {
+                    // Stored successfully, get download url
+                    ref.getDownloadUrl()
+                        .addOnSuccessListener(uri -> {
+                            // Done, set cover
+                            newPlaylist.setCover(uri.toString());
+                            sendEditPlaylistRequest(newPlaylist);
+                        })
+                        .addOnFailureListener(error -> {
+                            // Error getting download URL
+                            mPlaylistEditVM.saving.postValue(false);
+                            mActivity.warnError(error);
+                        });
+                })
                 .addOnFailureListener(error -> {
+                    // Error storing file in database
                     mPlaylistEditVM.saving.postValue(false);
-                    mMainVM.error.postValue(error);
+                    mActivity.warnError(error);
                 });
         } else {
             sendEditPlaylistRequest(newPlaylist);
         }
-    }
-
-    private void sendEditPlaylistRequest(Playlist playlist) {
-        new EditPlaylistRequest(playlist, removed, new EditPlaylistRequest.Callback() {
-            @Override
-            public void onComplete(String response) {
-                mPlaylistEditVM.songs
-                    .getValue()
-                    .stream()
-                    .filter(song -> removed.contains(song.getSongId()))
-                    .forEach(song -> song.deleteIfNotUsed(mActivity, mMainVM.mySongs.getValue()));
-
-                mPlaylistEditVM.saving.postValue(false);
-                new Handler(Looper.getMainLooper()).post(mActivity::onBackPressed);
-            }
-
-            @Override
-            public void onError(String message) {
-                mMainVM.error.postValue(new Exception(message));
-                mPlaylistEditVM.saving.postValue(false);
-            }
-        });
     }
 
     private void onSavingChange(Boolean saving) {

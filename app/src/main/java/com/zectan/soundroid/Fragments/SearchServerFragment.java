@@ -49,7 +49,7 @@ public class SearchServerFragment extends Fragment<FragmentSearchServerBinding> 
 
         @Override
         public boolean onMenuItemClicked(SearchResult result, MenuItem item) {
-            return mActivity.handleMenuItemClick(result.getPlaylistInfo(), result.getSong(), item);
+            return mActivity.handleMenuItemClick(result.getPlaylistInfo(), result.getSong(), item, null);
         }
     };
 
@@ -70,7 +70,7 @@ public class SearchServerFragment extends Fragment<FragmentSearchServerBinding> 
         B.recyclerView.setLayoutManager(layoutManager);
         B.recyclerView.setAdapter(mSearchAdapter);
 
-        // Observers
+        // Listeners
         mSearchVM.serverResults.observe(this, this::onServerResultsChange);
         mSearchVM.message.observe(this, this::onMessageChange);
         mSearchVM.query.observe(this, query -> mSearchVM.searchServer());
@@ -80,6 +80,11 @@ public class SearchServerFragment extends Fragment<FragmentSearchServerBinding> 
         return B.getRoot();
     }
 
+    /**
+     * Checks if the device is offline
+     *
+     * @return If the device is offline
+     */
     private boolean isOffline() {
         ConnectivityManager cm = mActivity.getSystemService(ConnectivityManager.class);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
@@ -87,14 +92,20 @@ public class SearchServerFragment extends Fragment<FragmentSearchServerBinding> 
         return !networkInfo.isConnected();
     }
 
+    /**
+     * Update the message that is displayed in the search screen
+     *
+     * @param results List of results
+     * @param loading Loading state
+     */
     @SuppressLint("UseCompatLoadingForDrawables")
     private void updateVisuals(List<SearchResult> results, boolean loading) {
         if (mSearchVM.query.getValue().equals("")) {
-            B.responseImage.setImageDrawable(mActivity.getDrawable(R.drawable.ic_search));
+            B.responseImage.setImageResource(R.drawable.ic_search);
             B.responseHeaderText.setText(R.string.search);
             B.responseMessageText.setText(R.string.searchbar_placeholder);
         } else {
-            B.responseImage.setImageDrawable(mActivity.getDrawable(R.drawable.ic_search_no_results));
+            B.responseImage.setImageResource(R.drawable.ic_search_no_results);
             B.responseHeaderText.setText(R.string.no_results);
             B.responseMessageText.setText(
                 isOffline()
@@ -130,6 +141,8 @@ public class SearchServerFragment extends Fragment<FragmentSearchServerBinding> 
 
     private void onMessageChange(String message) {
         B.messageText.setText(message);
+
+        // If the message exists, make it visible by editing the recyclerview constraints
         ConstraintSet constraintSet = new ConstraintSet();
         constraintSet.clone(B.parent);
         if (message.equals("")) {

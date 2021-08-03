@@ -79,8 +79,10 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             if (fromUser) {
+                // Change the last touch value
                 mFinalTouch = progress;
 
+                // Change time text
                 double percent = (double) progress / 1000;
                 double duration = (double) mPlayingService.duration.getValue();
                 int selectedTime = (int) (percent * duration);
@@ -90,11 +92,13 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
 
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
+            // Set that seekbar is being touched
             mPlayingService.touchingSeekbar.setValue(true);
         }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
+            // After seek done, seek to location
             mPlayingService.seekTo(mFinalTouch);
             mPlayingService.touchingSeekbar.setValue(false);
         }
@@ -125,7 +129,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             mPlayingService = mMainVM.playingService.getValue();
         }
 
-        // Live Observers
+        // Listeners
         mPlayingService.queue.observe(this, mPlayingAdapter::updateSongs);
         mPlayingService.currentSong.observe(this, this::onCurrentSongChange);
         mPlayingService.time.observe(this, this::onTimeChange);
@@ -137,7 +141,6 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         mPlayingService.isShuffling.observe(this, this::onIsShufflingChange);
         mPlayingService.isLooping.observe(this, this::onIsLoopingChange);
         mPlayingService.error.observe(this, this::onErrorChange);
-
         B.backNavigateImage.setOnClickListener(__ -> mActivity.onBackPressed());
         B.moreImage.setOnClickListener(this::onMoreImageClicked);
         B.playPauseImage.setOnClickListener(this::playPauseSong);
@@ -153,7 +156,6 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         B.loopImage.setOnClickListener(__ -> mPlayingService.toggleLoop());
         B.loopImage.setOnTouchListener(Animations::animationMediumSqueeze);
         B.seekbar.setOnSeekBarChangeListener(onSeekBarChangeListener);
-        B.parent.setTransitionListener(mActivity.getTransitionListener());
 
         B.parent.setBackground(mPlayingService.background.getValue());
         mPlayingService.error.setValue("");
@@ -163,6 +165,9 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         return B.getRoot();
     }
 
+    /**
+     * Animate the image to become darker
+     */
     private void darkenAnimateImage() {
         if (mImageAnimator != null) mImageAnimator.pause();
         mImageAnimator = ValueAnimator.ofArgb(mImageColor, mActivity.getColor(R.color.playing_inactive)).setDuration(1000);
@@ -180,6 +185,9 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         mImageAnimator.start();
     }
 
+    /**
+     * Animate the image to become brighter
+     */
     private void brightenAnimateImage() {
         if (mPlayingService.error.getValue().equals("") && !mPlayingService.isBuffering.getValue()) {
             if (mImageAnimator != null) mImageAnimator.pause();
@@ -199,14 +207,11 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         }
     }
 
-    private void onMoreImageClicked(View view) {
-        MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
-        items.addToPlaylist();
-        items.openQueue();
-        items.clearQueue();
-        MenuBuilder.createMenu(view, items, mPlayingService.currentSong.getValue(), (song, item) -> mActivity.handleMenuItemClick(null, song, item, B.parent::transitionToEnd));
-    }
-
+    /**
+     * Toggle the playing and pausing of the song
+     *
+     * @param v View
+     */
     public void playPauseSong(View v) {
         if (mPlayingService.isBuffering.getValue()) return;
         if (mPlayingService.isPlaying.getValue()) {
@@ -216,17 +221,27 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         }
     }
 
+    private void onMoreImageClicked(View view) {
+        MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
+        items.addToPlaylist();
+        items.openQueue();
+        items.clearQueue();
+        MenuBuilder.createMenu(view, items, mPlayingService.currentSong.getValue(), (song, item) -> mActivity.handleMenuItemClick(null, song, item, B.parent::transitionToEnd));
+    }
+
     private void onCurrentSongChange(Song song) {
         String colorHex;
 
         if (song == null) {
+            // Song is null, set it to the default
             mPlayingAdapter.updateSongs(new ArrayList<>());
             B.playlistNameText.setText("-");
-            B.coverImage.setImageDrawable(mActivity.getDrawable(R.drawable.playing_cover_loading));
+            B.coverImage.setImageResource(R.drawable.playing_cover_loading);
             B.titleText.setText("-");
             B.descriptionText.setText("-");
             colorHex = "#7b828b";
         } else {
+            // Song is showing, display song details
             String title = song.getTitle();
             String artiste = song.getArtiste();
             String cover = song.getCover();
@@ -245,15 +260,17 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
                 .into(B.coverImage);
         }
 
-        GradientDrawable oldGD = mPlayingService.background.getValue();
+        // Transition the colors in the gradient background
+        GradientDrawable oldGradientDrawable = mPlayingService.background.getValue();
         int[] colors = {Color.parseColor(colorHex), mActivity.getAttributeResource(R.attr.colorSecondary)};
-        GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
-
-        Drawable[] layers = {oldGD, newGD};
+        GradientDrawable newGradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
+        Drawable[] layers = {oldGradientDrawable, newGradientDrawable};
         TransitionDrawable transition = new TransitionDrawable(layers);
         B.parent.setBackground(transition);
-        mPlayingService.background.setValue(newGD);
         transition.startTransition(500);
+
+        // Store the most recent background in ViewModel
+        mPlayingService.background.setValue(newGradientDrawable);
     }
 
     private void onTimeChange(int time) {
@@ -265,10 +282,12 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     }
 
     private void onIsPlayingChange(boolean isPlaying) {
-        B.playPauseImage.setImageDrawable(
-            mActivity.getDrawable(isPlaying ? R.drawable.ic_controls_pause_filled : R.drawable.ic_controls_play_filled));
-        B.playPauseMiniImage
-            .setImageDrawable(mActivity.getDrawable(isPlaying ? R.drawable.ic_controls_pause : R.drawable.ic_controls_play));
+        B.playPauseImage.setImageResource(isPlaying
+            ? R.drawable.ic_controls_pause_filled
+            : R.drawable.ic_controls_play_filled);
+        B.playPauseMiniImage.setImageResource(isPlaying
+            ? R.drawable.ic_controls_pause
+            : R.drawable.ic_controls_play);
     }
 
     private void onIsBufferingChange(boolean loading) {
@@ -282,21 +301,30 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     }
 
     private void onIsShufflingChange(boolean isShuffling) {
-        B.shuffleImage.setColorFilter(
-            ContextCompat.getColor(mActivity,
-                isShuffling ? R.color.white : R.color.playing_inactive),
-            android.graphics.PorterDuff.Mode.MULTIPLY);
+        B.shuffleImage.setColorFilter(ContextCompat.getColor(
+            mActivity,
+            isShuffling
+                ? R.color.white
+                : R.color.playing_inactive
+            ),
+            android.graphics.PorterDuff.Mode.MULTIPLY
+        );
     }
 
     private void onIsLoopingChange(boolean isLooping) {
-        B.loopImage.setColorFilter(
-            ContextCompat.getColor(mActivity,
-                isLooping ? R.color.white : R.color.playing_inactive),
-            android.graphics.PorterDuff.Mode.MULTIPLY);
+        B.loopImage.setColorFilter(ContextCompat.getColor(
+            mActivity,
+            isLooping
+                ? R.color.white
+                : R.color.playing_inactive
+            ),
+            android.graphics.PorterDuff.Mode.MULTIPLY
+        );
     }
 
     private void onErrorChange(String error) {
         if (!error.equals("")) {
+            // Animate error
             B.errorText.setText(error);
             B.errorText.animate().alpha(1).setDuration(500).setStartDelay(500).start();
             B.retryText.animate().alpha(1).setDuration(500).setStartDelay(500).start();

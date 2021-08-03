@@ -38,8 +38,10 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
         new ActivityResultContracts.StartActivityForResult(),
         result -> {
             if (result.getResultCode() == RESULT_OK && result.getData() != null && result.getData().getData() != null) {
+                // After image is selected
                 newFilePath = result.getData().getData();
                 try {
+                    // Set the bitmap in the image
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(mActivity.getContentResolver(), newFilePath);
                     Glide
                         .with(mActivity)
@@ -54,19 +56,14 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
         }
     );
 
-    public SongEditFragment() {
-        // Required empty public constructor
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         B = FragmentSongEditBinding.inflate(inflater, container, false);
         super.onCreateView(inflater, container, savedInstanceState);
 
-        // Observers
+        // Listeners
         mSongEditVM.saving.observe(this, this::onSavingChange);
-
         B.backImage.setOnClickListener(__ -> mNavController.navigateUp());
         B.saveImage.setOnClickListener(this::onSaveClicked);
         B.coverImage.setOnClickListener(this::onCoverClicked);
@@ -96,6 +93,8 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
+
+        // Launch image select intent
         chooseCoverImage.launch(intent);
     }
 
@@ -117,6 +116,7 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
             newArtiste = B.artisteTextInput.getText().toString();
         }
 
+        // Create new song instance to be stored in Firestore
         Song newSong = new Song(
             song.getSongId(),
             newTitle,
@@ -129,26 +129,38 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
 
         StorageReference ref = storage.getReference().child(String.format("songs/%s.png", song.getSongId()));
         if (newFilePath != null) {
+            // New image selected
             ref.putFile(newFilePath)
-                .addOnSuccessListener(snap -> ref.getDownloadUrl()
-                    .addOnSuccessListener(uri -> {
-                        newSong.setCover(uri.toString());
-                        sendColorHexRequest(newSong);
-                    })
-                    .addOnFailureListener(error -> {
-                        mSongEditVM.saving.postValue(false);
-                        mMainVM.error.postValue(error);
-                    }))
+                .addOnSuccessListener(snap -> {
+                    // File created, get the download URL
+                    ref.getDownloadUrl()
+                        .addOnSuccessListener(uri -> {
+                            // Set the cover of the new song
+                            newSong.setCover(uri.toString());
+                            sendSongEditRequest(newSong);
+                        })
+                        .addOnFailureListener(error -> {
+                            // Failed to get the download url
+                            mSongEditVM.saving.postValue(false);
+                            mActivity.warnError(error);
+                        });
+                })
                 .addOnFailureListener(error -> {
+                    // Failed to store the image in Firebase
                     mSongEditVM.saving.postValue(false);
-                    mMainVM.error.postValue(error);
+                    mActivity.warnError(error);
                 });
         } else {
-            sendColorHexRequest(newSong);
+            sendSongEditRequest(newSong);
         }
     }
 
-    private void sendColorHexRequest(Song song) {
+    /**
+     * Send the request to the server about the new song data
+     *
+     * @param song Song
+     */
+    private void sendSongEditRequest(Song song) {
         new SongEditRequest(song, new SongEditRequest.Callback() {
             @Override
             public void onComplete(String response) {
@@ -158,7 +170,7 @@ public class SongEditFragment extends Fragment<FragmentSongEditBinding> {
 
             @Override
             public void onError(String message) {
-                mMainVM.error.postValue(new Exception(message));
+                mActivity.warnError(new Exception(message));
                 mSongEditVM.saving.postValue(false);
             }
         });

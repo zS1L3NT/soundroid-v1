@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,14 +26,19 @@ import java.util.stream.Collectors;
 public class ErrorActivity extends AppCompatActivity {
     private static final String TAG = "(SounDroid) ErrorActivity";
     public final FirebaseFirestore mDb = FirebaseFirestore.getInstance();
+    private ActivityErrorBinding B;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityErrorBinding B = ActivityErrorBinding.inflate(LayoutInflater.from(this));
+        B = ActivityErrorBinding.inflate(LayoutInflater.from(this));
         setContentView(B.getRoot());
         getWindow().setStatusBarColor(getColor(R.color.red));
+
+        // Listeners
+        B.reloadImage.setOnClickListener(this::onReloadImageClicked);
+        B.arrowImage.setOnClickListener(this::onArrowImageClicked);
 
         try {
             Bundle extras = getIntent().getExtras();
@@ -41,15 +47,18 @@ public class ErrorActivity extends AppCompatActivity {
             String class_ = extras.getString("class", "class.not.Defined");
             String userId = extras.getString("userId");
 
+            // Set HTML as the text because HTML was easier to format
             B.errorText.setText(Html.fromHtml(String.format("<h1>%s</h1><br /><h5>%s</h5>", message, class_), Html.FROM_HTML_MODE_COMPACT));
             B.stackText.setText(Html.fromHtml(
                 stack
                     .stream()
-                    .map(t -> {
+                    .map(line -> {
+                        // Use Regex to print the stack with HTML
                         Pattern pattern = Pattern.compile("(.*)\\((.*)\\)");
-                        Matcher matcher = pattern.matcher(t);
+                        Matcher matcher = pattern.matcher(line);
 
                         if (matcher.find()) {
+                            // If the line matches the Regex
                             String path = matcher.group(1);
                             String file = matcher.group(2);
                             assert path != null;
@@ -60,25 +69,14 @@ public class ErrorActivity extends AppCompatActivity {
                                 file
                             );
                         } else {
-                            return t;
+                            return line;
                         }
                     })
                     .collect(Collectors.joining("<br /><br />")),
                 Html.FROM_HTML_MODE_COMPACT
             ));
-            B.reloadImage.setOnClickListener(__ -> {
-                Intent intent = new Intent(this, SplashScreenActivity.class);
-                startActivity(intent);
-                finish();
-            });
-            B.arrowImage.setOnClickListener(__ -> {
-                if (B.parent.getProgress() >= 0.5) {
-                    B.parent.transitionToStart();
-                } else {
-                    B.parent.transitionToEnd();
-                }
-            });
 
+            // Errors to ignore
             List<String> IgnoredErrors = new ArrayList<>();
             IgnoredErrors.add("Could not check for latest version");
             IgnoredErrors.add("A Runtime Exception was thrown!");
@@ -90,16 +88,30 @@ public class ErrorActivity extends AppCompatActivity {
                 error.put("message", message);
                 error.put("class", class_);
                 error.put("stack", stack);
+                error.put("userId", userId);
 
-                mDb.collection("users")
-                    .document(userId)
-                    .collection("errors")
+                // Store error in Firestore
+                mDb.collection("errors")
                     .add(error)
                     .addOnSuccessListener(__ -> Log.i(TAG, "Error stored successfully"))
                     .addOnFailureListener(e -> Log.e(TAG, "Error stored unsuccessfully: " + e.getMessage()));
             }
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
+        }
+    }
+
+    private void onReloadImageClicked(View view) {
+        Intent intent = new Intent(this, SplashScreenActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void onArrowImageClicked(View view) {
+        if (B.parent.getProgress() >= 0.5) {
+            B.parent.transitionToStart();
+        } else {
+            B.parent.transitionToEnd();
         }
     }
 }

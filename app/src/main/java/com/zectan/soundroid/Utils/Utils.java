@@ -30,13 +30,24 @@ public class Utils {
         return new FragmentNavigator.Extras.Builder().addSharedElement(view, transitionName).build();
     }
 
+    /**
+     * Generate a random int
+     *
+     * @return Integer
+     */
     public static int getRandomInt() {
         return (int) (Math.random() * 1000000000);
     }
 
-    public static boolean versionAtLeast(String test) {
+    /**
+     * Check if the current app version is up to date with the latest version
+     *
+     * @param latest Latest version
+     * @return true if up to date and false if not
+     */
+    public static boolean versionAtLeast(String latest) {
         List<String> currentPortions = Arrays.asList(BuildConfig.VERSION_NAME.split("\\."));
-        List<String> testPortions = Arrays.asList(test.split("\\."));
+        List<String> testPortions = Arrays.asList(latest.split("\\."));
         assert currentPortions.size() == 3;
         assert testPortions.size() == 3;
 
@@ -51,6 +62,12 @@ public class Utils {
         return true;
     }
 
+    /**
+     * Format a duration integer to form a nice number for the player
+     *
+     * @param duration TIme duration in seconds
+     * @return Duration formatted
+     */
     public static String formatDuration(int duration) {
         StringBuilder hours = new StringBuilder();
         StringBuilder minutes = new StringBuilder();
@@ -91,6 +108,12 @@ public class Utils {
         return formatted.toString();
     }
 
+    /**
+     * Crop the bitmap to a square
+     *
+     * @param bitmap Bitmap to crop
+     * @return Squared bitmap
+     */
     public static Bitmap cropSquare(Bitmap bitmap) {
         if (bitmap.getWidth() >= bitmap.getHeight()) {
             return Bitmap.createBitmap(
@@ -111,12 +134,28 @@ public class Utils {
         }
     }
 
+    /**
+     * Create a list filterer to only allow unique items by a specific property
+     *
+     * @param keyExtractor Specific property
+     * @param <T>          Type
+     * @return Continuation in the stream
+     */
     public static <T> Predicate<T> filterDistinctByKey(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
         return t -> seen.add(keyExtractor.apply(t));
     }
 
+    /**
+     * Create custom Regex expression to search through songs and playlists
+     * Splits the query into characters and the number of times you typed it
+     * Uses regex to check if the character appears n times
+     *
+     * @param query Query
+     * @return Regex string
+     */
     public static String createRegex(String query) {
+        // Determine character duplicates
         HashMap<Character, Integer> characterCount = new HashMap<>();
         for (int i = 0; i < query.length(); i++) {
             char c = query.charAt(i);
@@ -126,6 +165,13 @@ public class Utils {
                 characterCount.put(c, 1);
             }
         }
+
+        // Model: .*(?=(.*X.*){1})(?=(.*Y.*){2}).*
+        // X, Y -> the character
+        // 1, 2 -> the character count
+        // (?=(...)) -> Positive lookahead on the string
+        // (?=(.*X.*)) -> See if character exists anywhere in string
+        // (?=(.*X.*){1}) -> Check if character exists n time in string
 
         StringBuilder regex = new StringBuilder(".*");
         for (Character character : characterCount.keySet()) {

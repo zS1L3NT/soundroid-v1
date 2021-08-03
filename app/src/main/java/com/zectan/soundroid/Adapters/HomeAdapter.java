@@ -144,7 +144,6 @@ class HomeViewHolder extends RecyclerView.ViewHolder {
         Playable playable = new Playable(playlist, songs);
 
         B.parent.setOnClickListener(__ -> mCallback.onSongClicked(playable, id));
-
         B.menuClickable.setOnClickListener(v -> MenuBuilder.createMenu(v, MenuBuilder.MenuItems.forSong(song, activity, true), song, mCallback));
     }
 }

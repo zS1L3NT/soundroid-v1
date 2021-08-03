@@ -15,7 +15,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.constraintlayout.motion.widget.MotionLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -79,23 +78,20 @@ public class MainActivity extends CrashDebugApplication {
             return;
         }
 
-        // View Model
+        // Create View Models
         mMainVM = new ViewModelProvider(this).get(MainViewModel.class);
         mPlaylistsVM = new ViewModelProvider(this).get(PlaylistsViewModel.class);
         mPlaylistViewVM = new ViewModelProvider(this).get(PlaylistViewViewModel.class);
         mPlaylistEditVM = new ViewModelProvider(this).get(PlaylistEditViewModel.class);
         mSongEditVM = new ViewModelProvider(this).get(SongEditViewModel.class);
 
-        // Services
+        // Activate Services
         getDownloadService(service -> {
         });
         getPlayingService(service -> {
         });
 
-        // Live Observers
-        mMainVM.error.observe(this, this::handleError);
-
-        // Navigation
+        // Setup Navigation
         NavHostFragment navHostFragment =
             (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
@@ -103,7 +99,7 @@ public class MainActivity extends CrashDebugApplication {
         mNavController = navHostFragment.getNavController();
         NavigationUI.setupWithNavController(B.bottomNavigator, mNavController);
 
-        // Notification Channels
+        // Create Notification Channels
         NotificationChannel downloadChannel = new NotificationChannel(
             MainActivity.DOWNLOAD_CHANNEL_ID,
             MainActivity.DOWNLOAD_CHANNEL_ID,
@@ -119,14 +115,15 @@ public class MainActivity extends CrashDebugApplication {
         playingChannel.setDescription("Current playing song notification");
         mNotificationManager.createNotificationChannel(playingChannel);
 
-        // User ID
+        // Set User ID in ViewModel
         mMainVM.userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Playing Screen background
+        // Set playing screen background
         int[] colors = {getColor(R.color.default_cover_color), getAttributeResource(R.attr.colorSecondary)};
         GradientDrawable newGD = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, colors);
         getPlayingService(service -> service.background.setValue(newGD));
 
+        // Redirect if the intent is from a notification
         getPlayingService(service -> {
             Intent intent = getIntent();
             if (intent.getAction() != null) {
@@ -142,32 +139,58 @@ public class MainActivity extends CrashDebugApplication {
         });
     }
 
+    /**
+     * Watch the firebase values again because Firebase
+     * watching stops when activity stops
+     */
     @Override
     protected void onStart() {
         super.onStart();
         mMainVM.watch(this);
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        updateNavigator(1);
-    }
-
+    /**
+     * Display the keyboard
+     */
     public void showKeyboard() {
         mInputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
+    /**
+     * Hide the keyboard
+     *
+     * @param currentFocus View to hide the keyboard from...?
+     */
     public void hideKeyboard(View currentFocus) {
         mInputMethodManager.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
     }
 
+    /**
+     * Update the visibility of the navigator
+     * Hides when visibility is 0 so that it can allow click events below it
+     *
+     * @param alpha Alpha
+     */
     public void updateNavigator(float alpha) {
         B.bottomNavigator.setVisibility(alpha == 0 ? View.GONE : View.VISIBLE);
         B.bottomNavigator.setAlpha(alpha);
     }
 
-    public void handleError(Exception e) {
+    public void snack(String message) {
+        Snackbar
+            .make(B.navHostFragment, message, Snackbar.LENGTH_SHORT)
+            .setAction(R.string.done, __ -> {
+            })
+            .show();
+    }
+
+    /**
+     * Warn admin of the error
+     * Display the error first then upload the error to firebase
+     *
+     * @param e Exception
+     */
+    public void warnError(Exception e) {
         String message = e.getMessage() != null ? e.getMessage() : "Unknown error occurred";
         snack(message);
         e.printStackTrace();
@@ -180,31 +203,45 @@ public class MainActivity extends CrashDebugApplication {
         error.put("date", Calendar.getInstance().getTime().toString());
         error.put("message", e.getMessage());
         error.put("class", e.getClass().getName());
+        error.put("userId", mMainVM.userId);
 
-        mDb.collection("users")
-            .document(mMainVM.userId)
-            .collection("errors")
+        mDb.collection("errors")
             .add(error)
             .addOnSuccessListener(__ -> Log.i(TAG, "Error stored successfully"))
             .addOnFailureListener(e_ -> Log.e(TAG, "Error stored unsuccessfully: " + e_.getMessage()));
     }
 
+    /**
+     * Shortcut to get the resource value from R.attr.?
+     *
+     * @param id ID of the attr
+     * @return Value of the attr
+     */
     public int getAttributeResource(int id) {
         TypedValue value = new TypedValue();
         getTheme().resolveAttribute(id, value, true);
         return value.data;
     }
 
-    @SuppressLint("NonConstantResourceId")
-    public boolean handleMenuItemClick(Playlist playlist, Song song, MenuItem item) {
-        return new MenuEvents(this, playlist, song, item).handle();
-    }
-
+    /**
+     * Method to handle click events from menus
+     *
+     * @param playlist Playlist related to click event
+     * @param song     Song related to click event
+     * @param item     Menu item clicked
+     * @param runnable Runnable related to click event
+     * @return true because the event was handled
+     */
     @SuppressLint("NonConstantResourceId")
     public boolean handleMenuItemClick(Playlist playlist, Song song, MenuItem item, Runnable runnable) {
         return new MenuEvents(this, playlist, song, item, runnable).handle();
     }
 
+    /**
+     * Update the theme with the theme from Firestore
+     *
+     * @param theme Theme
+     */
     public void updateTheme(@Nullable String theme) {
         if (theme != null) {
             switch (theme) {
@@ -221,37 +258,11 @@ public class MainActivity extends CrashDebugApplication {
         }
     }
 
-    public void snack(String message) {
-        Snackbar
-            .make(B.navHostFragment, message, Snackbar.LENGTH_SHORT)
-            .setAction(R.string.done, __ -> {
-            })
-            .show();
-    }
-
-    public MotionLayout.TransitionListener getTransitionListener() {
-        return new MotionLayout.TransitionListener() {
-            @Override
-            public void onTransitionStarted(MotionLayout motionLayout, int i, int i1) {
-                updateNavigator(1f - motionLayout.getProgress());
-            }
-
-            @Override
-            public void onTransitionChange(MotionLayout motionLayout, int i, int i1, float v) {
-                updateNavigator(1f - v);
-            }
-
-            @Override
-            public void onTransitionCompleted(MotionLayout motionLayout, int i) {
-                updateNavigator(1f - motionLayout.getProgress());
-            }
-
-            @Override
-            public void onTransitionTrigger(MotionLayout motionLayout, int i, boolean b, float v) {
-            }
-        };
-    }
-
+    /**
+     * Assert that download service is alive then get the service
+     *
+     * @param callback Callback
+     */
     public void getDownloadService(DownloadServiceCallback callback) {
         if (mMainVM.downloadService.getValue() != null) {
             callback.onStart(mMainVM.downloadService.getValue());
@@ -262,6 +273,11 @@ public class MainActivity extends CrashDebugApplication {
         }
     }
 
+    /**
+     * Assert that playing service is alive then get the service
+     *
+     * @param callback Callback
+     */
     public void getPlayingService(PlayingServiceCallback callback) {
         if (mMainVM.playingService.getValue() != null) {
             callback.onStart(mMainVM.playingService.getValue());

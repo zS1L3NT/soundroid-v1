@@ -25,8 +25,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.Classes.CrashDebugApplication;
-import com.zectan.soundroid.Classes.Request;
-import com.zectan.soundroid.Connections.DefaultPlaylistsRequest;
+import com.zectan.soundroid.Connections.PlaylistsDefaultRequest;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.User;
 import com.zectan.soundroid.R;
@@ -41,6 +40,7 @@ public class AuthActivity extends CrashDebugApplication {
     private final ActivityResultLauncher<Intent> signInWithGoogleLauncher = registerForActivityResult(
         new ActivityResultContracts.StartActivityForResult(),
         result -> {
+            // After Google sign in popup is finished
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
@@ -60,34 +60,50 @@ public class AuthActivity extends CrashDebugApplication {
         B = ActivityAuthBinding.inflate(LayoutInflater.from(this));
         setContentView(B.getRoot());
 
+        // Google sign in options object
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
+        // Listeners
         B.signInButton.setOnClickListener(this::signInWithGoogle);
     }
 
+    /**
+     * Start the google sign in process
+     *
+     * @param view View
+     */
     public void signInWithGoogle(View view) {
+        // Animate button to loading state
         B.googleIcon.animate().alpha(0).setDuration(250).start();
         B.signInText.animate().alpha(0).setDuration(250).start();
         B.loadingCircle.animate().alpha(1).setDuration(250).start();
         B.signInButton.setOnClickListener(__ -> {
         });
 
+        // Launch the google sign in popup
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         signInWithGoogleLauncher.launch(signInIntent);
     }
 
+    /**
+     * Google authentication complete, not Firebase authentication
+     *
+     * @param idToken ID Token...?
+     */
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
         mAuth
             .signInWithCredential(credential)
             .addOnCompleteListener(this, task -> {
                 if (task.isSuccessful()) {
+                    // Firebase authentication successful
                     addToFirestore();
                 } else {
+                    // Firebase authentication failed
                     Snackbar.make(B.getRoot(), "Firebase sign in failed", Snackbar.LENGTH_SHORT).show();
                     if (task.getException() != null) Log.e(TAG, task.getException().getMessage());
                     restoreButton();
@@ -95,6 +111,9 @@ public class AuthActivity extends CrashDebugApplication {
             });
     }
 
+    /**
+     * Google and Firebase authentication successful
+     */
     private void addToFirestore() {
         FirebaseUser firebaseUser = mAuth.getCurrentUser();
         assert firebaseUser != null;
@@ -102,6 +121,7 @@ public class AuthActivity extends CrashDebugApplication {
 
         userRef.get()
             .addOnSuccessListener(snap -> {
+                // If user exists, continue to MainActivity
                 if (snap.exists()) {
                     Intent intent = new Intent(this, MainActivity.class);
                     startActivity(intent);
@@ -113,6 +133,7 @@ public class AuthActivity extends CrashDebugApplication {
                 Uri photoUri = firebaseUser.getPhotoUrl();
                 String photoUrl = photoUri != null ? photoUri.toString() : getString(R.string.default_profile_icon);
 
+                // Create user object with default values
                 User user = new User(
                     firebaseUser.getUid(),
                     firebaseUser.getDisplayName(),
@@ -125,13 +146,15 @@ public class AuthActivity extends CrashDebugApplication {
 
                 userRef.set(user.toMap())
                     .addOnSuccessListener(__ -> {
-                        new DefaultPlaylistsRequest(user.getId());
+                        // Creation of user successful, inflate default playlists and redirect
+                        new PlaylistsDefaultRequest(user.getId());
                         Intent intent = new Intent(this, MainActivity.class);
                         startActivity(intent);
                         finish();
                         restoreButton();
                     })
                     .addOnFailureListener(error -> {
+                        // Failed to create use in Firestore
                         Snackbar.make(B.getRoot(), "Error creating user in database", Snackbar.LENGTH_SHORT).show();
                         error.printStackTrace();
                         restoreButton();
@@ -139,6 +162,7 @@ public class AuthActivity extends CrashDebugApplication {
                     });
             })
             .addOnFailureListener(error -> {
+                // Failed to find user in Firestore
                 Snackbar.make(B.getRoot(), "Error finding user in database", Snackbar.LENGTH_SHORT).show();
                 error.printStackTrace();
                 restoreButton();
@@ -146,6 +170,9 @@ public class AuthActivity extends CrashDebugApplication {
             });
     }
 
+    /**
+     * Restore button animations to default
+     */
     private void restoreButton() {
         B.googleIcon.animate().alpha(1).setDuration(250).start();
         B.signInText.animate().alpha(1).setDuration(250).start();

@@ -1,20 +1,18 @@
 package com.zectan.soundroid.Utils;
 
 import android.content.Context;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 
 import androidx.annotation.NonNull;
 
+import com.zectan.soundroid.Classes.Interval;
 import com.zectan.soundroid.Classes.Request;
 import com.zectan.soundroid.Connections.DownloadRequest;
+import com.zectan.soundroid.Connections.SongFullRequest;
+import com.zectan.soundroid.Connections.SongPingRequest;
 import com.zectan.soundroid.Models.Song;
 
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.OkHttpClient;
 
 public class DownloadProcess {
     public static final int RETRY_COUNT = 3;
@@ -23,11 +21,19 @@ public class DownloadProcess {
     private final Song mSong;
     private final boolean mHighDownloadQuality;
 
-    private CheckingHandler mCheckingHandler;
-    private ConvertingHandler mConvertingHandler;
+    private CheckingInterval mCheckingInterval;
+    private ConvertingInterval mConvertingInterval;
     private Date mStartTime;
     private int mAttemptIndex;
 
+    /**
+     * Goes through the network process of downloading a song
+     *
+     * @param context             Context
+     * @param song                Song to download
+     * @param highDownloadQuality Quality of download
+     * @param callback            Download Callback
+     */
     public DownloadProcess(Context context, Song song, boolean highDownloadQuality, Callback callback) {
         mContext = context;
         mSong = song;
@@ -38,15 +44,19 @@ public class DownloadProcess {
         ping();
     }
 
+    /**
+     * Ping the server to check if the song exists
+     */
     private void ping() {
         mStartTime = new Date();
 
-        if (mCheckingHandler != null) mConvertingHandler.cancel();
-        mCheckingHandler = new CheckingHandler(Looper.getMainLooper());
-        new PingRequest(new Request.Callback() {
+        if (mCheckingInterval != null) mConvertingInterval.cancel();
+        mCheckingInterval = new CheckingInterval(Looper.getMainLooper());
+        new SongPingRequest(mSong, mHighDownloadQuality, new Request.Callback() {
             @Override
             public void onComplete(String response) {
-                mCheckingHandler.cancel();
+                mCheckingInterval.cancel();
+                mCheckingInterval = null;
                 if (mCallback.isCancelled()) return;
 
                 download();
@@ -54,7 +64,8 @@ public class DownloadProcess {
 
             @Override
             public void onError(String message) {
-                mCheckingHandler.cancel();
+                mCheckingInterval.cancel();
+                mCheckingInterval = null;
                 if (mCallback.isCancelled()) return;
 
                 convert();
@@ -62,15 +73,20 @@ public class DownloadProcess {
         });
     }
 
+    /**
+     * Runs if a ping failed, meaning song conversion from
+     * YouTube video to WEBM is needed
+     */
     private void convert() {
         mStartTime = new Date();
 
-        if (mConvertingHandler != null) mConvertingHandler.cancel();
-        mConvertingHandler = new ConvertingHandler(Looper.getMainLooper());
-        new SongRequest(new Request.Callback() {
+        if (mConvertingInterval != null) mConvertingInterval.cancel();
+        mConvertingInterval = new ConvertingInterval(Looper.getMainLooper());
+        new SongFullRequest(mSong, mHighDownloadQuality, new Request.Callback() {
             @Override
             public void onComplete(String response) {
-                mConvertingHandler.cancel();
+                mConvertingInterval.cancel();
+                mConvertingInterval = null;
                 if (mCallback.isCancelled()) return;
 
                 download();
@@ -78,10 +94,14 @@ public class DownloadProcess {
 
             @Override
             public void onError(String message) {
-                mConvertingHandler.cancel();
+                mConvertingInterval.cancel();
+                mConvertingInterval = null;
                 if (mCallback.isCancelled()) return;
 
                 mSong.deleteLocally(mContext);
+
+                // Increase the number of convert attempts
+                // Server may take multiple attempts to convert a song
                 mAttemptIndex++;
                 if (mAttemptIndex > RETRY_COUNT) {
                     mCallback.onError();
@@ -92,6 +112,10 @@ public class DownloadProcess {
         });
     }
 
+    /**
+     * If a ping is successful, or a song is converted successfully,
+     * start downloading the song using the DownloadRequest class
+     */
     private void download() {
         if (!mCallback.isCancelled()) mCallback.showDownloadProgress(mAttemptIndex, 0);
         new DownloadRequest(mContext, mSong, mHighDownloadQuality, new DownloadRequest.Callback() {
@@ -123,40 +147,15 @@ public class DownloadProcess {
         });
     }
 
-    private class PingRequest extends Request {
-        public PingRequest(Callback callback) {
-            super(String.format("/ping/%s/%s.mp3", mHighDownloadQuality ? "highest" : "lowest", mSong.getSongId()), callback);
-            sendRequest(RequestType.GET);
-        }
-    }
+    private class CheckingInterval extends Interval {
 
-    private class SongRequest extends Request {
-        public SongRequest(Callback callback) {
-            super(String.format("/song/%s/%s.mp3", mHighDownloadQuality ? "highest" : "lowest", mSong.getSongId()), callback);
-            replaceClient(
-                new OkHttpClient.Builder()
-                    .connectTimeout(5, TimeUnit.MINUTES)
-                    .writeTimeout(5, TimeUnit.MINUTES)
-                    .readTimeout(5, TimeUnit.MINUTES)
-                    .build()
-            );
-            sendRequest(RequestType.GET);
-        }
-    }
-
-    private class CheckingHandler extends Handler {
-        private boolean mCancelled;
-
-        public CheckingHandler(@NonNull Looper looper) {
-            super(looper);
-            mCancelled = false;
-
-            sendEmptyMessage(0);
+        public CheckingInterval(@NonNull Looper looper) {
+            super(looper, 1000);
+            start();
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            if (mCancelled) return;
+        public void onNextCall() {
             Date nowTime = new Date();
 
             int time = (int) (nowTime.getTime() - mStartTime.getTime()) / 1000;
@@ -164,29 +163,19 @@ public class DownloadProcess {
             int minutes = time / 60;
 
             mCallback.showCheckingTime(minutes, seconds);
-            sendEmptyMessageDelayed(0, 1000);
-        }
-
-        public void cancel() {
-            mCancelled = true;
-            mCheckingHandler = null;
         }
 
     }
 
-    private class ConvertingHandler extends Handler {
-        private boolean mCancelled;
+    private class ConvertingInterval extends Interval {
 
-        public ConvertingHandler(@NonNull Looper looper) {
-            super(looper);
-            mCancelled = false;
-
-            sendEmptyMessage(0);
+        public ConvertingInterval(@NonNull Looper looper) {
+            super(looper, 1000);
+            start();
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            if (mCancelled) return;
+        public void onNextCall() {
             Date nowTime = new Date();
 
             int time = (int) (nowTime.getTime() - mStartTime.getTime()) / 1000;
@@ -194,14 +183,7 @@ public class DownloadProcess {
             int minutes = time / 60;
 
             mCallback.showConvertingTime(mAttemptIndex, minutes, seconds);
-            sendEmptyMessageDelayed(0, 1000);
         }
-
-        public void cancel() {
-            mCancelled = true;
-            mConvertingHandler = null;
-        }
-
     }
 
     public interface Callback {

@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -23,8 +22,8 @@ import com.zectan.soundroid.Classes.Fragment;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.Models.User;
-import com.zectan.soundroid.Services.PlayingService;
 import com.zectan.soundroid.R;
+import com.zectan.soundroid.Services.PlayingService;
 import com.zectan.soundroid.databinding.FragmentSettingsBinding;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,17 +34,13 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
     private static final String TAG = "(SounDroid) SettingsFragment";
     private SettingsPreference settingsPreference;
 
-    public SettingsFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         B = FragmentSettingsBinding.inflate(inflater, container, false);
         super.onCreateView(inflater, container, savedInstanceState);
         settingsPreference = new SettingsPreference();
 
-        // Observers
+        // Listeners
         mMainVM.myUser.observe(this, this::onMyUserChange);
         B.logoutButton.setOnClickListener(this::logout);
 
@@ -99,34 +94,37 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
         private SwitchPreferenceCompat highStreamQuality;
         private ListPreference theme;
 
-        public SettingsPreference() {
-
-        }
-
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.fragment_settings_preferences, rootKey);
+
+            // Reference Views
             openPlayingScreen = findPreference("open_playing_screen");
             highDownloadQuality = findPreference("high_download_quality");
             highStreamQuality = findPreference("high_stream_quality");
             theme = findPreference("theme");
+            Preference clearAllDownloads = findPreference("clear_all_downloads");
+            Preference throwError = findPreference("throw_error");
+            assert clearAllDownloads != null;
+            assert throwError != null;
+
+            // Listeners
             openPlayingScreen.setOnPreferenceChangeListener(this::onOpenPlayingScreenChange);
             highDownloadQuality.setOnPreferenceChangeListener(this::onHighDownloadQualityChange);
             highStreamQuality.setOnPreferenceChangeListener(this::onHighStreamQualityChange);
             theme.setOnPreferenceChangeListener(this::onThemeChange);
-
-            Preference clearAllDownloads = findPreference("clear_all_downloads");
-            assert clearAllDownloads != null;
             clearAllDownloads.setOnPreferenceClickListener(this::onClearAllDownloadsClick);
-
-            Preference throwError = findPreference("throw_error");
-            assert throwError != null;
             throwError.setOnPreferenceClickListener(this::onThrowErrorClicked);
 
             mActivity = (MainActivity) requireContext();
             if (mActivity.mMainVM != null) updatePreferences(mActivity.mMainVM.myUser.getValue());
         }
 
+        /**
+         * Update the state of the preferences
+         *
+         * @param user User
+         */
         public void updatePreferences(User user) {
             userRef = FirebaseFirestore.getInstance()
                 .collection("users")
@@ -148,7 +146,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             if (userRef != null)
                 userRef
                     .update("openPlayingScreen", Boolean.parseBoolean(o.toString()))
-                    .addOnFailureListener(mActivity::handleError);
+                    .addOnFailureListener(mActivity::warnError);
             return false;
         }
 
@@ -156,7 +154,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             if (userRef != null)
                 userRef
                     .update("highDownloadQuality", Boolean.parseBoolean(o.toString()))
-                    .addOnFailureListener(mActivity::handleError);
+                    .addOnFailureListener(mActivity::warnError);
             return false;
         }
 
@@ -164,7 +162,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             if (userRef != null)
                 userRef
                     .update("highStreamQuality", Boolean.parseBoolean(o.toString()))
-                    .addOnFailureListener(mActivity::handleError);
+                    .addOnFailureListener(mActivity::warnError);
             return false;
         }
 
@@ -172,7 +170,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             if (userRef != null)
                 userRef
                     .update("theme", o.toString())
-                    .addOnFailureListener(mActivity::handleError);
+                    .addOnFailureListener(mActivity::warnError);
             return false;
         }
 

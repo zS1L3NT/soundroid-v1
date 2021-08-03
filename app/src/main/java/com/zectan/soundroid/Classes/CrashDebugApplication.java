@@ -13,6 +13,12 @@ import java.util.ArrayList;
 public abstract class CrashDebugApplication extends AppCompatActivity {
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
+    /**
+     * Base class for an Activity, instead when errors show up,
+     * user gets sent to the {@link ErrorActivity}
+     *
+     * @param savedInstanceState Saved Instance State
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

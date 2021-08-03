@@ -41,6 +41,24 @@ public class DownloadService extends Service {
     private int mDownloadCount;
     private boolean mFailed;
 
+    /**
+     * Runs when an intent was passed to the Service
+     *
+     * @param intent  Intent
+     * @param flags   Flags
+     * @param startId Start ID
+     * @return START_STICKY
+     */
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null && intent.getAction() != null) {
+            if (CANCEL.equals(intent.getAction())) {
+                cancelDownloads(true);
+            }
+        }
+        return START_STICKY;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -55,16 +73,9 @@ public class DownloadService extends Service {
         mNotificationManager.cancel(mNotificationID);
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null && intent.getAction() != null) {
-            if (CANCEL.equals(intent.getAction())) {
-                cancelDownloads(true);
-            }
-        }
-        return START_STICKY;
-    }
-
+    /**
+     * Downloads the first playlist in line
+     */
     private void downloadFirstPlaylist() {
         if (mPlayables.size() == 0) {
             stopSelf();
@@ -81,11 +92,13 @@ public class DownloadService extends Service {
             .filter(s -> !s.isDownloaded(getApplicationContext()))
             .count();
 
+        // Create intents
         Intent intentOpen = new Intent(this, MainActivity.class).setAction(MainActivity.FRAGMENT_PLAYLISTS);
         Intent intentCancel = new Intent(this, DownloadService.class).setAction(CANCEL);
         PendingIntent pendingIntentOpen = PendingIntent.getActivity(getApplicationContext(), 0, intentOpen, PendingIntent.FLAG_IMMUTABLE);
         PendingIntent pendingIntentCancel = PendingIntent.getService(getApplicationContext(), 0, intentCancel, PendingIntent.FLAG_IMMUTABLE);
 
+        // Create notification
         mNotificationBuilder = new NotificationCompat
             .Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
             .setContentTitle("Downloading Service")
@@ -99,6 +112,11 @@ public class DownloadService extends Service {
         downloadSong(mCurrentPlayable);
     }
 
+    /**
+     * Download a song from the playable
+     *
+     * @param playable Playable
+     */
     private void downloadSong(Playable playable) {
         if (isOffline()) {
             cancelDownloads(false);
@@ -129,6 +147,7 @@ public class DownloadService extends Service {
             .setProgress(100, 0, true);
         mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
 
+        // Create a download process to start downloading the song
         Debounce debounce = new Debounce(1000);
         new DownloadProcess(getApplicationContext(), song, mHighDownloadQuality, new DownloadProcess.Callback() {
             @Override
@@ -211,10 +230,14 @@ public class DownloadService extends Service {
         });
     }
 
+    /**
+     * Runs when a playlist has finished downloading
+     */
     private void downloadsDone() {
         mNotificationManager.cancel(mNotificationID);
         stopForeground(mNotificationID);
 
+        // Show done notification
         int NOTIFICATION_ID = Utils.getRandomInt();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
             .setContentTitle(mFailed ? "Downloads Incomplete" : "Downloading Finished")
@@ -232,10 +255,16 @@ public class DownloadService extends Service {
         }
     }
 
+    /**
+     * Cancel the current download
+     *
+     * @param startNextPlaylist Start downloading next playlist
+     */
     private void cancelDownloads(boolean startNextPlaylist) {
         stopForeground(mNotificationID);
         mNotificationManager.cancel(mNotificationID);
 
+        // Show cancelled notification
         int NOTIFICATION_ID = Utils.getRandomInt();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.DOWNLOAD_CHANNEL_ID)
             .setContentTitle("Downloads Cancelled")
@@ -258,6 +287,11 @@ public class DownloadService extends Service {
         }
     }
 
+    /**
+     * Check if device is offline
+     *
+     * @return If is offline
+     */
     private boolean isOffline() {
         ConnectivityManager cm = getSystemService(ConnectivityManager.class);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
@@ -265,6 +299,13 @@ public class DownloadService extends Service {
         return !networkInfo.isConnected();
     }
 
+    /**
+     * Push a playable to the queue of downloads
+     *
+     * @param playable            Playable
+     * @param highDownloadQuality Quality of downloads
+     * @return True if the download was queued and False if the playlist is already downloading
+     */
     public boolean startDownload(Playable playable, boolean highDownloadQuality) {
         mHighDownloadQuality = highDownloadQuality;
 
@@ -275,6 +316,11 @@ public class DownloadService extends Service {
         return true;
     }
 
+    /**
+     * Stop the download of a playable
+     *
+     * @param playable Playable
+     */
     public void stopDownload(Playable playable) {
         if (mPlayables.size() == 0) return;
         if (mPlayables.get(0).equals(playable)) {
@@ -284,6 +330,12 @@ public class DownloadService extends Service {
         }
     }
 
+    /**
+     * Check if a playlist is being downloaded
+     *
+     * @param playlistId Playlist ID to check
+     * @return If the playlist is being downloaded
+     */
     public boolean isDownloading(String playlistId) {
         return mPlayables.stream().anyMatch(p -> p.getInfo().getId().equals(playlistId));
     }

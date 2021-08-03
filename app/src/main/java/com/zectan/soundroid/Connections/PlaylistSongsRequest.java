@@ -10,11 +10,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlaylistSongsRequest extends Request {
+
+    /**
+     * Get songs from a playlist
+     *
+     * @param playlistId Playlist ID
+     * @param callback   Callback
+     */
     public PlaylistSongsRequest(String playlistId, Callback callback) {
         super("/playlist/songs?playlistId=" + playlistId, new Request.Callback() {
             @Override
             public void onComplete(String response) {
                 try {
+                    // Convert response to JSON object
                     JSONArray objects = new JSONArray(response);
                     List<Song> songs = new ArrayList<>();
                     for (int i = 0; i < objects.length(); i++) {

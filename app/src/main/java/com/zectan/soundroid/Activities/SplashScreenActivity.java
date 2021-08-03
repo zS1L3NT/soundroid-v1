@@ -17,12 +17,14 @@ public class SplashScreenActivity extends CrashDebugApplication {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Check if is authenticated
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             mIntent = new Intent(this, AuthActivity.class);
         } else {
             mIntent = new Intent(this, MainActivity.class);
         }
 
+        // Check for update
         new VersionCheckRequest(new Request.Callback() {
             @Override
             public void onComplete(String version) {
@@ -40,7 +42,6 @@ public class SplashScreenActivity extends CrashDebugApplication {
                 finish();
             }
         });
-
 
     }
 }

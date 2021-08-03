@@ -36,6 +36,16 @@ public class MenuBuilder {
     public static final int ADD_PLAYLIST = 13;
     public static final int IMPORT_PLAYLIST = 14;
 
+    /**
+     * Create and display a popup with the menu items you pass it
+     *
+     * @param v        View that owns the popup
+     * @param items    Menu Items
+     * @param object   Object
+     * @param callback Callback
+     * @param <T>      Type
+     */
+    @SuppressLint("RestrictedApi")
     public static <T> void createMenu(View v, MenuItems items, T object, MenuItemCallback<T> callback) {
         Context context = v.getContext();
         PopupMenu popup = new PopupMenu(context, v);
@@ -44,12 +54,8 @@ public class MenuBuilder {
             popup.getMenu().add(0, item.getItemId(), i, item.getTitle()).setIcon(item.getIconId());
         }
         popup.setOnMenuItemClickListener(item -> callback.onMenuItemClicked(object, item));
-        inflateIcons(popup, context);
-        popup.show();
-    }
 
-    @SuppressLint("RestrictedApi")
-    private static void inflateIcons(PopupMenu popup, Context context) {
+        // Inflate icons in the popup menu
         if (popup.getMenu() instanceof androidx.appcompat.view.menu.MenuBuilder) {
             androidx.appcompat.view.menu.MenuBuilder menuBuilder = (androidx.appcompat.view.menu.MenuBuilder) popup.getMenu();
             menuBuilder.setOptionalIconsVisible(true);
@@ -68,6 +74,7 @@ public class MenuBuilder {
                 }
             }
         }
+        popup.show();
     }
 
     public interface MenuItemCallback<T> {
@@ -105,7 +112,14 @@ public class MenuBuilder {
             mItems = new ArrayList<>();
         }
 
-        public static MenuItems forPlaylist(Playable playable, MainActivity activity) {
+        /**
+         * Default menu items for a playable
+         *
+         * @param playable Playable
+         * @param activity Activity
+         * @return Menu items
+         */
+        public static MenuItems forPlayable(Playable playable, MainActivity activity) {
             MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
             if (playable.isDownloaded(activity)) {
                 items.clearDownloads();
@@ -127,6 +141,14 @@ public class MenuBuilder {
             return items;
         }
 
+        /**
+         * Default menu items for a song
+         *
+         * @param song     Song
+         * @param context  Context
+         * @param editable If the song is saved on Firebase
+         * @return Menu items
+         */
         public static MenuItems forSong(Song song, Context context, boolean editable) {
             MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
             if (editable) items.editSong();

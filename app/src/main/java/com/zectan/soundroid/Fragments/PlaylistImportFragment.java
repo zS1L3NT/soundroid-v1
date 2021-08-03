@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.Nullable;
 
 import com.zectan.soundroid.Classes.Fragment;
-import com.zectan.soundroid.Connections.ImportPlaylistRequest;
+import com.zectan.soundroid.Connections.PlaylistImportRequest;
 import com.zectan.soundroid.databinding.FragmentPlaylistImportBinding;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,10 +25,9 @@ public class PlaylistImportFragment extends Fragment<FragmentPlaylistImportBindi
         B = FragmentPlaylistImportBinding.inflate(inflater, container, false);
         super.onCreateView(inflater, container, savedInstanceState);
 
-        // Observers
+        // Listeners
         mPlaylistImportVM.text.observe(this, B.urlTextInput::setText);
         mPlaylistImportVM.loading.observe(this, this::onLoadingChange);
-
         B.importButton.setOnClickListener(this::onImportButtonClicked);
 
         return B.getRoot();
@@ -40,14 +39,16 @@ public class PlaylistImportFragment extends Fragment<FragmentPlaylistImportBindi
         if (editable == null) return;
         mActivity.hideKeyboard(B.getRoot());
 
+        // Check if URL is valid
         String url = editable.toString();
         try {
             new URL(url);
         } catch (MalformedURLException e) {
             mActivity.snack("Invalid URL");
+            return;
         }
 
-        new ImportPlaylistRequest(url, mMainVM.userId, new ImportPlaylistRequest.Callback() {
+        new PlaylistImportRequest(url, mMainVM.userId, new PlaylistImportRequest.Callback() {
             @Override
             public void onComplete(String response) {
                 mActivity.snack("Adding songs to playlist...");
@@ -57,7 +58,7 @@ public class PlaylistImportFragment extends Fragment<FragmentPlaylistImportBindi
 
             @Override
             public void onError(String message) {
-                mActivity.handleError(new Exception(message));
+                mActivity.warnError(new Exception(message));
                 mPlaylistImportVM.loading.postValue(false);
             }
         });

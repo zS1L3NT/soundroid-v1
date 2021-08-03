@@ -6,13 +6,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.zectan.soundroid.BuildConfig;
+import com.zectan.soundroid.Classes.CrashDebugApplication;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.ActivityUpdateBinding;
 
-public class UpdateActivity extends AppCompatActivity {
+public class UpdateActivity extends CrashDebugApplication {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

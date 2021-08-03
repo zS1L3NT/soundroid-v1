@@ -7,6 +7,12 @@ import org.json.JSONException;
 
 public class SongEditRequest extends Request {
 
+    /**
+     * Edit a song
+     *
+     * @param song     Song
+     * @param callback Callback
+     */
     public SongEditRequest(Song song, Callback callback) {
         super("/song/edit", callback);
 
@@ -17,4 +23,5 @@ public class SongEditRequest extends Request {
             e.printStackTrace();
         }
     }
+
 }
