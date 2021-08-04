@@ -107,10 +107,12 @@ public abstract class Fragment<T extends ViewBinding> extends androidx.fragment.
     @Override
     public void onResume() {
         super.onResume();
-        if (flagsContain(FLAG_HIDE_NAVIGATOR) && !flagsContain(FLAG_IGNORE_NAVIGATOR)) {
-            mActivity.updateNavigator(0);
-        } else {
-            mActivity.updateNavigator(1);
+        if (!flagsContain(FLAG_IGNORE_NAVIGATOR)) {
+            if (flagsContain(FLAG_HIDE_NAVIGATOR)) {
+                mActivity.updateNavigator(0);
+            } else {
+                mActivity.updateNavigator(1);
+            }
         }
     }
 }
