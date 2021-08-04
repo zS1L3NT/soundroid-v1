@@ -561,7 +561,6 @@ public class PlayingService extends Service {
         public void onNextCall() {
             if (!touchingSeekbar.getValue())
                 time.setValue((int) (mPlayer.getContentPosition() / 1000));
-            sendEmptyMessageDelayed(0, 250);
         }
 
     }
