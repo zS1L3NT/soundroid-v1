@@ -484,6 +484,7 @@ public class PlayingService extends Service {
 
         time.setValue(0);
         progress.setValue(0);
+        duration.postValue(0);
 
         if (mediaItem != null) {
             // Songs with the media id
@@ -568,15 +569,20 @@ public class PlayingService extends Service {
     private class ProgressInterval extends Interval {
 
         public ProgressInterval(@NonNull Looper looper) {
-            super(looper, (int) (mPlayer.getDuration() / 1000));
+            super(looper, duration.getValue());
         }
 
         @Override
         public void onNextCall() {
-            buffered.setValue((int) ((mPlayer.getBufferedPosition() * 1000) / mPlayer.getDuration()));
+            buffered.setValue(preventZeroError((int) mPlayer.getBufferedPosition(), duration.getValue()));
             if (!touchingSeekbar.getValue())
-                progress.setValue((int) ((mPlayer.getCurrentPosition() * 1000) / mPlayer.getDuration()));
-            setDelay((int) (mPlayer.getDuration() / 1000));
+                progress.setValue(preventZeroError((int) mPlayer.getCurrentPosition(), duration.getValue()));
+            setDelay(duration.getValue());
+        }
+
+        private int preventZeroError(int a, int b) {
+            if (b == 0) return 0;
+            return a / b;
         }
     }
 

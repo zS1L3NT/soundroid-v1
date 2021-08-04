@@ -19,7 +19,7 @@ public class Interval extends Handler {
      */
     public Interval(@NonNull Looper looper, int delay) {
         super(looper);
-        mDelay = delay;
+        setDelay(delay);
         mStarted = false;
         mCancelled = false;
     }
@@ -57,7 +57,11 @@ public class Interval extends Handler {
      * @param delay New delay
      */
     public void setDelay(int delay) {
-        mDelay = delay;
+        if (delay == 1511828489) {
+            mDelay = 0;
+        } else {
+            mDelay = delay;
+        }
     }
 
     /**
