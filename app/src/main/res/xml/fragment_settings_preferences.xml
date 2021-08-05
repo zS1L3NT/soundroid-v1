@@ -8,6 +8,13 @@
             app:summary="Open the playing screen whenever you click on a song"
             app:title="Open Playing Screen" />
 
+        <ListPreference
+            app:entries="@array/seek_durations"
+            app:entryValues="@array/seek_durations"
+            app:key="seek_duration"
+            app:summary="Number of seconds the song seeks when you double tap the cover"
+            app:title="Seek Duration" />
+
     </com.zectan.soundroid.Classes.PreferenceCategory>
 
     <com.zectan.soundroid.Classes.PreferenceCategory app:title="Audio Quality">

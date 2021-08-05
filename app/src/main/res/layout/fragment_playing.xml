@@ -68,21 +68,113 @@
         android:id="@+id/cover_image"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:maxHeight="340dp"
-        android:maxWidth="340dp"
         android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginBottom="72dp"
         android:background="@drawable/playing_cover_shadow"
         android:elevation="5dp"
+        android:maxWidth="340dp"
+        android:maxHeight="340dp"
         android:src="@drawable/playing_cover_loading"
         app:layout_constraintBottom_toTopOf="@+id/seekbar"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/playlist_name_text"
-        app:layout_constraintDimensionRatio="1:1"
         app:shapeAppearanceOverlay="@style/shapeableImageViewStyle" />
+
+    <FrameLayout
+        android:id="@+id/backward_wrapper"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="36dp"
+        android:elevation="6dp"
+        app:layout_constraintBottom_toBottomOf="@id/cover_image"
+        app:layout_constraintStart_toStartOf="@id/cover_image"
+        app:layout_constraintTop_toTopOf="@id/cover_image">
+
+        <View
+            android:id="@+id/backward_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:background="@drawable/seek_background" />
+
+        <ImageView
+            android:id="@+id/backward_1_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical|end"
+            android:alpha="0"
+            android:contentDescription="@string/backward"
+            android:src="@drawable/ic_arrow_left" />
+
+        <ImageView
+            android:id="@+id/backward_2_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:alpha="0"
+            android:contentDescription="@string/backward"
+            android:src="@drawable/ic_arrow_left" />
+
+        <ImageView
+            android:id="@+id/backward_3_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:alpha="0"
+            android:contentDescription="@string/backward"
+            android:src="@drawable/ic_arrow_left" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/forward_wrapper"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginEnd="36dp"
+        android:elevation="6dp"
+        app:layout_constraintBottom_toBottomOf="@id/cover_image"
+        app:layout_constraintEnd_toEndOf="@id/cover_image"
+        app:layout_constraintTop_toTopOf="@id/cover_image">
+
+        <View
+            android:id="@+id/forward_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:background="@drawable/seek_background" />
+
+        <ImageView
+            android:id="@+id/forward_1_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:alpha="0"
+            android:contentDescription="@string/forward"
+            android:src="@drawable/ic_arrow_right" />
+
+        <ImageView
+            android:id="@+id/forward_2_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:alpha="0"
+            android:contentDescription="@string/forward"
+            android:src="@drawable/ic_arrow_right" />
+
+        <ImageView
+            android:id="@+id/forward_3_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical|end"
+            android:alpha="0"
+            android:contentDescription="@string/forward"
+            android:src="@drawable/ic_arrow_right" />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/error_text"
@@ -131,8 +223,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="32dp"
+        android:layout_marginBottom="8dp"
         android:alpha="0.6"
         android:elevation="6dp"
         android:ellipsize="end"

@@ -11,7 +11,9 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
@@ -19,6 +21,7 @@ import android.widget.SeekBar;
 import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GestureDetectorCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -42,13 +45,45 @@ import java.util.ArrayList;
 @SuppressLint("UseCompatLoadingForDrawables")
 public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     private static final String TAG = "(SounDroid) PlayingFragment";
-    private @ColorInt
-    int mImageColor;
+    private final GestureDetector.SimpleOnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener() {
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            double relativeX = e.getX() / B.coverImage.getMeasuredWidth();
+            if (relativeX < 0.35) {
+                // Backward double press
+                B.backward1Icon.setAlpha(1f);
+                B.backwardBackground.setAlpha(0.25f);
+                new Handler().postDelayed(() -> B.backward2Icon.setAlpha(1f), 100);
+                new Handler().postDelayed(() -> B.backward3Icon.setAlpha(1f), 200);
+                B.backward1Icon.animate().alpha(0f).setStartDelay(250).setDuration(250).start();
+                B.backward2Icon.animate().alpha(0f).setStartDelay(350).setDuration(250).start();
+                B.backward3Icon.animate().alpha(0f).setStartDelay(450).setDuration(250).start();
+                B.backwardBackground.animate().alpha(0f).setStartDelay(450).setDuration(250).start();
+                mPlayingService.backwardTime(mMainVM.myUser.getValue().getSeekDuration());
+            }
+
+            if (relativeX > 0.65) {
+                // Forward double press
+                B.forward1Icon.setAlpha(1f);
+                B.forwardBackground.setAlpha(0.25f);
+                new Handler().postDelayed(() -> B.forward2Icon.setAlpha(1f), 100);
+                new Handler().postDelayed(() -> B.forward3Icon.setAlpha(1f), 200);
+                B.forward1Icon.animate().alpha(0f).setStartDelay(250).setDuration(250).start();
+                B.forward2Icon.animate().alpha(0f).setStartDelay(350).setDuration(250).start();
+                B.forward3Icon.animate().alpha(0f).setStartDelay(450).setDuration(250).start();
+                B.forwardBackground.animate().alpha(0f).setStartDelay(450).setDuration(250).start();
+                mPlayingService.forwardTime(mMainVM.myUser.getValue().getSeekDuration());
+            }
+
+            return super.onDoubleTap(e);
+        }
+    };
     private int mFinalTouch;
     private ValueAnimator mImageAnimator;
     private PlayingAdapter mPlayingAdapter;
     private ItemTouchHelper mItemTouchHelper;
     private PlayingService mPlayingService;
+    private int mImageColor;
     private final PlayingAdapter.Callback callback = new PlayingAdapter.Callback() {
         @Override
         public void onSongClicked(Song song) {
@@ -103,6 +138,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             mPlayingService.touchingSeekbar.setValue(false);
         }
     };
+    private GestureDetectorCompat mGestureDetector;
 
     public PlayingFragment() {
         super(FLAG_TRANSPARENT_STATUS);
@@ -128,6 +164,8 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         } else {
             mPlayingService = mMainVM.playingService.getValue();
         }
+
+        mGestureDetector = new GestureDetectorCompat(getContext(), gestureListener);
 
         // Listeners
         mPlayingService.queue.observe(this, mPlayingAdapter::updateSongs);
@@ -322,6 +360,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         );
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void onErrorChange(String error) {
         if (!error.equals("")) {
             // Animate error
@@ -329,13 +368,17 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             B.errorText.animate().alpha(1).setDuration(500).setStartDelay(500).start();
             B.retryText.animate().alpha(1).setDuration(500).setStartDelay(500).start();
             darkenAnimateImage();
-            new Handler().postDelayed(() -> B.coverImage.setOnClickListener(__ -> {
-                mPlayingService.retry();
-                mPlayingService.error.setValue("");
-            }), 1000);
+            new Handler().postDelayed(() -> {
+                B.coverImage.setOnClickListener(__ -> {
+                    mPlayingService.retry();
+                    mPlayingService.error.setValue("");
+                });
+                B.coverImage.setOnTouchListener((__, ___) -> false);
+            }, 1000);
         } else {
             B.coverImage.setOnClickListener(__ -> {
             });
+            B.coverImage.setOnTouchListener((v, event) -> mGestureDetector.onTouchEvent(event));
             B.errorText.setAlpha(0f);
             B.retryText.setAlpha(0f);
             brightenAnimateImage();

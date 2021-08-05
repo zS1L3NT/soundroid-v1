@@ -10,6 +10,7 @@ public class User {
     private boolean openPlayingScreen;
     private boolean highStreamQuality;
     private boolean highDownloadQuality;
+    private int seekDuration;
     private String theme;
 
     public User() {
@@ -24,15 +25,26 @@ public class User {
      * @param openPlayingScreen   Opens playing screen when click on a song
      * @param highStreamQuality   Wants high quality streaming
      * @param highDownloadQuality Wants high quality downloads
+     * @param seekDuration        Seconds to seek when double tap cover
      * @param theme               Theme
      */
-    public User(String id, String usnm, String profilePicture, boolean openPlayingScreen, boolean highStreamQuality, boolean highDownloadQuality, String theme) {
+    public User(
+        String id,
+        String usnm,
+        String profilePicture,
+        boolean openPlayingScreen,
+        boolean highStreamQuality,
+        boolean highDownloadQuality,
+        int seekDuration,
+        String theme
+    ) {
         this.id = id;
         this.usnm = usnm;
         this.profilePicture = profilePicture;
         this.openPlayingScreen = openPlayingScreen;
         this.highStreamQuality = highStreamQuality;
         this.highDownloadQuality = highDownloadQuality;
+        this.seekDuration = seekDuration;
         this.theme = theme;
     }
 
@@ -47,6 +59,7 @@ public class User {
             true,
             true,
             true,
+            5,
             "Dark"
         );
     }
@@ -73,6 +86,10 @@ public class User {
 
     public boolean getHighDownloadQuality() {
         return highDownloadQuality;
+    }
+
+    public int getSeekDuration() {
+        return seekDuration;
     }
 
     public String getTheme() {

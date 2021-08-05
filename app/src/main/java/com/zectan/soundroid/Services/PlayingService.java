@@ -422,6 +422,16 @@ public class PlayingService extends Service {
         mPlayer.seekTo((long) duration.getValue() * progress);
     }
 
+    public void forwardTime(int seconds) {
+        long seekTime = (time.getValue() + seconds) * 1000L;
+        mPlayer.seekTo(Math.min(seekTime, duration.getValue() * 1000));
+    }
+
+    public void backwardTime(int seconds) {
+        long seekTime = (time.getValue() - seconds) * 1000L;
+        mPlayer.seekTo(Math.max(seekTime, 0));
+    }
+
     /**
      * Get the audio focus from the system
      */

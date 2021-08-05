@@ -92,6 +92,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
         private SwitchPreferenceCompat openPlayingScreen;
         private SwitchPreferenceCompat highDownloadQuality;
         private SwitchPreferenceCompat highStreamQuality;
+        private ListPreference seekDuration;
         private ListPreference theme;
 
         @Override
@@ -102,6 +103,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             openPlayingScreen = findPreference("open_playing_screen");
             highDownloadQuality = findPreference("high_download_quality");
             highStreamQuality = findPreference("high_stream_quality");
+            seekDuration = findPreference("seek_duration");
             theme = findPreference("theme");
             Preference clearAllDownloads = findPreference("clear_all_downloads");
             Preference throwError = findPreference("throw_error");
@@ -112,6 +114,7 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
             openPlayingScreen.setOnPreferenceChangeListener(this::onOpenPlayingScreenChange);
             highDownloadQuality.setOnPreferenceChangeListener(this::onHighDownloadQualityChange);
             highStreamQuality.setOnPreferenceChangeListener(this::onHighStreamQualityChange);
+            seekDuration.setOnPreferenceChangeListener(this::onSeekDurationChange);
             theme.setOnPreferenceChangeListener(this::onThemeChange);
             clearAllDownloads.setOnPreferenceClickListener(this::onClearAllDownloadsClick);
             throwError.setOnPreferenceClickListener(this::onThrowErrorClicked);
@@ -136,6 +139,8 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
                 highDownloadQuality.setChecked(user.getHighDownloadQuality());
             if (highStreamQuality != null)
                 highStreamQuality.setChecked(user.getHighStreamQuality());
+            if (seekDuration != null)
+                seekDuration.setValue(String.valueOf(user.getSeekDuration()));
             if (theme != null) {
                 theme.setValue(user.getTheme());
                 theme.setSummary(user.getTheme());
@@ -163,6 +168,15 @@ public class SettingsFragment extends Fragment<FragmentSettingsBinding> {
                 userRef
                     .update("highStreamQuality", Boolean.parseBoolean(o.toString()))
                     .addOnFailureListener(mActivity::warnError);
+            return false;
+        }
+
+        private boolean onSeekDurationChange(Preference preference, Object o) {
+            if (userRef != null) {
+                userRef
+                    .update("seekDuration", Integer.valueOf(o.toString()))
+                    .addOnFailureListener(mActivity::warnError);
+            }
             return false;
         }
 

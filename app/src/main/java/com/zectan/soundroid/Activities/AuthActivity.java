@@ -141,6 +141,7 @@ public class AuthActivity extends CrashDebugApplication {
                     true,
                     true,
                     true,
+                    5,
                     "Dark"
                 );
 

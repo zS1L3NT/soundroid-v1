@@ -101,6 +101,24 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </Constraint>
+        <Constraint android:id="@id/backward_wrapper">
+            <Layout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginStart="36dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </Constraint>
+        <Constraint android:id="@id/forward_wrapper">
+            <Layout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginEnd="36dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </Constraint>
         <Constraint android:id="@+id/error_text">
             <Layout
                 android:layout_width="wrap_content"
