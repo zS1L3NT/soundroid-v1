@@ -51,10 +51,10 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             double relativeX = e.getX() / B.coverImage.getMeasuredWidth();
             if (relativeX < 0.35) {
                 // Backward double press
-                B.backward1Icon.setAlpha(1f);
+                B.backward1Icon.setAlpha(0.8f);
                 B.backwardBackground.setAlpha(0.25f);
-                new Handler().postDelayed(() -> B.backward2Icon.setAlpha(1f), 100);
-                new Handler().postDelayed(() -> B.backward3Icon.setAlpha(1f), 200);
+                new Handler().postDelayed(() -> B.backward2Icon.setAlpha(0.8f), 100);
+                new Handler().postDelayed(() -> B.backward3Icon.setAlpha(0.8f), 200);
                 B.backward1Icon.animate().alpha(0f).setStartDelay(250).setDuration(250).start();
                 B.backward2Icon.animate().alpha(0f).setStartDelay(350).setDuration(250).start();
                 B.backward3Icon.animate().alpha(0f).setStartDelay(450).setDuration(250).start();
@@ -64,10 +64,10 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
 
             if (relativeX > 0.65) {
                 // Forward double press
-                B.forward1Icon.setAlpha(1f);
+                B.forward1Icon.setAlpha(0.8f);
                 B.forwardBackground.setAlpha(0.25f);
-                new Handler().postDelayed(() -> B.forward2Icon.setAlpha(1f), 100);
-                new Handler().postDelayed(() -> B.forward3Icon.setAlpha(1f), 200);
+                new Handler().postDelayed(() -> B.forward2Icon.setAlpha(0.8f), 100);
+                new Handler().postDelayed(() -> B.forward3Icon.setAlpha(0.8f), 200);
                 B.forward1Icon.animate().alpha(0f).setStartDelay(250).setDuration(250).start();
                 B.forward2Icon.animate().alpha(0f).setStartDelay(350).setDuration(250).start();
                 B.forward3Icon.animate().alpha(0f).setStartDelay(450).setDuration(250).start();
