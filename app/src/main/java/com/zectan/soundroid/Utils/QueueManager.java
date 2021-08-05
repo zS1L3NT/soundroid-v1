@@ -193,8 +193,9 @@ public class QueueManager {
         }
 
         mSongs.add(song);
-        mSortedOrder.add(song.getSongId());
-        mShuffledOrder.add((int) (Math.random() * mShuffledOrder.size()), song.getSongId());
+        mSortedOrder.add(mPosition, song.getSongId());
+        mShuffledOrder.add(mPosition, song.getSongId());
+        mPosition++;
         if (mSongs.size() == 1) {
             goToSong(song);
         }
