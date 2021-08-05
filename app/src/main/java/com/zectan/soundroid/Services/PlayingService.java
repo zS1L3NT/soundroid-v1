@@ -3,8 +3,10 @@ package com.zectan.soundroid.Services;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
@@ -74,6 +76,7 @@ public class PlayingService extends Service {
     public PlayingService.ProgressInterval mProgressInterval;
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mNotificationBuilder;
+    private MusicIntentReceiver mMusicIntentReceiver;
     private AudioFocusRequest mAudioFocusRequest;
     private AudioManager mAudioManager;
     private QueueManager mQueueManager;
@@ -233,6 +236,10 @@ public class PlayingService extends Service {
             new ArrayList<>(),
             true
         );
+
+        mMusicIntentReceiver = new MusicIntentReceiver();
+        IntentFilter filter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+        registerReceiver(mMusicIntentReceiver, filter);
     }
 
     @Override
@@ -240,6 +247,7 @@ public class PlayingService extends Service {
         super.onDestroy();
         stopForeground(mNotificationID);
         mNotificationManager.cancel(mNotificationID);
+        unregisterReceiver(mMusicIntentReceiver);
     }
 
     /**
@@ -593,6 +601,17 @@ public class PlayingService extends Service {
         private int preventZeroError(int a, int b) {
             if (b == 0) return 0;
             return a / b;
+        }
+    }
+
+    private class MusicIntentReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (
+                intent.getAction().equals(Intent.ACTION_HEADSET_PLUG) &&
+                    intent.getIntExtra("state", -1) == 0 &&
+                    isPlaying.getValue()
+            ) pause(false);
         }
     }
 
