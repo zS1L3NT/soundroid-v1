@@ -1,6 +1,8 @@
 package com.zectan.soundroid.Fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +56,7 @@ public class PlaylistImportFragment extends Fragment<FragmentPlaylistImportBindi
                 mActivity.snack("Adding songs to playlist...");
                 mPlaylistImportVM.text.postValue("");
                 mPlaylistImportVM.loading.postValue(false);
+                new Handler(Looper.getMainLooper()).post(mActivity::onBackPressed);
             }
 
             @Override
