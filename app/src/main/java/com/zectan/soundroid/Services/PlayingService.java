@@ -266,7 +266,7 @@ public class PlayingService extends Service {
             this,
             mPlayer,
             playable.getSongs(),
-            ListArrayUtils.startOrderFromId(playable.getInfo().getOrder(), songId),
+            ListArrayUtils.startListFromObject(playable.getInfo().getOrder(), songId),
             highStreamQuality
         );
 

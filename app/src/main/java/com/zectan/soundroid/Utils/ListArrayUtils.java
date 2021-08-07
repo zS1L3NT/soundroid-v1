@@ -15,20 +15,20 @@ public class ListArrayUtils {
     /**
      * Reorder a list to start with a specific song id
      *
-     * @param order  Order to change
+     * @param list   Order to change
      * @param songId ID to start with
      * @return New order
      */
-    public static List<String> startOrderFromId(List<String> order, String songId) {
-        List<String> filtered = order
+    public static <T> List<T> startListFromObject(List<T> list, T songId) {
+        List<T> filtered = list
             .stream()
-            .filter(s -> s.equals(songId))
+            .filter(o -> o.equals(songId))
             .collect(Collectors.toList());
 
-        if (filtered.size() == 0) return order;
-        int startPosition = order.indexOf(filtered.get(0));
+        if (filtered.size() == 0) return list;
+        int startPosition = list.indexOf(filtered.get(0));
 
-        return startListFromPosition(order, startPosition);
+        return startListFromPosition(list, startPosition);
     }
 
     /**

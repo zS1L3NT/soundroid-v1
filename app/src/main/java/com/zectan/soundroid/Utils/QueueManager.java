@@ -126,13 +126,20 @@ public class QueueManager {
             if (mIsLooping.getValue()) {
                 // Go to the start of the queue
                 mPosition = 0;
-            } else {
-                return;
             }
             // else: Don't change a thing
         } else {
             // Not end of the queue
             mPosition = position + 1;
+
+            if (mPosition == 1 && !mIsLooping.getValue()) {
+                if (mIsShuffling.getValue()) {
+                    removeSong(mShuffledOrder.get(0));
+                } else {
+                    removeSong(mSortedOrder.get(0));
+                }
+                mPosition = 0;
+            }
         }
 
         updateLiveSong();
@@ -170,7 +177,7 @@ public class QueueManager {
      */
     public void goToSong(Song song) {
         mPosition = 0;
-        List<String> sortedOrder = new ArrayList<>(ListArrayUtils.startOrderFromId(mSortedOrder, song.getSongId()));
+        List<String> sortedOrder = new ArrayList<>(ListArrayUtils.startListFromObject(mSortedOrder, song.getSongId()));
         mSortedOrder.clear();
         mSortedOrder.addAll(sortedOrder);
         List<String> shuffleOrder = ListArrayUtils.shuffleOrder(new ArrayList<>(mSortedOrder));
@@ -277,6 +284,21 @@ public class QueueManager {
      */
     public void toggleLoop() {
         mIsLooping.setValue(!mIsLooping.getValue());
+
+        if (!mIsLooping.getValue()) {
+            if (mIsShuffling.getValue()) {
+                List<String> shuffledOrder = ListArrayUtils.startListFromPosition(mShuffledOrder, mPosition);
+                mShuffledOrder.clear();
+                mShuffledOrder.addAll(shuffledOrder);
+            } else {
+                List<String> sortedOrder = ListArrayUtils.startListFromPosition(mSortedOrder, mPosition);
+                mSortedOrder.clear();
+                mSortedOrder.addAll(sortedOrder);
+            }
+
+            mPosition = 0;
+        }
+
         updateLiveQueue();
     }
 
@@ -284,11 +306,19 @@ public class QueueManager {
      * Toggle shuffle
      */
     public void toggleShuffle() {
+        if (mIsShuffling.getValue()) {
+            List<String> sortedOrder_temp = ListArrayUtils.startListFromObject(mSortedOrder, mShuffledOrder.get(mPosition));
+            List<String> sortedOrder = ListArrayUtils.startListFromPosition(sortedOrder_temp, mSortedOrder.size() - mPosition);
+            mSortedOrder.clear();
+            mSortedOrder.addAll(sortedOrder);
+        }
+
         List<String> shuffledOrder = ListArrayUtils.shuffleOrder(new ArrayList<>(mSortedOrder));
 
         mIsShuffling.setValue(!mIsShuffling.getValue());
         mShuffledOrder.clear();
         mShuffledOrder.addAll(shuffledOrder);
+
         updateLiveQueue();
     }
 
