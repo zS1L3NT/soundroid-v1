@@ -20,6 +20,7 @@ import com.zectan.soundroid.R;
 import com.zectan.soundroid.Services.PlayingService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -104,13 +105,11 @@ public class MenuEvents {
     }
 
     private void addToPlaylist() {
-        MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(mActivity).setTitle("Add To Playlist:");
         List<Playlist> playlists = new ArrayList<>(mActivity.mMainVM.myPlaylists.getValue());
 
-        // Items in the dialog box should represent the your playlists
-        dialog.setItems(ListArrayUtils.toArray(CharSequence.class, playlists.stream().map(Playlist::getName).collect(Collectors.toList())), (dialog_, i) -> {
-            Playlist playlist = playlists.get(i);
-
+        MaterialAlertDialogBuilder playlistTypeDialog = new MaterialAlertDialogBuilder(mActivity).setTitle("Add to");
+        CharSequence[] playlistTypeOptions = new CharSequence[]{"New Playlist", "Existing Playlist"};
+        playlistTypeDialog.setItems(playlistTypeOptions, (dialog, i) -> {
             AtomicInteger completed = new AtomicInteger(0);
             OnSuccessListener<Object> onSuccessListener = __ -> {
                 if (completed.incrementAndGet() == 2) {
@@ -118,31 +117,61 @@ public class MenuEvents {
                 }
             };
 
-            // Check if song is in playlist[i]
-            boolean inPlaylist = mActivity
-                .mMainVM
-                .getSongsFromPlaylist(playlist.getId())
-                .stream()
-                .anyMatch(song -> song.getSongId().equals(mSong.getSongId()));
+            if (i == 0) {
+                Playlist playlist = new Playlist(
+                    mDb.collection("playlists").document().getId(),
+                    "New Playlist",
+                    "https://firebasestorage.googleapis.com/v0/b/android-soundroid.appspot.com/o/playing_cover_default.png?alt=media&token=e8980e80-ab5d-4f21-8ed4-6bc6e7e06ef7",
+                    "#7b828b",
+                    mActivity.mMainVM.userId,
+                    Collections.singletonList(mSong.getSongId())
+                );
 
-            if (inPlaylist) {
-                mActivity.snack("Song already in playlist!");
-            } else {
-                // Not in playlist, can add to playlist
                 mSong.setPlaylistId(playlist.getId());
                 mSong.setUserId(mActivity.mMainVM.userId);
+                mDb.collection("playlists")
+                    .document(playlist.getId())
+                    .set(playlist.toMap())
+                    .addOnSuccessListener(onSuccessListener)
+                    .addOnFailureListener(mActivity::warnError);
                 mDb.collection("songs")
                     .add(mSong.toMap())
                     .addOnSuccessListener(onSuccessListener)
                     .addOnFailureListener(mActivity::warnError);
-                mDb.collection("playlists")
-                    .document(playlist.getId())
-                    .update("order", FieldValue.arrayUnion(mSong.getSongId()))
-                    .addOnSuccessListener(onSuccessListener)
-                    .addOnFailureListener(mActivity::warnError);
             }
-        });
-        dialog.show();
+
+            if (i == 1) {
+                MaterialAlertDialogBuilder playlistSelectDialog = new MaterialAlertDialogBuilder(mActivity);
+                CharSequence[] playlistNames = ListArrayUtils.toArray(CharSequence.class, playlists.stream().map(Playlist::getName).collect(Collectors.toList()));
+                playlistSelectDialog.setItems(playlistNames, (dialog_, i_) -> {
+                    Playlist playlist = playlists.get(i_);
+
+                    // Check if song is in playlist[i]
+                    boolean inPlaylist = mActivity
+                        .mMainVM
+                        .getSongsFromPlaylist(playlist.getId())
+                        .stream()
+                        .anyMatch(song -> song.getSongId().equals(mSong.getSongId()));
+
+                    if (inPlaylist) {
+                        mActivity.snack("Song already in playlist!");
+                    } else {
+                        // Not in playlist, can add to playlist
+                        mSong.setPlaylistId(playlist.getId());
+                        mSong.setUserId(mActivity.mMainVM.userId);
+                        mDb.collection("songs")
+                            .add(mSong.toMap())
+                            .addOnSuccessListener(onSuccessListener)
+                            .addOnFailureListener(mActivity::warnError);
+                        mDb.collection("playlists")
+                            .document(playlist.getId())
+                            .update("order", FieldValue.arrayUnion(mSong.getSongId()))
+                            .addOnSuccessListener(onSuccessListener)
+                            .addOnFailureListener(mActivity::warnError);
+                    }
+                }).show();
+            }
+        }).show();
     }
 
     private void addToQueue() {
