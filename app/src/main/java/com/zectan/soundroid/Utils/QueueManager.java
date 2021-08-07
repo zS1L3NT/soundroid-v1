@@ -28,25 +28,25 @@ public class QueueManager {
     private final List<String> mSortedOrder;
     private final List<String> mShuffledOrder;
 
-    private final boolean mHighDownloadQuality;
+    private final boolean mHighStreamQuality;
     private int mPosition;
 
     /**
      * Create a queue manager who's sole purpose is to manage the queue
      * and update the current playing song being shown
      *
-     * @param playingService      Playing Service
-     * @param player              Player
-     * @param songs               All the songs in the queue
-     * @param order               Order of the playlist
-     * @param highDownloadQuality Quality of downloads
+     * @param playingService    Playing Service
+     * @param player            Player
+     * @param songs             All the songs in the queue
+     * @param order             Order of the playlist
+     * @param highStreamQuality Quality of stream
      */
     public QueueManager(
         PlayingService playingService,
         SimpleExoPlayer player,
         List<Song> songs,
         List<String> order,
-        boolean highDownloadQuality
+        boolean highStreamQuality
     ) {
         mContext = playingService.getApplicationContext();
         mPlayer = player;
@@ -59,7 +59,7 @@ public class QueueManager {
         mSongs = new ArrayList<>(songs);
         mSortedOrder = new ArrayList<>(order);
         mShuffledOrder = ListArrayUtils.shuffleOrder(new ArrayList<>(order));
-        mHighDownloadQuality = highDownloadQuality;
+        mHighStreamQuality = highStreamQuality;
     }
 
     /**
@@ -332,7 +332,7 @@ public class QueueManager {
         mCurrentSong.setValue(song);
 
         mPlayer.stop();
-        mPlayer.setMediaItem(song.getMediaItem(mContext, mHighDownloadQuality));
+        mPlayer.setMediaItem(song.getMediaItem(mContext, mHighStreamQuality));
         mPlayer.prepare();
         mPlayer.play();
 

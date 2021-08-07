@@ -254,11 +254,11 @@ public class PlayingService extends Service {
      * Start playing from a playable.
      * Stops the previous playable.
      *
-     * @param playable            Playable
-     * @param songId              Song ID to start from
-     * @param highDownloadQuality Quality of download
+     * @param playable          Playable
+     * @param songId            Song ID to start from
+     * @param highStreamQuality Quality of stream
      */
-    public void startPlayable(Playable playable, String songId, boolean highDownloadQuality) {
+    public void startPlayable(Playable playable, String songId, boolean highStreamQuality) {
         Log.i(TAG, String.format("Start Playlist (%s)[%s]", playable.getInfo().getId(), songId));
 
         this.playable.setValue(playable);
@@ -267,7 +267,7 @@ public class PlayingService extends Service {
             mPlayer,
             playable.getSongs(),
             ListArrayUtils.startOrderFromId(playable.getInfo().getOrder(), songId),
-            highDownloadQuality
+            highStreamQuality
         );
 
         changeSong(songId);

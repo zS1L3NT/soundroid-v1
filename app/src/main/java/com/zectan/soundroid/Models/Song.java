@@ -154,17 +154,17 @@ public class Song {
     /**
      * Get the media item of a song so it can be parsed by ExoPlayer
      *
-     * @param context             Context
-     * @param highDownloadQuality Quality of downloading
+     * @param context           Context
+     * @param highStreamQuality Quality of stream
      * @return Media item
      */
-    public MediaItem getMediaItem(Context context, boolean highDownloadQuality) {
+    public MediaItem getMediaItem(Context context, boolean highStreamQuality) {
         Uri uri;
 
         if (isDownloaded(context)) {
             uri = Uri.fromFile(getFileDir(context));
         } else {
-            uri = Uri.parse(String.format(SongsURL, highDownloadQuality ? "highest" : "lowest", songId));
+            uri = Uri.parse(String.format(SongsURL, highStreamQuality ? "highest" : "lowest", songId));
         }
 
         return new MediaItem.Builder().setUri(uri).setMediaId(songId).build();

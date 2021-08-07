@@ -12,12 +12,12 @@ public class SongFullRequest extends Request {
     /**
      * Get a full song from the server
      *
-     * @param song                Song
-     * @param highDownloadQuality Quality of song
-     * @param callback            Callback
+     * @param song        Song
+     * @param highQuality Quality of song
+     * @param callback    Callback
      */
-    public SongFullRequest(Song song, boolean highDownloadQuality, Callback callback) {
-        super(String.format("/song/%s/%s.mp3", highDownloadQuality ? "highest" : "lowest", song.getSongId()), callback);
+    public SongFullRequest(Song song, boolean highQuality, Callback callback) {
+        super(String.format("/song/%s/%s.mp3", highQuality ? "highest" : "lowest", song.getSongId()), callback);
         replaceClient(
             new OkHttpClient.Builder()
                 .connectTimeout(5, TimeUnit.MINUTES)
