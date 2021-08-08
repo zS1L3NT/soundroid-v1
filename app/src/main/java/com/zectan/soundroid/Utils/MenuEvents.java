@@ -7,6 +7,7 @@ import android.view.MenuItem;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.zectan.soundroid.Connections.PlaylistDeleteRequest;
@@ -97,6 +98,9 @@ public class MenuEvents {
                 break;
             case MenuBuilder.IMPORT_PLAYLIST:
                 importPlaylist();
+                break;
+            case MenuBuilder.SHOW_LYRICS:
+                showLyrics();
                 break;
             default:
                 break;
@@ -261,7 +265,7 @@ public class MenuEvents {
         mActivity.getPlayingService(service -> service.startPlayable(playable, songs.get(0).getSongId(), mActivity.mMainVM.myUser.getValue().getHighStreamQuality()));
 
         if (mActivity.mMainVM.myUser.getValue().getOpenPlayingScreen()) {
-            mActivity.mNavController.navigate(R.id.fragment_playing);
+            mActivity.mNavController.navigate(R.id.fragment_playing_controls);
         }
     }
 
@@ -314,6 +318,14 @@ public class MenuEvents {
 
     private void importPlaylist() {
         mRunnable.run();
+    }
+
+    private void showLyrics() {
+        Snackbar
+            .make(mActivity.B.parent, "Double click the song cover to show lyrics!", Snackbar.LENGTH_LONG)
+            .setAction(R.string.done, __ -> {
+            })
+            .show();
     }
 
 }

@@ -35,6 +35,7 @@ public class MenuBuilder {
     public static final int DELETE_PLAYLIST = 12;
     public static final int ADD_PLAYLIST = 13;
     public static final int IMPORT_PLAYLIST = 14;
+    public static final int SHOW_LYRICS = 15;
 
     /**
      * Create and display a popup with the menu items you pass it
@@ -267,6 +268,13 @@ public class MenuBuilder {
          */
         public void importPlaylist() {
             mItems.add(new MenuItem(IMPORT_PLAYLIST, "Import Playlist", R.drawable.ic_download));
+        }
+
+        /**
+         * Toast to tell the user how to open lyrics screen
+         */
+        public void showLyrics() {
+            mItems.add(new MenuItem(SHOW_LYRICS, "Show Lyrics", R.drawable.ic_lyrics));
         }
 
     }

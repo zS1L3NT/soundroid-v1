@@ -7,7 +7,7 @@
         android:title="@string/navigation_home" />
 
     <item
-        android:id="@+id/fragment_playing"
+        android:id="@+id/fragment_playing_controls"
         android:icon="@drawable/ic_playing"
         android:title="@string/navigation_playing" />
 

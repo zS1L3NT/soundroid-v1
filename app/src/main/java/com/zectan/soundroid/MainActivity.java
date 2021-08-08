@@ -129,7 +129,7 @@ public class MainActivity extends CrashDebugApplication {
             if (intent.getAction() != null) {
                 switch (intent.getAction()) {
                     case FRAGMENT_PLAYING:
-                        mNavController.navigate(R.id.fragment_playing);
+                        mNavController.navigate(R.id.fragment_playing_controls);
                         break;
                     case FRAGMENT_PLAYLISTS:
                         mNavController.navigate(R.id.fragment_playlists);

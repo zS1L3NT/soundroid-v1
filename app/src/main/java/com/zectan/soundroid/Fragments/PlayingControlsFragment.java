@@ -28,7 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.zectan.soundroid.Adapters.PlayingAdapter;
+import com.zectan.soundroid.Adapters.PlayingControlsAdapter;
 import com.zectan.soundroid.Classes.Fragment;
 import com.zectan.soundroid.Models.Song;
 import com.zectan.soundroid.R;
@@ -36,20 +36,25 @@ import com.zectan.soundroid.Services.PlayingService;
 import com.zectan.soundroid.Utils.Animations;
 import com.zectan.soundroid.Utils.MenuBuilder;
 import com.zectan.soundroid.Utils.Utils;
-import com.zectan.soundroid.databinding.FragmentPlayingBinding;
+import com.zectan.soundroid.databinding.FragmentPlayingControlsBinding;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
 @SuppressLint("UseCompatLoadingForDrawables")
-public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
+public class PlayingControlsFragment extends Fragment<FragmentPlayingControlsBinding> {
     private static final String TAG = "(SounDroid) PlayingFragment";
+    private int mFinalTouch;
+    private ValueAnimator mImageAnimator;
+    private PlayingControlsAdapter mPlayingControlsAdapter;
+    private ItemTouchHelper mItemTouchHelper;
+    private PlayingService mPlayingService;
     private final GestureDetector.SimpleOnGestureListener gestureListener = new GestureDetector.SimpleOnGestureListener() {
         @Override
         public boolean onDoubleTap(MotionEvent e) {
             double relativeX = e.getX() / B.coverImage.getMeasuredWidth();
-            if (relativeX < 0.35) {
+            if (relativeX < 0.25) {
                 // Backward double press
                 B.backward1Icon.setAlpha(0.8f);
                 B.backwardBackground.setAlpha(0.25f);
@@ -60,9 +65,10 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
                 B.backward3Icon.animate().alpha(0f).setStartDelay(450).setDuration(250).start();
                 B.backwardBackground.animate().alpha(0f).setStartDelay(450).setDuration(250).start();
                 mPlayingService.backwardTime(mMainVM.myUser.getValue().getSeekDuration());
+                return true;
             }
 
-            if (relativeX > 0.65) {
+            if (relativeX > 0.75) {
                 // Forward double press
                 B.forward1Icon.setAlpha(0.8f);
                 B.forwardBackground.setAlpha(0.25f);
@@ -73,18 +79,14 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
                 B.forward3Icon.animate().alpha(0f).setStartDelay(450).setDuration(250).start();
                 B.forwardBackground.animate().alpha(0f).setStartDelay(450).setDuration(250).start();
                 mPlayingService.forwardTime(mMainVM.myUser.getValue().getSeekDuration());
+                return true;
             }
 
-            return super.onDoubleTap(e);
+            mNavController.navigate(PlayingControlsFragmentDirections.openLyrics());
+            return true;
         }
     };
-    private int mFinalTouch;
-    private ValueAnimator mImageAnimator;
-    private PlayingAdapter mPlayingAdapter;
-    private ItemTouchHelper mItemTouchHelper;
-    private PlayingService mPlayingService;
-    private int mImageColor;
-    private final PlayingAdapter.Callback callback = new PlayingAdapter.Callback() {
+    private final PlayingControlsAdapter.Callback callback = new PlayingControlsAdapter.Callback() {
         @Override
         public void onSongClicked(Song song) {
             mPlayingService.changeSong(song.getSongId());
@@ -138,9 +140,10 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
             mPlayingService.touchingSeekbar.setValue(false);
         }
     };
+    private int mImageColor;
     private GestureDetectorCompat mGestureDetector;
 
-    public PlayingFragment() {
+    public PlayingControlsFragment() {
         super(FLAG_TRANSPARENT_STATUS);
     }
 
@@ -148,14 +151,14 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
     @Nullable
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        B = FragmentPlayingBinding.inflate(inflater, container, false);
+        B = FragmentPlayingControlsBinding.inflate(inflater, container, false);
         super.onCreateView(inflater, container, savedInstanceState);
 
         // Recycler Views
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mActivity);
-        mPlayingAdapter = new PlayingAdapter(callback);
-        mItemTouchHelper = new ItemTouchHelper(new PlayingAdapter.PlayingItemTouchHelper(mPlayingAdapter));
-        B.recyclerView.setAdapter(mPlayingAdapter);
+        mPlayingControlsAdapter = new PlayingControlsAdapter(callback);
+        mItemTouchHelper = new ItemTouchHelper(new PlayingControlsAdapter.PlayingItemTouchHelper(mPlayingControlsAdapter));
+        B.recyclerView.setAdapter(mPlayingControlsAdapter);
         B.recyclerView.setLayoutManager(layoutManager);
         mItemTouchHelper.attachToRecyclerView(B.recyclerView);
 
@@ -168,7 +171,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         mGestureDetector = new GestureDetectorCompat(getContext(), gestureListener);
 
         // Listeners
-        mPlayingService.queue.observe(this, mPlayingAdapter::updateSongs);
+        mPlayingService.queue.observe(this, mPlayingControlsAdapter::updateSongs);
         mPlayingService.currentSong.observe(this, this::onCurrentSongChange);
         mPlayingService.time.observe(this, this::onTimeChange);
         mPlayingService.buffered.observe(this, B.seekbar::setSecondaryProgress);
@@ -263,6 +266,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
         MenuBuilder.MenuItems items = new MenuBuilder.MenuItems();
         items.addToPlaylist();
         items.openQueue();
+        items.showLyrics();
         items.clearQueue();
         MenuBuilder.createMenu(view, items, mPlayingService.currentSong.getValue(), (song, item) -> mActivity.handleMenuItemClick(null, song, item, B.parent::transitionToEnd));
     }
@@ -272,7 +276,7 @@ public class PlayingFragment extends Fragment<FragmentPlayingBinding> {
 
         if (song == null) {
             // Song is null, set it to the default
-            mPlayingAdapter.updateSongs(new ArrayList<>());
+            mPlayingControlsAdapter.updateSongs(new ArrayList<>());
             B.playlistNameText.setText("-");
             B.coverImage.setImageResource(R.drawable.playing_cover_loading);
             B.titleText.setText("-");

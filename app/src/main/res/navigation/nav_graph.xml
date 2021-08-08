@@ -27,7 +27,7 @@
             app:popExitAnim="@anim/fade_out" />
         <action
             android:id="@+id/open_playing"
-            app:destination="@id/fragment_playing"
+            app:destination="@id/fragment_playing_controls"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -71,10 +71,17 @@
             app:popUpTo="@id/fragment_playlists"/>
     </fragment>
     <fragment
-        android:id="@+id/fragment_playing"
-        android:name="com.zectan.soundroid.Fragments.PlayingFragment"
-        android:label="fragment_playing"
-        tools:layout="@layout/fragment_playing">
+        android:id="@+id/fragment_playing_controls"
+        android:name="com.zectan.soundroid.Fragments.PlayingControlsFragment"
+        android:label="fragment_playing_controls"
+        tools:layout="@layout/fragment_playing_controls">
+        <action
+            android:id="@+id/open_lyrics"
+            app:destination="@id/fragment_playing_lyrics"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/fragment_search"
@@ -83,7 +90,7 @@
         tools:layout="@layout/fragment_search">
         <action
             android:id="@+id/open_playing"
-            app:destination="@id/fragment_playing"
+            app:destination="@id/fragment_playing_controls"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -121,7 +128,7 @@
             app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/open_playing"
-            app:destination="@id/fragment_playing"
+            app:destination="@id/fragment_playing_controls"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -149,4 +156,16 @@
         android:id="@+id/fragment_playlist_import"
         android:name="com.zectan.soundroid.Fragments.PlaylistImportFragment"
         android:label="fragment_playlist_import" />
+    <fragment
+        android:id="@+id/fragment_playing_lyrics"
+        android:name="com.zectan.soundroid.Fragments.PlayingLyricsFragment"
+        android:label="PlayingLyricsFragment">
+        <action
+            android:id="@+id/open_controls"
+            app:destination="@id/fragment_playing_controls"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
 </navigation>

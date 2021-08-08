@@ -8,7 +8,7 @@
     android:background="@drawable/playing_background"
     android:fitsSystemWindows="true"
     app:layoutDescription="@xml/fragment_playing_scene"
-    tools:context=".Fragments.PlayingFragment">
+    tools:context=".Fragments.PlayingControlsFragment">
 
     <ImageView
         android:id="@+id/back_navigate_image"

@@ -25,11 +25,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PlayingAdapter extends RecyclerView.Adapter<PlayingViewHolder> implements ItemTouchHelperAdapter {
+public class PlayingControlsAdapter extends RecyclerView.Adapter<PlayingControlsViewHolder> implements ItemTouchHelperAdapter {
     private final Callback mCallback;
     private final List<Song> mSongs;
 
-    public PlayingAdapter(Callback callback) {
+    public PlayingControlsAdapter(Callback callback) {
         mCallback = callback;
         mSongs = new ArrayList<>();
     }
@@ -37,12 +37,12 @@ public class PlayingAdapter extends RecyclerView.Adapter<PlayingViewHolder> impl
     @NonNull
     @NotNull
     @Override
-    public PlayingViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+    public PlayingControlsViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater
             .from(parent.getContext())
             .inflate(R.layout.song_reorder_list_item, parent, false);
 
-        return new PlayingViewHolder(itemView, mCallback);
+        return new PlayingControlsViewHolder(itemView, mCallback);
     }
 
     public void updateSongs(List<Song> songs) {
@@ -56,7 +56,7 @@ public class PlayingAdapter extends RecyclerView.Adapter<PlayingViewHolder> impl
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull PlayingViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull @NotNull PlayingControlsViewHolder holder, int position) {
         holder.bind(mSongs.get(position));
     }
 
@@ -134,11 +134,11 @@ public class PlayingAdapter extends RecyclerView.Adapter<PlayingViewHolder> impl
     }
 }
 
-class PlayingViewHolder extends RecyclerView.ViewHolder {
+class PlayingControlsViewHolder extends RecyclerView.ViewHolder {
     public final SongReorderListItemBinding B;
-    private final PlayingAdapter.Callback mCallback;
+    private final PlayingControlsAdapter.Callback mCallback;
 
-    public PlayingViewHolder(@NotNull View itemView, PlayingAdapter.Callback callback) {
+    public PlayingControlsViewHolder(@NotNull View itemView, PlayingControlsAdapter.Callback callback) {
         super(itemView);
         B = SongReorderListItemBinding.bind(itemView);
         mCallback = callback;

@@ -33,6 +33,7 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.zectan.soundroid.Classes.Interval;
 import com.zectan.soundroid.Classes.StrictLiveData;
+import com.zectan.soundroid.Connections.SongLyricsRequest;
 import com.zectan.soundroid.MainActivity;
 import com.zectan.soundroid.Models.Playable;
 import com.zectan.soundroid.Models.Song;
@@ -43,6 +44,8 @@ import com.zectan.soundroid.Utils.Utils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -55,8 +58,6 @@ public class PlayingService extends Service {
     private static final String NEXT = "NEXT";
     private static final String START_AGAIN = "START_AGAIN";
     private final IBinder mBinder = new PlayingService.PlayingBinder();
-    private Context mContext;
-
     public final StrictLiveData<Playable> playable = new StrictLiveData<>(Playable.getEmpty());
     public final StrictLiveData<Song> currentSong = new StrictLiveData<>(Song.getEmpty());
     public final StrictLiveData<Integer> time = new StrictLiveData<>(0);
@@ -70,10 +71,11 @@ public class PlayingService extends Service {
     public final StrictLiveData<String> error = new StrictLiveData<>("");
     public final StrictLiveData<Boolean> touchingSeekbar = new StrictLiveData<>(false);
     public final StrictLiveData<List<Song>> queue = new StrictLiveData<>(new ArrayList<>());
+    public final StrictLiveData<List<String>> lyrics = new StrictLiveData<>(new ArrayList<>());
     public final MutableLiveData<GradientDrawable> background = new MutableLiveData<>();
-
     public PlayingService.TimeInterval mTimeInterval;
     public PlayingService.ProgressInterval mProgressInterval;
+    private Context mContext;
     private NotificationManager mNotificationManager;
     private NotificationCompat.Builder mNotificationBuilder;
     private MusicIntentReceiver mMusicIntentReceiver;
@@ -502,7 +504,8 @@ public class PlayingService extends Service {
 
         time.setValue(0);
         progress.setValue(0);
-        duration.postValue(0);
+        duration.setValue(0);
+        lyrics.setValue(new ArrayList<>());
 
         if (mediaItem != null) {
             // Songs with the media id
@@ -538,6 +541,24 @@ public class PlayingService extends Service {
                             mNotificationManager.notify(mNotificationID, mNotificationBuilder.build());
                         }
                     });
+
+                try {
+                    String query = URLEncoder.encode(String.format("%s %s", song.getTitle(), song.getArtiste()), String.valueOf(StandardCharsets.UTF_8));
+                    new SongLyricsRequest(query, new SongLyricsRequest.Callback() {
+                        @Override
+                        public void onComplete(List<String> lyrics) {
+                            if (currentSong.getValue().getSongId().equals(song.getSongId())) {
+                                PlayingService.this.lyrics.postValue(lyrics);
+                            }
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            Log.e(TAG, message);
+                        }
+                    });
+                } catch (Exception ignore) {
+                }
 
                 // If song is not export, start the timer again
                 if (!song.equals(Song.getEmpty())) {
