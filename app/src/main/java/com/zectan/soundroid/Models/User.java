@@ -109,6 +109,7 @@ public class User {
         object.put("openPlayingScreen", openPlayingScreen);
         object.put("highDownloadQuality", highDownloadQuality);
         object.put("highStreamQuality", highStreamQuality);
+        object.put("seekDuration", seekDuration);
         object.put("theme", theme);
         return object;
     }
