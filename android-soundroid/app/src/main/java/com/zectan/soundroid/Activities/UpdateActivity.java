@@ -8,6 +8,7 @@ import android.view.View;
 
 import com.zectan.soundroid.BuildConfig;
 import com.zectan.soundroid.Classes.CrashDebugApplication;
+import com.zectan.soundroid.Env;
 import com.zectan.soundroid.R;
 import com.zectan.soundroid.databinding.ActivityUpdateBinding;
 
@@ -28,7 +29,7 @@ public class UpdateActivity extends CrashDebugApplication {
     private void onOpenWebsiteClicked(View view) {
         Intent browserIntent = new Intent(
             Intent.ACTION_VIEW,
-            Uri.parse("http://soundroid.zectan.com")
+            Uri.parse(Env.API_URL)
         );
         startActivity(browserIntent);
     }

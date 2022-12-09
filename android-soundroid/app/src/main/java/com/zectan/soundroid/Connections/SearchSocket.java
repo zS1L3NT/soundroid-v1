@@ -2,6 +2,7 @@ package com.zectan.soundroid.Connections;
 
 import android.util.Log;
 
+import com.zectan.soundroid.Env;
 import com.zectan.soundroid.Models.SearchResult;
 
 import org.json.JSONArray;
@@ -17,7 +18,7 @@ import io.socket.client.Socket;
 
 public class SearchSocket {
     private static final String TAG = "(SounDroid) SearchSocket";
-    private static final String SocketURL = "http://soundroid.zectan.com/";
+    private static final String SocketURL = Env.API_URL;
     private final Callback mCallback;
     private final Socket mSocket;
 

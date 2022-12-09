@@ -1,5 +1,7 @@
 package com.zectan.soundroid.Classes;
 
+import com.zectan.soundroid.Env;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,7 +26,7 @@ public abstract class Request {
      * @param callback Callback
      */
     public Request(String URL, Callback callback) {
-        mURL = "http://soundroid.zectan.com" + URL;
+        mURL = Env.API_URL + URL;
         mJSON = MediaType.parse("application/json; charset=utf-8");
         mObject = new JSONObject();
         mClient = new OkHttpClient();

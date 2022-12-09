@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.google.android.exoplayer2.MediaItem;
+import com.zectan.soundroid.Env;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class Song {
     private static final String TAG = "(SounDroid) Song";
-    private static final String SongsURL = "http://soundroid.zectan.com/play/%s/%s.mp3";
+    private static final String SongsURL = Env.API_URL + "/play/%s/%s.mp3";
     private String songId;
     private String title;
     private String artiste;

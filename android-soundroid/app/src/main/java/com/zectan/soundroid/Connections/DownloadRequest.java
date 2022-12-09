@@ -3,6 +3,7 @@ package com.zectan.soundroid.Connections;
 import android.content.Context;
 import android.util.Log;
 
+import com.zectan.soundroid.Env;
 import com.zectan.soundroid.Models.Song;
 
 import java.io.BufferedInputStream;
@@ -15,7 +16,7 @@ import java.net.URLConnection;
 
 public class DownloadRequest {
     private static final String TAG = "(SounDroid) SongDownloadTask";
-    private static final String URL = "http://soundroid.zectan.com/song/%s/%s.mp3";
+    private static final String URL = Env.API_URL + "/song/%s/%s.mp3";
 
     /**
      * Downloads a file from the internet, downloads byte by byte.
