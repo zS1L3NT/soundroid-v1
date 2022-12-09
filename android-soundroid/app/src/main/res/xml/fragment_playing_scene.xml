@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ConstraintSet android:id="@+id/start">
+        <Constraint android:id="@+id/back_navigate_image">
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="true" />
+        </Constraint>
+        <Constraint android:id="@+id/more_image">
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="true" />
+        </Constraint>
+        <Constraint android:id="@id/loading_circle">
+            <Transform android:elevation="6dp" />
+        </Constraint>
+        <Constraint android:id="@+id/shuffle_image">
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="true" />
+        </Constraint>
+        <Constraint android:id="@+id/back_image">
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="true" />
+        </Constraint>
+        <Constraint android:id="@+id/play_pause_image">
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="true" />
+        </Constraint>
+        <Constraint android:id="@+id/play_pause_mini_image">
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="false" />
+        </Constraint>
+        <Constraint android:id="@+id/next_image">
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="true" />
+        </Constraint>
+        <Constraint android:id="@+id/loop_image">
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="true" />
+        </Constraint>
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint android:id="@+id/back_navigate_image">
+            <Layout
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <PropertySet android:alpha="0" />
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="false" />
+        </Constraint>
+        <Constraint android:id="@+id/playing_from_text">
+            <Layout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <PropertySet android:alpha="0" />
+        </Constraint>
+        <Constraint android:id="@+id/playlist_name_text">
+            <Layout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="@+id/playing_from_text"
+                app:layout_constraintStart_toStartOf="@+id/playing_from_text"
+                app:layout_constraintTop_toBottomOf="@+id/playing_from_text" />
+            <PropertySet android:alpha="0" />
+        </Constraint>
+        <Constraint android:id="@+id/more_image">
+            <Layout
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <PropertySet android:alpha="0" />
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="false" />
+        </Constraint>
+        <Constraint android:id="@+id/cover_image">
+            <Layout
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </Constraint>
+        <Constraint android:id="@id/backward_wrapper">
+            <Layout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginStart="36dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </Constraint>
+        <Constraint android:id="@id/forward_wrapper">
+            <Layout
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginEnd="36dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </Constraint>
+        <Constraint android:id="@+id/error_text">
+            <Layout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <Transform
+                android:scaleX="0"
+                android:scaleY="0" />
+        </Constraint>
+        <Constraint android:id="@+id/retry_text">
+            <Transform
+                android:scaleX="0"
+                android:scaleY="0" />
+        </Constraint>
+        <Constraint android:id="@+id/title_text">
+            <Layout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@+id/description_text"
+                app:layout_constraintEnd_toEndOf="@+id/description_text"
+                app:layout_constraintStart_toStartOf="@+id/description_text"
+                app:layout_constraintTop_toTopOf="@id/cover_image" />
+            <Transform
+                android:scaleX="0.8"
+                android:scaleY="0.8" />
+        </Constraint>
+        <Constraint android:id="@+id/description_text">
+            <Layout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="0dp"
+                app:layout_constraintBottom_toBottomOf="@id/cover_image"
+                app:layout_constraintEnd_toStartOf="@+id/play_pause_mini_image"
+                app:layout_constraintStart_toStartOf="@id/cover_image"
+                app:layout_constraintTop_toBottomOf="@+id/title_text" />
+            <Transform
+                android:scaleX="0.8"
+                android:scaleY="0.8" />
+        </Constraint>
+        <Constraint android:id="@+id/loading_circle">
+            <Layout
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                app:layout_constraintBottom_toBottomOf="@id/cover_image"
+                app:layout_constraintEnd_toEndOf="@id/cover_image"
+                app:layout_constraintStart_toStartOf="@id/cover_image"
+                app:layout_constraintTop_toTopOf="@id/cover_image" />
+            <Transform android:elevation="6dp" />
+        </Constraint>
+        <Constraint android:id="@+id/shuffle_image">
+            <Layout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="24dp"
+                app:layout_constraintBottom_toBottomOf="@+id/back_image"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/back_image" />
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="false" />
+        </Constraint>
+        <Constraint android:id="@+id/back_image">
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="false" />
+        </Constraint>
+        <Constraint android:id="@+id/play_pause_image">
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="false" />
+        </Constraint>
+        <Constraint android:id="@+id/play_pause_mini_image">
+            <Layout
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginRight="20dp"
+                app:layout_constraintBottom_toBottomOf="@id/cover_image"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/cover_image" />
+            <PropertySet android:alpha="1" />
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="true" />
+        </Constraint>
+        <Constraint android:id="@+id/next_image">
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="false" />
+        </Constraint>
+        <Constraint android:id="@+id/loop_image">
+            <CustomAttribute
+                app:attributeName="enabled"
+                app:customBoolean="false" />
+        </Constraint>
+        <Constraint android:id="@+id/recycler_view">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="82dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </Constraint>
+    </ConstraintSet>
+
+    <Transition
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@+id/start">
+        <OnSwipe
+            app:maxAcceleration="10"
+            app:touchAnchorId="@+id/queue_pill" />
+        <KeyFrameSet>
+            <KeyPosition
+                app:framePosition="15"
+                app:motionTarget="@id/cover_image"
+                app:percentHeight="0"
+                app:percentWidth="0"
+                app:percentX="0"
+                app:percentY="0" />
+            <KeyPosition
+                app:framePosition="15"
+                app:motionTarget="@id/title_text"
+                app:percentHeight="0"
+                app:percentWidth="0"
+                app:percentX="0"
+                app:percentY="0" />
+            <KeyPosition
+                app:framePosition="15"
+                app:motionTarget="@id/description_text"
+                app:percentHeight="0"
+                app:percentWidth="0"
+                app:percentX="0"
+                app:percentY="0" />
+            <KeyPosition
+                app:framePosition="15"
+                app:motionTarget="@id/loading_circle"
+                app:percentHeight="0"
+                app:percentWidth="0"
+                app:percentX="0"
+                app:percentY="0" />
+            <KeyPosition
+                app:framePosition="15"
+                app:motionTarget="@id/play_pause_mini_image"
+                app:percentHeight="0"
+                app:percentWidth="0"
+                app:percentX="0"
+                app:percentY="0" />
+
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/seekbar" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/time_text" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/duration_text" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/shuffle_image" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/back_image" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/play_pause_image" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/next_image" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="20"
+                app:motionTarget="@id/loop_image" />
+
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="25"
+                app:motionTarget="@id/playing_from_text" />
+            <KeyPosition
+                app:framePosition="25"
+                app:motionTarget="@id/playing_from_text"
+                app:percentHeight="1"
+                app:percentWidth="1"
+                app:percentX="1"
+                app:percentY="1" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="25"
+                app:motionTarget="@id/playlist_name_text" />
+            <KeyPosition
+                app:framePosition="25"
+                app:motionTarget="@id/playlist_name_text"
+                app:percentHeight="1"
+                app:percentWidth="1"
+                app:percentX="1"
+                app:percentY="1" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="25"
+                app:motionTarget="@id/back_navigate_image" />
+            <KeyPosition
+                app:framePosition="25"
+                app:motionTarget="@id/back_navigate_image"
+                app:percentHeight="1"
+                app:percentWidth="1"
+                app:percentX="1"
+                app:percentY="1" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="25"
+                app:motionTarget="@id/more_image" />
+            <KeyPosition
+                app:framePosition="25"
+                app:motionTarget="@id/more_image"
+                app:percentHeight="1"
+                app:percentWidth="1"
+                app:percentX="1"
+                app:percentY="1" />
+
+            <KeyPosition
+                app:framePosition="50"
+                app:motionTarget="@id/cover_image"
+                app:percentX="0"
+                app:percentY="0.75" />
+            <KeyPosition
+                app:framePosition="50"
+                app:motionTarget="@id/title_text"
+                app:percentX="0"
+                app:percentY="0.6" />
+            <KeyPosition
+                app:framePosition="50"
+                app:motionTarget="@id/description_text"
+                app:percentX="0"
+                app:percentY="0.8" />
+            <KeyPosition
+                app:framePosition="50"
+                app:motionTarget="@id/loading_circle"
+                app:percentX="0"
+                app:percentY="0.75" />
+            <KeyPosition
+                app:framePosition="50"
+                app:motionTarget="@id/play_pause_mini_image"
+                app:percentX="1"
+                app:percentY="0.75" />
+        </KeyFrameSet>
+    </Transition>
+</MotionScene>

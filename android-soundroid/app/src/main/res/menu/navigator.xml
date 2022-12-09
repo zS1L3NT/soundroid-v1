@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/fragment_home"
+        android:icon="@drawable/ic_home"
+        android:title="@string/navigation_home" />
+
+    <item
+        android:id="@+id/fragment_playing_controls"
+        android:icon="@drawable/ic_playing"
+        android:title="@string/navigation_playing" />
+
+    <item
+        android:id="@+id/fragment_playlists"
+        android:icon="@drawable/ic_playlists"
+        android:title="@string/navigation_playlist" />
+
+</menu>

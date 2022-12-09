@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zectan.soundroid.Classes.SavingMotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    app:layoutDescription="@xml/fragment_playlist_view_scene"
+    tools:context=".Fragments.PlaylistViewFragment">
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="1dp">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <View
+        android:id="@+id/toolbar_background"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:background="?attr/colorPrimary"
+        android:elevation="-2dp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="?attr/backgroundColor"
+        android:elevation="-1dp"
+        app:layout_constraintBottom_toTopOf="@id/break_line"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/back_image"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/back"
+        android:elevation="1dp"
+        android:padding="5dp"
+        android:src="@drawable/ic_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
+
+    <TextView
+        android:id="@+id/more_image"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="11dp"
+        android:layout_marginEnd="10dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:elevation="1dp"
+        android:gravity="center"
+        android:text="@string/menu_special_string"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/cover_image"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_marginTop="40dp"
+        android:contentDescription="@string/playlist_cover"
+        android:src="@drawable/playing_cover_loading"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/back_image"
+        app:shapeAppearanceOverlay="@style/shapeableImageViewStyle" />
+
+    <TextView
+        android:id="@+id/name_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:elevation="1dp"
+        android:ellipsize="end"
+        android:fontFamily="@font/carme"
+        android:maxLines="1"
+        android:text="@string/Nil"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/recycler_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cover_image" />
+
+    <View
+        android:id="@+id/break_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:alpha="0"
+        android:elevation="1dp"
+        app:layout_constraintBottom_toTopOf="@id/recycler_view" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:elevation="1dp"
+        android:layoutAnimation="@anim/songs_recycler_animation"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/name_text"
+        tools:listitem="@layout/song_list_item" />
+
+</com.zectan.soundroid.Classes.SavingMotionLayout>

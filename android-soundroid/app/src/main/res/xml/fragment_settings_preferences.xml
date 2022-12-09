@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.zectan.soundroid.Classes.PreferenceCategory app:title="Playing">
+
+        <SwitchPreferenceCompat
+            app:key="open_playing_screen"
+            app:summary="Open the playing screen whenever you click on a song"
+            app:title="Open Playing Screen" />
+
+        <ListPreference
+            app:entries="@array/seek_durations"
+            app:entryValues="@array/seek_durations"
+            app:key="seek_duration"
+            app:summary="Number of seconds the song seeks when you double tap the cover"
+            app:title="Seek Duration" />
+
+    </com.zectan.soundroid.Classes.PreferenceCategory>
+
+    <com.zectan.soundroid.Classes.PreferenceCategory app:title="Audio Quality">
+
+        <SwitchPreferenceCompat
+            app:key="high_download_quality"
+            app:summary="High song download quality, uses more bandwidth"
+            app:title="High Download Quality" />
+
+        <SwitchPreferenceCompat
+            app:key="high_stream_quality"
+            app:summary="High song stream quality, uses more bandwidth"
+            app:title="High Stream Quality" />
+
+    </com.zectan.soundroid.Classes.PreferenceCategory>
+
+    <com.zectan.soundroid.Classes.PreferenceCategory app:title="Others">
+
+        <ListPreference
+            app:key="theme"
+            app:summary=""
+            app:title="Theme"
+            app:entries="@array/themes"
+            app:entryValues="@array/themes" />
+
+        <Preference
+            app:key="clear_all_downloads"
+            app:summary="Clear all downloads from all playlists"
+            app:title="Clear All Downloads" />
+
+        <Preference
+            app:key="throw_error"
+            app:summary="Show an error so that you will be taken to the error preview screen"
+            app:title="Show an error" />
+
+    </com.zectan.soundroid.Classes.PreferenceCategory>
+
+</PreferenceScreen>

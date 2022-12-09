@@ -1,0 +1,17 @@
+<resources>
+    <style name="Theme.SounDroid" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowActivityTransitions">true</item>
+
+        <item name="colorPrimary">#546E7A</item>
+        <item name="colorSecondary">#36393F</item>
+        <item name="backgroundColor">#EEEEEE</item>
+        <item name="colorOnBackground">#737373</item>
+        <item name="cardBackgroundColor">#FAFAFA</item>
+        <item name="colorControlHighlight">#DBDBDB</item>
+        <item name="colorControlActivated">@color/gold</item>
+        <item name="colorControlNormal">@color/gold</item>
+        <item name="navigationIconTint">#737373</item>
+        <item name="statusBarBackground">#485963</item>
+    </style>
+</resources>

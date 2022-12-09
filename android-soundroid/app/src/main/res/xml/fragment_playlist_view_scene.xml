@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ConstraintSet android:id="@+id/start">
+        <Constraint android:id="@+id/name_text">
+            <CustomAttribute
+                app:attributeName="textColor"
+                app:customColorValue="?attr/colorOnBackground" />
+        </Constraint>
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint android:id="@+id/cover_image">
+            <Layout
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <PropertySet android:alpha="0" />
+            <Transform android:elevation="-1dp" />
+        </Constraint>
+        <Constraint android:id="@+id/name_text">
+            <Layout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                app:layout_constraintBottom_toBottomOf="@+id/back_image"
+                app:layout_constraintEnd_toStartOf="@id/more_image"
+                app:layout_constraintStart_toEndOf="@id/back_image"
+                app:layout_constraintTop_toTopOf="@id/back_image" />
+            <CustomAttribute
+                app:attributeName="textColor"
+                app:customColorValue="@color/white" />
+        </Constraint>
+        <Constraint android:id="@+id/break_line">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                app:layout_constraintBottom_toTopOf="@id/recycler_view" />
+        </Constraint>
+        <Constraint android:id="@+id/recycler_view">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar_background" />
+        </Constraint>
+        <Constraint android:id="@+id/background">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+            <PropertySet android:alpha="0" />
+        </Constraint>
+    </ConstraintSet>
+
+    <Transition
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@+id/start">
+        <OnSwipe app:touchAnchorId="@+id/recycler_view" />
+        <KeyFrameSet>
+            <KeyPosition
+                app:framePosition="30"
+                app:motionTarget="@id/cover_image"
+                app:percentHeight="0.4"
+                app:percentWidth="0.4"
+                app:percentX="0"
+                app:percentY="0.25" />
+            <KeyAttribute
+                android:alpha="1"
+                app:framePosition="30"
+                app:motionTarget="@id/cover_image" />
+
+            <KeyPosition
+                app:framePosition="50"
+                app:motionTarget="@id/name_text"
+                app:percentX="0"
+                app:percentY="0.75" />
+
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="60"
+                app:motionTarget="@id/cover_image" />
+
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="75"
+                app:motionTarget="@id/break_line" />
+
+            <KeyPosition
+                app:framePosition="99"
+                app:motionTarget="@id/cover_image"
+                app:percentHeight="0.4"
+                app:percentWidth="0.4"
+                app:percentX="0"
+                app:percentY="1" />
+        </KeyFrameSet>
+    </Transition>
+</MotionScene>

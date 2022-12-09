@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    android:label="fragment"
+    app:startDestination="@id/fragment_home">
+
+    <fragment
+        android:id="@+id/fragment_home"
+        android:name="com.zectan.soundroid.Fragments.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/open_search"
+            app:destination="@id/fragment_search"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/open_settings"
+            app:destination="@id/fragment_settings"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/open_playing"
+            app:destination="@id/fragment_playing_controls"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/open_edit_song"
+            app:destination="@id/fragment_edit_song"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_playlists"
+        android:name="com.zectan.soundroid.Fragments.PlaylistsFragment"
+        android:label="fragment_playlist"
+        tools:layout="@layout/fragment_playlists">
+        <action
+            android:id="@+id/open_playlist_view"
+            app:destination="@id/fragment_playlist_view"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out"
+            app:popUpTo="@id/fragment_playlists" />
+        <action
+            android:id="@+id/open_playlist_edit"
+            app:destination="@id/fragment_playlist_edit"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out"
+            app:popUpTo="@id/fragment_playlists" />
+        <action
+            android:id="@+id/open_playlist_import"
+            app:destination="@id/fragment_playlist_import"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out"
+            app:popUpTo="@id/fragment_playlists"/>
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_playing_controls"
+        android:name="com.zectan.soundroid.Fragments.PlayingControlsFragment"
+        android:label="fragment_playing_controls"
+        tools:layout="@layout/fragment_playing_controls">
+        <action
+            android:id="@+id/open_lyrics"
+            app:destination="@id/fragment_playing_lyrics"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_search"
+        android:name="com.zectan.soundroid.Fragments.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/open_playing"
+            app:destination="@id/fragment_playing_controls"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/open_playlist_view"
+            app:destination="@id/fragment_playlist_view"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_settings"
+        android:name="com.zectan.soundroid.Fragments.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/fragment_playlist_edit"
+        android:name="com.zectan.soundroid.Fragments.PlaylistEditFragment"
+        android:label="fragment_playlist_edit"
+        tools:layout="@layout/fragment_playlist_edit">
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_playlist_view"
+        android:name="com.zectan.soundroid.Fragments.PlaylistViewFragment"
+        android:label="fragment_playlist_view"
+        tools:layout="@layout/fragment_playlist_view">
+        <action
+            android:id="@+id/open_playlist_edit"
+            app:destination="@id/fragment_playlist_edit"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/open_playing"
+            app:destination="@id/fragment_playing_controls"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+        <action
+            android:id="@+id/open_edit_song"
+            app:destination="@id/fragment_edit_song"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/open_playlists"
+            app:destination="@id/fragment_playlists"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_edit_song"
+        android:name="com.zectan.soundroid.Fragments.SongEditFragment"
+        android:label="fragment_edit_song" />
+    <fragment
+        android:id="@+id/fragment_playlist_import"
+        android:name="com.zectan.soundroid.Fragments.PlaylistImportFragment"
+        android:label="fragment_playlist_import" />
+    <fragment
+        android:id="@+id/fragment_playing_lyrics"
+        android:name="com.zectan.soundroid.Fragments.PlayingLyricsFragment"
+        android:label="PlayingLyricsFragment">
+        <action
+            android:id="@+id/open_controls"
+            app:destination="@id/fragment_playing_controls"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+</navigation>

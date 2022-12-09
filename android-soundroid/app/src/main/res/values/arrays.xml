@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="themes">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>System</item>
+    </string-array>
+    <string-array name="seek_durations">
+        <item>1</item>
+        <item>3</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+    </string-array>
+</resources>
