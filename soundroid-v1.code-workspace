@@ -1,0 +1,14 @@
+{
+    "folders": [
+        {
+            "path": "web-express-soundroid-v1"
+        },
+        {
+            "path": "android-soundroid"
+        },
+        {
+            "path": "."
+        }
+    ],
+    "settings": {}
+}
