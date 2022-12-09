@@ -10,5 +10,16 @@
             "path": "."
         }
     ],
-    "settings": {}
+    "settings": {
+        "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/Thumbs.db": true,
+            "android-soundroid": true,
+            "web-express-soundroid-v1": true
+        }
+    }
 }
